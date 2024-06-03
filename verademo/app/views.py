@@ -30,7 +30,7 @@ def finish_register(request):
 def home(request):
     # Equivalent of HomeController.java
     # TODO: Check if user is already logged in.
-    #   If so, redirect to user's feed
+    #       If so, redirect to user's feed
     # if request.user.is_authenticated:
         # return redirect('feed')
     # else:
@@ -75,7 +75,7 @@ def login(request):
         else:
             return redirect('feed')
 
-    return render(request, 'app/login.html', {})
+    return render(request, 'app/login.html', { "username": username, "target": target })
 
 '''
 Interprets POST request from register form, adds user to database
