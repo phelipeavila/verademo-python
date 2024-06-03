@@ -2,8 +2,9 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpRequest
 import logging
 import base64
-
 from django.views.generic import TemplateView
+
+from .forms import UserForm
 
 # Get logger
 logger = logging.getLogger(__name__)
@@ -11,6 +12,9 @@ logger = logging.getLogger(__name__)
 # Deals with HTTP request/response
 def say_hello(request):
     return HttpResponse('hello')
+
+def register(request):
+    return render(request, 'app/register.html', {})
 
 def home(request):
     # Equivalent of HomeController.java
@@ -47,7 +51,20 @@ def login(request):
     logger.info("User details were remembered")
     unencodedUserDetails = userDetailsCookie.decode('ascii')
 
-
-    
-        
     return render(request, 'app/login.html', {})
+
+def user_create_view(request):
+    form = UserForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        print('help?')
+    context = {
+        'form': form
+    }
+    print("help")
+    return render (request, 'app/login.html')
+
+class LoginView(TemplateView):
+    template_name = 'app/login.html'
+    extra_context = {}
+
