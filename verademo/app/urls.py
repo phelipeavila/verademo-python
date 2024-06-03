@@ -10,5 +10,5 @@ urlpatterns = [
     path('register', views.register),
     path('reg-return', views.user_create_view),
     path('hello/',views.say_hello),
-   # path('register/', views.register),
+    path('register/', views.register),
 ]
