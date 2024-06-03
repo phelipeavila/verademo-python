@@ -4,6 +4,11 @@ from django.db import models
 class User(models.Model):
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
+    hint = models.CharField(max_length=100, null=True)
+    dateCreated = models.DateField(null=True)
+    lastLogin = models.DateField(null=True)
+    blabName=models.CharField(max_length=100, null=True)
+    realName=models.CharField(max_length=100, null=True)
     
 class Blab(models.Model):
     content = models.TextField(max_length=1000)
