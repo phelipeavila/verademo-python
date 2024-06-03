@@ -41,15 +41,28 @@ def login(request):
 
     # TODO: Use cookies to remember users
     userDetailsCookie = request.COOKIES.get('user')
-    if userDetailsCookie is None:
+    if userDetailsCookie is None or not userDetailsCookie:
         logger.info("No user cookie")
         userDetailsCookie = None
-    if not userDetailsCookie:
-        logger.info("User cookie is empty")
-        userDetailsCookie = None
+        if username is None:
+            username = ''
+        if target is None:
+            target = ''
+        logger.info("Entering login with username " + username + " and target " + target)
+        
+        # TODO: Add username and target to login
 
-    logger.info("User details were remembered")
-    unencodedUserDetails = userDetailsCookie.decode('ascii')
+    else:
+        logger.info("User details were remembered")
+        unencodedUserDetails = userDetailsCookie.decode('ascii')
+        logger.info("User details were retrieved for user: " + unencodedUserDetails.UserName)
+        
+        # TODO: Set username for session
+
+        if (target != None) and (target) and (not target == "null"):
+            return redirect('target')
+        else:
+            return redirect('feed')
 
     return render(request, 'app/login.html', {})
 
