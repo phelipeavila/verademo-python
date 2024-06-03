@@ -25,6 +25,7 @@
 </head>
 
 <body role="document">
+
     <div class="container">
 
 		<div class="header clearfix">
@@ -47,24 +48,13 @@
     <div class="container theme-showcase" role="main">
 
         <div class="page-header">
-            <h4><%= request.getAttribute("blab_name") %> says...</h4>
+            <h4>= {{ getattr(blabName) }} says...</h4>
         </div>
         <div>
             <blockquote>
-                <h3><%= request.getAttribute("content") %></h3>
+                <h3>= {{ getattr(content) }} </h3>
             </blockquote>
         </div>
-        <%
-            String error = (String) request.getAttribute("error");
-            if (error != null) {
-                %>
-                <div class="alert alert-danger" role="alert">
-                    <%=error%>
-                </div>
-                <%
-                    }
-                %>
-
                 <div class="row">
                     <div class="col-md-6">
                         <div class="detailBox">
@@ -82,32 +72,23 @@
                                             <button class="btn btn-default">Add</button>
                                         </div>
                                         <input type="hidden" name="blabid"
-                                            value="<%=request.getAttribute("blabid")%>">
+                                            value="{{ blabid }}">
                                     </form>
                                 </div>
                                 <ul class="commentList">
-                                <%
-                                    @SuppressWarnings("unchecked")
-                                    List<Comment> comments = (ArrayList<Comment>) request.getAttribute("comments");
-                                    
-                                    for (Comment comment : comments) {
-                                %>
                                 <li>
                                     <div>
                                         <div class="commenterImage">
-                                            <img src="resources/images/<%= comment.__str4__().__str__() %>.png" />
+                                            <img src={{ "resources/images/= comment.getAuthor().user() %>.png" }} />
                                         </div>
                                         <div class ="blockquote">
                                             <p class="">
-                                                "<%= comment.__str2__() %>"
+                                                {{ comment.getAuthor() }}
                                             </p>
-                                            <span class="date sub-text">by <%= comment.getAuthor().getBlabName() %>
-                                                on <%= comment.__str3__() %></span><br>
+                                            <span class="date sub-text">by {{comment.getAuthor().getBlabName()}}
+                                                 {{ comment.getAuthor() /span<br> }}
                                         </div>
                                     </li>
-                                    <%
-                                        }
-                                    %>
                                 </ul>
                             </div>
                         </div>
