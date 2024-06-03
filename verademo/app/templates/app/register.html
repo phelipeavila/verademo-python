@@ -76,24 +76,33 @@
 					if (username == null) username = "";
 					%>-->
 					<div class="panel-body">
-						<!-- <form method="POST" action="register">
+						<form method="POST" action="reg-return">
+							{% csrf_token %}
+							{{ form }}
 							<input type="hidden" name="returnPath" value="">
 							<table class="table table-condensed">
 								<tbody>
 									<tr>
 										<td>Username</td>
 										<td><div class="form-group">
-												<input type="text" class="form-control" name="user" value="<%=username%>">
+												<input id='username' type="text" maxlength='100' class="form-control" name="username"
+													{% comment %}value="<%=(String) request.getAttribute("username")%>" {% endcomment %}>
+											</div><a href="javascript:hint()">Hint</a></td>
+									</tr>
+									<tr>
+										<td>Password</td>
+										<td><div class="form-group">
+												<input id='password' type="text" maxlength='100' class="form-control" name="password">
 											</div></td>
 									</tr>
 									<tr>
 										<td><button type="submit" class="btn btn-primary"
-												id="login" name="Register" value="Register">Register</button></td>
+												id="login" name="Register" value='Register'>Register</button></td>
 										<td></td>
 									</tr>
 								</tbody>
 							</table>
-						</form> -->
+						</form>
 					</div>
 				</div>
 			</div>
