@@ -6,7 +6,6 @@ class User(models.Model):
     password = models.CharField(max_length=100)
     
 class Blab(models.Model):
-
     content = models.TextField(max_length=1000)
     postDate = models.DateTimeField(auto_now_add=True)
     commentCount = models.IntegerField(default=0)
