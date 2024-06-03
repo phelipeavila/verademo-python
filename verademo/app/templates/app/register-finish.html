@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,7 @@
 <title>Register for Blab</title>
 
 <!-- Bootstrap core CSS -->
-<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" >
 <!-- Bootstrap theme -->
 <link href="{% static 'css/bootstrap-theme.min.css' %}" rel="stylesheet">
 
@@ -70,29 +71,49 @@
 						<h3 class="panel-title">Please provide your user information
 							to register for Blab</h3>
 					</div>
-					<!--
-					<%
-					String username = (String) request.getSession().getAttribute("username");
-					if (username == null) username = "";
-					%>-->
 					<div class="panel-body">
-						<!-- TODO: Link form post method to User model-->
-						<form method="POST" action="register">
-							{% csrf_token %}
-							{{ form }}
+						<form method="POST" action="register-finish">
+                            {% csrf_token %}
 							<input type="hidden" name="returnPath" value="">
 							<table class="table table-condensed">
 								<tbody>
-									<tr>
+																		<tr>
 										<td>Username</td>
 										<td><div class="form-group">
-												<input id='username' type="text" maxlength='100' class="form-control" name="username"
-													{% comment %}value="<%=(String) request.getAttribute("username")%>" {% endcomment %}>
+												<p id = "username" maxlength='100' type="text" class="form-control" name="username">{{ username }} </p>
+											</div></td>
+									</tr>
+									<tr>
+										<td>Password</td>
+										<td><div class="form-group">
+												<input id = "password" maxlength='100' type="password" class="form-control" name="password"
+													value="">
+											</div></td>
+									</tr>
+									<tr>
+										<td>Confirm Password</td>
+										<td><div class="form-group">
+												<input id = "password" type="password" maxlength='100' class="form-control" name="cpassword"
+													value="">
+											</div></td>
+									</tr>
+									<tr>
+										<td>Real Name</td>
+										<td><div class="form-group">
+												<input id="realName" type="text" maxlength='100' class="form-control" name="realName"
+													value="">
+											</div></td>
+									</tr>
+									<tr>
+										<td>Blab Name</td>
+										<td><div class="form-group">
+												<input id="blabName" type="text" maxlength='100' class="form-control" name="blabName"
+													value="">
 											</div></td>
 									</tr>
 									<tr>
 										<td><button type="submit" class="btn btn-primary"
-												id="login" name="Register" value='Register'>Register</button></td>
+												id="login" name="Register" value="Register">Register</button></td>
 										<td></td>
 									</tr>
 								</tbody>
