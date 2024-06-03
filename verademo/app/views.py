@@ -9,12 +9,23 @@ from .forms import UserForm
 # Get logger
 logger = logging.getLogger(__name__)
 
-# Deals with HTTP request/response
-def say_hello(request):
-    return HttpResponse('hello')
+def registerHandler(request):
+    if(request.method == "GET"):
+        return register(request)
+    elif(request.method == "POST"):
+        return finish_register(request)
 
+'''
+renders the register.html file, called by a path in urls
+'''
 def register(request):
     return render(request, 'app/register.html', {})
+
+def finish_register(request):
+    context = {
+        'username':request.POST.get('username')
+    }
+    return render(request, 'app/register-finish.html', context)
 
 def home(request):
     # Equivalent of HomeController.java
@@ -66,17 +77,15 @@ def login(request):
 
     return render(request, 'app/login.html', {})
 
+'''
+Interprets POST request from register form, adds user to database
+TODO: Currently linked with register.html
+    - Redirect to login.html
+    - called by completion of register-finish.html
+    - maintiain /register URL
+'''
 def user_create_view(request):
     form = UserForm(request.POST or None)
     if form.is_valid():
         form.save()
-        print('help?')
-    context = {
-        'form': form
-    }
-    print("help")
     return render (request, 'app/login.html')
-
-class LoginView(TemplateView):
-    template_name = 'app/login.html'
-    extra_context = {}
