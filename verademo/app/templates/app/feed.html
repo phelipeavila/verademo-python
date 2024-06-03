@@ -53,18 +53,11 @@
 			<h4>The home of of witty one-liners</h4>
 		</div>
 
-        <%
-			String error = (String) request.getAttribute("error");
-			if (null != error) {
-		%>
-		
+      
 		<div class="alert alert-danger" role="alert">
 			<%=error%>
 		</div>
 
-        <%
-			}
-		%>
 
         <div class="row">
             <div class="col-md-6">
@@ -74,16 +67,12 @@
                     </div>
                     <div id="feed" class="actionBox">
 						<ul class="commentList">
-							<%
-								@SuppressWarnings("unchecked")
-								List<Blab> feedBlabs = (List<Blab>) request.getAttribute("blabsByOthers");
 								
-								for (Blab post : feedBlabs) {
-							%>
+							
                             <li>
                                 <div>
                                     <div class="commenterImage">
-                                        <img src="resources/images/<%= post.__str4__().__str__() %>.png" />
+                                        <img src="resources/images/<%= post.getAuthor().user() %>.png" />
                                     </div>
                                     <div class ="commentText">
                                         <p class=""><%= post.getCommentContent() %></p>
@@ -97,9 +86,6 @@
                                     </div>
                                 </div>
                             </li>
-                            <%
-                                }
-                            %>
                         </ul>
                         <a href="#" onclick="getmore(this); return false;">Fetch more...</a>
                     </div>
@@ -122,12 +108,6 @@
                                 </form>
                             </div> 
                             <ul class="commentList">
-                                <%
-                                    @SuppressWarnings("unchecked")
-                                    List<Blab> myBlabs = (List<Blab>) request.getAttribute("blabsByMe");
-                                    
-                                    for (Blab post : myBlabs) {
-                                %>
                                 <li>
                                     <div class="commentText">
                                         <p class=""><%= post.getContent() %></p>
@@ -137,14 +117,34 @@
                                         </span>
                                     </div>
                                 </li>
-                                <%
-                                    }
-                                %>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <script src="resources/js/jquery.min.js"></script>
+    <script src="resources/js/bootstrap.min.js"></script>
+
+    <!-- Fetch additional feed items  -->
+    <script type="text/javascript">
+        def getmore(obj) {
+			var count = $("#feed li").length;
+			$.get("morefeed", {
+				count : count,
+				len : 10
+			}, function(data) {
+				if (data) {
+					$("#feed ul").append(data);
+				} else {
+					$(obj).remove();
+				}
+			});
+        }
+    </script>
+</script>
+</html>
+
 
 

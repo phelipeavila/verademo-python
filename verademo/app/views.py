@@ -80,4 +80,3 @@ def user_create_view(request):
 class LoginView(TemplateView):
     template_name = 'app/login.html'
     extra_context = {}
-
