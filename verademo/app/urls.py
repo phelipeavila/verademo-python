@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from . import views
 
 urlpatterns = [
-    path('', views.login),
+    path('', views.home),
     path('login', views.login),
     path('register', views.register),
     path('reg-return', views.user_create_view),

@@ -53,17 +53,9 @@
 			<h4>Choose Blabbers to Listen to</h4>
 		</div>
 		<div></div>
-		<%
-			String error = (String) request.getAttribute("error");
-			if (null != error) {
-		%>
 		<div class="alert alert-danger" role="alert">
 			<%=error%>
 		</div>
-
-		<%
-			}
-		%>
 
 		<div class="row">
 			<div class="col-md-12">
@@ -85,12 +77,6 @@
 								</tr>
 							</thead>
 							<tbody>
-								<%
-									@SuppressWarnings("unchecked")
-									ArrayList<Blabber> blabbers = (ArrayList<Blabber>) request.getAttribute("blabbers");
-
-									for (Blabber blabber : blabbers) {
-								%>
 								<tr>
 									<td class="commenterImage">
 										<img src="resources/images/<%= blabber.__str2__() %>.png" />
@@ -116,9 +102,6 @@
 										</form>
 									</td>
 								</tr>
-								<%
-									}
-								%>
 							</tbody>
 						</table>
 					</div>
