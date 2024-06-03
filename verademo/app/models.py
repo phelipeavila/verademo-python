@@ -11,19 +11,19 @@ class Blab(models.Model):
     commentCount = models.IntegerField(default=0)
     author = models.TextField(max_length=100)
     
-    def __str__(self):
+    def getID(self):
         return self.id
     
-    def __str2__(self):
+    def content(self):
         return self.content
     
-    def __str3__(self):
+    def postDate(self):
         return self.postDate
     
-    def __str4__(self):
+    def getCommentCount(self):
         return self.commentCount
     
-    def __str5__(self):
+    def getAuthor(self):
         return self.author
      
 class Blabber(models.Model):
@@ -33,43 +33,41 @@ class Blabber(models.Model):
     createdDate = models.DateTimeField(auto_now_add=True)
     numberListeners = models.IntegerField(default=0)
     numberListening = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.id
     
-    def __str2__(self):
+    def user(self):
         return self.username
     
-    def __str3__(self):
+    def getRealName(self):
         return self.realName
     
-    def __str4__(self):
+    def getBlabName(self):
         return self.blabName
     
-    def __str5__(self):
+    def getCreatedDate(self):
         return self.createdDate
     
-    def __str6__(self):
+    def getNumListeners(self):
         return self.numberListeners
     
-    def __str7__(self):
+    def getNumListening(self):
         return self.numberListening
     
 class Comment(models.Model):
+    username = models.TextField(max_length=100)
     content = models.TextField()
     timestamp = models.DateTimeField
     author = models.TextField()
 
-    def __str__(self):
-        return self.id
+    def commentUser(self):
+        return self.username
     
-    def __str2__(self):
+    def getCommentContent(self):
         return self.content
     
-    def __str3__(self):
+    def postedTime(self):
         return self.timestamp
     
-    def __str4__(self):
+    def getCommentAuthor(self):
         return self.author
 
 
