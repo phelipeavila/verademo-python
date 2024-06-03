@@ -73,16 +73,17 @@
 							password to login to Blab</h3>
 					</div>
 					<div class="panel-body">
-						<!-- <form method="POST" action="<%= request.getAttribute("javax.servlet.forward.request_uri") %>">
-							<input type="hidden" name="target"
-								value="<%=(String) request.getAttribute("target")%>">
+						<form method="POST">
+							{% csrf_token %}
+							{{ form }}
+							<input type="hidden" name="target" value="{{ request.path }}">
 							<table class="table table-condensed">
 								<tbody>
 									<tr>
 										<td>Username</td>
 										<td><div class="form-group">
-												<input type="text" class="form-control" name="user"
-													value="<%=(String) request.getAttribute("username")%>">
+												{% comment %} <input type="text" class="form-control" name="user"
+													value="<%=(String) request.getAttribute("username")%>"> {% endcomment %}
 											</div><a href="javascript:hint()">Hint</a></td>
 									</tr>
 									<tr>
@@ -104,7 +105,7 @@
 									</tr>
 								</tbody>
 							</table>
-						</form> -->
+						</form>
 					</div>
 				</div>
 			</div>

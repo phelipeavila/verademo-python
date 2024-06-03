@@ -7,6 +7,5 @@ from django.views.generic import TemplateView
 def say_hello(request):
     return HttpResponse('hello')
 
-class LoginView(TemplateView):
-    template_name = 'app/login.html'
-    extra_context = {}
+def login(request):
+    return render(request, 'app/login.html', {})
