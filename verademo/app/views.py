@@ -12,9 +12,6 @@ def register(request):
     return render(request, 'app/register.html', {})
 
 def login(request):
-<<<<<<< HEAD
-    return render(request, 'app/login.html', {})
-=======
     return render(request, 'app/login.html',{})
 
 def user_create_view(request):
@@ -31,4 +28,3 @@ def user_create_view(request):
 class LoginView(TemplateView):
     template_name = 'app/login.html'
     extra_context = {}
->>>>>>> 734d829abd341b9ec23e66f74351b3f13856dbf6
