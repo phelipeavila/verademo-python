@@ -14,6 +14,18 @@ from .forms import UserForm
 # Get logger
 logger = logging.getLogger("__name__")
 
+def feed(request):
+    return render(request, 'app/feed.html', {})
+
+def blabbers(request):
+    return render(request, 'app/blabbers.html', {})
+
+def profile(request):
+    return render(request, 'app/profile.html', {})
+
+def tools(request):
+    return render(request, 'app/tools.html', {})
+
 def registerHandler(request):
     if(request.method == "GET"):
         return register(request)
@@ -41,8 +53,6 @@ def home(request):
     # else:
     return login(request)
 
-def feed(request):
-    return render(request, 'app/feed.html', {})
 
 def login(request):
     if request.method == "GET":
@@ -145,10 +155,6 @@ def login(request):
 
 '''
 Interprets POST request from register form, adds user to database
-TODO: Currently linked with register.html
-    - Redirect to login.html
-    - called by completion of register-finish.html
-    - maintiain /register URL
 '''
 def user_create_view(request):
     form = UserForm(request.POST or None)

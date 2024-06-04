@@ -96,7 +96,7 @@
 										<td>
 											<div class="form-group">
 												<input type="text" class="form-control" name="realName"
-													value="{% request.getAttribute("realName") %}" />
+													value="<% request.getAttribute("realName") %>" />
 											</div>
 										</td>
 									</tr>
@@ -105,7 +105,7 @@
 										<td>
 											<div class="form-group">
 												<input type="text" class="form-control" name="blabName"
-													value="{% request.getAttribute("blabName") %}" />
+													value="<% request.getAttribute("blabName") %>" />
 											</div>
 										</td>
 									</tr>
@@ -114,7 +114,7 @@
 										<td>
 											<div class="form-group">
 												<input type="text" class="form-control" name="username"
-													value="{% request.getAttribute("username") %}" />
+													value="<% request.getAttribute("username") %>" />
 											</div>
 										</td>
 									</tr>
@@ -157,11 +157,11 @@
 							<li>
 								<div class="clear">
 									<div class="commenterImage">
-										<img src="{% static'images/{% heckler.getUsername() %}.png' %}" />
+										<img src="<% static'images/<% heckler.getUsername() %>.png' %>" />
 									</div>
 									<div class="commentText">
-										<p> {% heckler.getBlabName() %}</p>
-										<span class="date sub-text">member since {% heckler.getCreatedDateString() %}</span>
+										<p> <% heckler.getBlabName() %></p>
+										<span class="date sub-text">member since <% heckler.getCreatedDateString() %></span>
 										<br/>
 									</div>
 								</div>

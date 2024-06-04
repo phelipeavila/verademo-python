@@ -1,15 +1,13 @@
 {% load static %}
 
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-{% block metadescription %}
-<meta charset = "utf-8" />
+<meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <meta name="author" content="">
-{% endblock %}
 
 <title>Blab</title>
 
@@ -35,14 +33,14 @@
 		<div class="header clearfix">
 			<nav>
 				<ul class="nav nav-pills pull-right">
-					<li role="present<li ation"><a href="feed">Feed</a></li>
+					<li role="presentation"><a href="feed">Feed</a></li>
 					<li role="presentation" class="active"><a href="blabbers">Blabbers</a></li>
 					<li role="presentation"><a href="profile">Profile</a></li>
 					<li role="presentation"><a href="tools">Tools</a></li>
 					<li role="presentation"><a href="logout">Logout</a></li>
 				</ul>
 			</nav>
-			<img src="resources/images/Tokyoship_Talk_icon.svg" height="100"
+			<img src="{% static 'images/Tokyoship_Talk_icon.svg' %}" height="100"
 				width="100">
 		</div>
 
@@ -55,10 +53,19 @@
 			<h4>Choose Blabbers to Listen to</h4>
 		</div>
 		<div></div>
+        <!--
+		<%
+			String error = (String) request.getAttribute("error");
+			if (null != error) {
+		%>
 		<div class="alert alert-danger" role="alert">
-			{% error %}
+			<%=error%>
 		</div>
 
+		<%
+			}
+		%>
+-->
 		<div class="row">
 			<div class="col-md-12">
 				<div class="detailBox">
@@ -79,31 +86,42 @@
 								</tr>
 							</thead>
 							<tbody>
+                                <!--
+								<%
+									@SuppressWarnings("unchecked")
+									ArrayList<Blabber> blabbers = (ArrayList<Blabber>) request.getAttribute("blabbers");
+
+									for (Blabber blabber : blabbers) {
+								%>
 								<tr>
 									<td class="commenterImage">
-										<img src="resources/images/<%= blabber.user() .png" />
+										<img src="resources/images/<%= blabber.getUsername() %>.png" />
 									</td>
 									<td class="commenterName">
-										{% blabber.getBlabName() %}
+										<%= blabber.getBlabName() %>
 									</td>
 									<td class="commenterJoinDate">
-										{% blabber.getcreatedDate() %}
+										<%= blabber.getCreatedDateString() %>
 									</td>
 									<td class="commenterListening">
-										{% blabber.getNumListening() %}
+										&nbsp;<%= blabber.getNumberListening() %>&nbsp;
 									</td>
 									<td>
 										<form class="form-inline" role="form" method="POST"
 											action="blabbers">
 											<input type="hidden" name="blabberUsername"
-												value={% HtmlUtils.htmlEscape(blabber.user()) %} />
+												value="<%= HtmlUtils.htmlEscape(blabber.getUsername()) %>" />
 											<input type="hidden" name="command"
-												value={%"(blabber.getNumListeners() == 1 ? "ignore" : "listen")"%} />
+												value="<%=(blabber.getNumberListeners() == 1 ? "ignore" : "listen")%>" />
 											<input type="submit" class="btn btn-default pull-right" name="button"
-												value={%"(blabber.getNumListeners() == 1 ? "Ignore" : "Listen")"%} />
+												value="<%=(blabber.getNumberListeners() == 1 ? "Ignore" : "Listen")%>" />
 										</form>
 									</td>
 								</tr>
+								<%
+									}
+								%>
+                                -->
 							</tbody>
 						</table>
 					</div>
@@ -119,7 +137,7 @@
 	<!-- Bootstrap core JavaScript
     ================================================== -->
 	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="resources/js/jquery-1.11.2.min.js"></script>
-	<script src="resources/js/bootstrap.min.js"></script>
+	<script src="{% static 'js/jquery-1.11.2.min.js' %}"></script>
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
 </body>
 </html>
