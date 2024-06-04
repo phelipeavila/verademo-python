@@ -31,24 +31,25 @@ def home(request):
     # Equivalent of HomeController.java
     # TODO: Check if user is already logged in.
     #       If so, redirect to user's feed
-    # if request.user.is_authenticated:
-        # return redirect('feed')
-    # else:
-    return login(request)
+    if request.user.is_authenticated:
+        return redirect('feed')
+    else:
+        return login(request)
 
 def login(request):
     # Equivalent of UserController.java
     target = request.GET.get('target')
     username = request.GET.get('username')
+    feed = request.GET.get('feed')
 
-    # TODO: Check if user is already logged in.
-    #       If user is already logged in, redirect to 'feed' by default or target if exists
-    # if request.user.is_authenticated:
-    #     logger.info("User is already logged in - redirecting...")
-    #     if (target != None) and (target) and (not target == "null"):
-    #         return redirect('target')
-    #     else:
-    #         return redirect('feed')
+   # if request.user.is_authenticated:
+    #    logger.info("User is already logged in - redirecting...")
+   # if (target!= None) and (target) and (not target == "null"):
+    #    return redirect('target')
+    # else:
+     #   return redirect('feed')
+
+   # return redirect('feed')
 
     # TODO: Use cookies to remember users
     userDetailsCookie = request.COOKIES.get('user')
