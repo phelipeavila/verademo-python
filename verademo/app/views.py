@@ -222,6 +222,7 @@ def processRegisterFinish(request):
                 query += ("'" + blabName + "'")
                 query += (");")
                 #execute query
+                #test
                 cursor.execute(query)
                 sqlStatement = cursor.fetchone() #<- variable for response
                 logger.info(query)
