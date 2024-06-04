@@ -141,7 +141,10 @@ def login(request):
 
             logger.error("Unexpected error:", sys.exc_info()[0])
 
-            logger.info("Redirecting to view: " + nextView)
+            nextView = 'login'
+            response = redirect(nextView)
+
+        logger.info("Redirecting to view: " + nextView)
             
         return response
 
