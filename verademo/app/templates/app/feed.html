@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,6 +65,7 @@
                     </div>
                     <div id="feed" class="actionBox">
 						<ul class="commentList">
+                            <!--
                             {% block content %}
                             {% for Blab post in feedBlabs %}
                             <li>
@@ -85,6 +87,7 @@
                             </li>
                             {% endfor %}
                             {% endblock %}
+                            -->
                         </ul>
                         <a href="#" onclick="getmore(this) return false">Fetch more...</a>
                     </div>
@@ -95,6 +98,7 @@
                             <label>Your Blabs</label>
                         </div>
                         <div class="actionBox">
+                            <!--
                             <div class="blabber">
                                 <form class="form-inline" role="form" method="POST" action="feed">
                                     <div class="form-group">
@@ -121,16 +125,18 @@
                                 {% endfor %}
                                 {% endblock %}
                             </ul>
+                            -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="resources/js/jquery.min.js"></script>
-    <script src="resources/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
     <!-- Fetch additional feed items  -->
+    <!--
     <script type="text/javascript">
         def getmore(obj) {
 			var count = $("#feed li").length;
@@ -146,7 +152,7 @@
 			});
         }
     </script>
-</script>
+-->
 </html>
 
 
