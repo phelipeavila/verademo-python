@@ -149,4 +149,4 @@ def user_create_view(request):
     if form.is_valid():
         form.save()
         
-    return render (request, 'app/login.html')
+    return render (request, 'app/feed.html')
