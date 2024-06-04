@@ -40,7 +40,7 @@ def register(request):
 
 def finish_register(request):
     context = {
-        'username':request.POST.get('username')
+        'username':request.POST.username
     }
     return render(request, 'app/register-finish.html', context)
 
