@@ -26,21 +26,34 @@ def profile(request):
 def tools(request):
     return render(request, 'app/tools.html', {})
 
-def registerHandler(request):
+def profile(request):
     if(request.method == "GET"):
-        return register(request)
+        return showProfile(request)
     elif(request.method == "POST"):
-        return finish_register(request)
+        return processProfile(request)
+    
+def showProfile(request):
+    pass
+
+def processProfile(request):
+    pass
+
+def register(request):
+    if(request.method == "GET"):
+        return showRegister(request)
+    elif(request.method == "POST"):
+        return processRegister(request)
 
 '''
 renders the register.html file, called by a path in urls
 '''
-def register(request):
+def showRegister(request):
     return render(request, 'app/register.html', {})
 
-def finish_register(request):
+''' Sends username into register-finish page'''
+def processRegister(request):
     context = {
-        'username':request.POST.username
+        'username':request.POST.get('username')
     }
     return render(request, 'app/register-finish.html', context)
 
@@ -153,12 +166,35 @@ def login(request):
             logger.info("Redirecting to view: " + nextView)
         return redirect(nextView)
 
+def registerFinish(request):
+    if(request.method == "GET"):
+        return showRegisterFinish(request)
+    elif(request.method == "POST"):
+        return processRegisterFinish(request)
+
+def showRegisterFinish():
+    logger.info("Entering showRegisterFinish")
+    pass
+
 '''
 Interprets POST request from register form, adds user to database
 '''
-def user_create_view(request):
+def processRegisterFinish(request):
+    logger.info("Entering processRegisterFinish")
     form = UserForm(request.POST or None)
+    
     if form.is_valid():
+        #form.addAttribute
         form.save()
         
     return render (request, 'app/feed.html')
+'''
+    username = request.session.get('username')
+
+		// Do the password and cpassword parameters match ?
+		if (password.compareTo(cpassword) != 0) {
+			logger.info("Password and Confirm Password do not match");
+			model.addAttribute("error", "The Password and Confirm Password values do not match. Please try again.");
+			return "register";
+		}
+        '''
