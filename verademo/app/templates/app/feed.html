@@ -1,5 +1,3 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,15 +7,16 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
+
 <title>Blab Feed</title>
 
 <!-- Bootstrap core CSS -->
-<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="resources/css/bootstrap.min.css" rel="stylesheet">
 <!-- Bootstrap theme -->
 <link href="{% static 'css/bootstrap-theme.min.css' %}" rel="stylesheet">
 
 <!-- Custom styles for this template -->
-<link href="resources/css/pwm.css" rel="stylesheet">
+<link href="{% static 'css/pwm.css' %}" rel="stylesheet">
 
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -66,11 +65,11 @@
                     <div id="feed" class="actionBox">
 						<ul class="commentList">
                             {% block content %}
-                            {% for Blab post : feedBlabs %}
+                            {% for Blab post in feedBlabs %}
                             <li>
                                 <div>
                                     <div class="commenterImage">
-                                        <img src="resources/images/<%= post.getAuthor().user() %>.png" />
+                                        <img src="resources/images/<%= post.getAuthor().user().png" />
                                     </div>
                                     <div class ="commentText">
                                         <p class="">= post.getCommentContent() </p>
@@ -109,7 +108,7 @@
                             </div> 
                             <ul class="commentList">
                                 {% block content %}
-                                {% for Blab post in myBlabs %}
+                                {% for Blab post : myBlabs %}
                                 <li>
                                     <div class="commentText">
                                         <p class=""> {{ post.getContent() }} </p>
@@ -119,8 +118,8 @@
                                         </span>
                                     </div>
                                 </li>
-                                {% endblock %}
                                 {% endfor %}
+                                {% endblock %}
                             </ul>
                         </div>
                     </div>

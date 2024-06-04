@@ -10,5 +10,6 @@ urlpatterns = [
     path('register', views.registerHandler, name='register'),
     path('register-finish', views.user_create_view, name='register-finish'),
     path('feed', views.feed, name='feed'),
-   # path('register/', views.register),
+    #path('hello/',views.say_hello),
+    # path('register/', views.register),
 ]
