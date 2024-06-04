@@ -43,8 +43,6 @@
 			<img src="{% static 'images/Tokyoship_Talk_icon.svg' %}" height="100"
 				width="100">
 		</div>
-
-
 	</div>
 
 	<div class="container theme-showcase" role="main">
@@ -52,29 +50,19 @@
 		<div class="page-header">
             <h3>
 				Hi
+			    {{ request.username }}, welcome to Blab-a-Gag
 			</h3>
-            <!--
-			<h3>
-				Hi
-				<%=request.getAttribute("currentUser")%>, welcome to Blab-a-Gag
-			</h3>
-        -->
 			<h4>The home of of witty one-liners</h4>
 		</div>
-<!--
-		<%
-			String error = (String) request.getAttribute("error");
-			if (null != error) {
-		%>
-		
-		<div class="alert alert-danger" role="alert">
-			<%=error%>
-		</div>
 
-		<%
-			}
-		%>
-        -->
+		
+		{% if null != error %}
+		    <div class="alert alert-danger" role="alert">
+		    </div>
+        {% endif %}
+
+	</div>
+
 		<div class="row">
 			<div class="col-md-6">
 				<div class="detailBox">
@@ -83,95 +71,80 @@
 					</div>
 					<div id="feed" class="actionBox">
 						<ul class="commentList">
-                            <!--
-							<%
-								@SuppressWarnings("unchecked")
-								List<Blab> feedBlabs = (List<Blab>) request.getAttribute("blabsByOthers");
-								
-								for (Blab post : feedBlabs) {
-							%>
-							<li>
-								<div>
-									<div class="commenterImage">
-										<img src="resources/images/<%= post.getAuthor().getUsername() %>.png" />
-									</div>
-									<div class="commentText">
-										<p class=""><%= post.getContent() %></p>
-										<span class="date sub-text">
-											by <%= post.getAuthor().getBlabName() %> on <%= post.getPostDateString() %>
-										</span>
-										<br/>
-										<span class="date sub-text">
-											<a href="blab?blabid=<%= post.getId() %>"><%= post.getCommentCount() %> Comments</a>
-										</span>
-									</div>
-								</div>
-							</li>
-							<%
-								}
-							%>
-                            -->
-						</ul>
-						<a href="#" >Fetch more...</a>
-                        <!-- <a href="#" onclick="getmore(this); return false;">Fetch more...</a> -->
-					</div>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div class="detailBox">
-					<div class="titleBox">
-						<label>Your Blabs</label>
-					</div>
-					<div class="actionBox">
-						<div class="blabber">
-							<form class="form-inline" role="form" method="POST" action="feed">
-								<div class="form-group">
-									<input class="form-control" type="text"
-										placeholder="Blab something now..." name="blab" />
-								</div>
-								<div class="form-group">
-									<button class="btn btn-default">Add</button>
-								</div>
-							</form>
-						</div>
-						<ul class="commentList">
-                            <!--
-							<%
-								@SuppressWarnings("unchecked")
-								List<Blab> myBlabs = (List<Blab>) request.getAttribute("blabsByMe");
-								
-								for (Blab post : myBlabs) {
-							%>
-							<li>
-								<div class="commentText">
-									<p class=""><%= post.getContent() %></p>
-									<span class="date sub-text">by you on <%= post.getPostDateString() %></span><br/>
-									<span class="date sub-text">
-										<a href="blab?blabid=<%= post.getId() %>"><%= post.getCommentCount() %> Comments</a>
-									</span>
-								</div>
-							</li>
-							<%
-								}
-							%>
-                            -->
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- /container -->
+                            {% block comment %}
+                            {% for post in feedBlabs %}
+                            <li>
+                                <div>
+                                    <div class="commenterImage">
+                                        <img src="resources/images/<%= post.getAuthor().user().png" />
+                                    </div>
+                                    <div class ="commentText">
+                                        <p class="">= post.getCommentContent() </p>
+                                        <span class="date sub-text">
+                                            by {{" post.getCommentAuthor.getBlabName() "}} on = post.postDate() 
+                                        </span>
+                                        <br/>
+                                        <span class="date sub-text">
+                                            <a href="blab?blabid=<%= {{"post.getId()"}} >">= {{"post.getCommentCount()"}} Comments</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                            {% endblock %}
+                        </ul>
+                        <a href="#" onclick={{"getmore(this) return false"}}>Fetch more...</a>
+                    </div>
+                </div>
+            </div>
+                <div class="col-md-6">
+                    <div class="detailBox">
+                        <div class="titleBox">
+                            <label>Your Blabs</label>
+                        </div>
+                        <div class="actionBox">
+                            <div class="blabber">
+                                <form class="form-inline" role="form" method="POST" action="feed">
+                                    <div class="form-group">
+                                        <input class="form-control" type="text"
+                                            placeholder={{ "Blab something now..." }} name={{"blab"}} />
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-default">Add</button>
+                                    </div>
+                                </form>
+                            </div> 
+                            <ul class="commentList">
+                                {% block content %}
+                                {% for post in myBlabs %}
+                                <li>
+                                    <div class="commentText">
+                                        <p class=""> {{" post.getContent() "}} </p>
+                                        <span class="date sub-text">by you on {{" post.getPostDateString() "}} </span><br/>
+                                        <span class="date sub-text">
+                                            <a href={{" blab ? blabid = post.getId() "}}> {{" post.getCommentCount() "}} Comments</a>
+                                        </span>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                {% endblock %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /container -->
 
 	<!-- Bootstrap core JavaScript
     ================================================== -->
 	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="{% static 'js/jquery-1.11.2.min.js' %}"></script>
-	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="resources/js/jquery.min.js"></script>
+    <script src="resources/js/bootstrap.min.js"></script>
 
-	<!-- Fetch additional feed items -->
-    <!--
-	<script type="text/javascript">
+    <!-- Fetch additional feed items  -->
+    <script type="text/javascript">
 		function getmore(obj) {
 			var count = $("#feed li").length;
 			$.get("morefeed", {
@@ -186,6 +159,9 @@
 			});
 		}
 	</script>
+<<<<<<< HEAD
 -->
+=======
+>>>>>>> eaf6956f605211fb0a7f082bd5b3a1c079a20367
 </body>
 </html>

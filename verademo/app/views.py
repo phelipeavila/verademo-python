@@ -6,7 +6,7 @@ import base64
 import hashlib
 from django.views.generic import TemplateView
 from app.models import User
-import pickle
+from django.core import serializers
 import sys
 
 from .forms import UserForm
@@ -59,30 +59,25 @@ def processRegister(request):
 
 def home(request):
     # Equivalent of HomeController.java
-    # TODO: Check if user is already logged in.
-    #       If so, redirect to user's feed
-    # if request.user.is_authenticated:
-        # return redirect('feed')
-    # else:
+    if request.session.get('username'):
+        return redirect('feed')
+    
     return login(request)
 
 
 def login(request):
     if request.method == "GET":
-        # Equivalent of UserController.java
+
         target = request.GET.get('target')
         username = request.GET.get('username')
 
-        # TODO: Check if user is already logged in.
-        #       If user is already logged in, redirect to 'feed' by default or target if exists
-        # if request.user.is_authenticated:
-        #     logger.info("User is already logged in - redirecting...")
-        #     if (target != None) and (target) and (not target == "null"):
-        #         return redirect(target)
-        #     else:
-        #         return redirect('feed')
+        if request.session.get('username'):
+            logger.info("User is already logged in - redirecting...")
+            if (target != None) and (target) and (not target == "null"):
+                return redirectr(target)
+            else:
+                return redirect('feed')
 
-        # TODO: Use cookies to remember users
         userDetailsCookie = request.COOKIES.get('user')
         if userDetailsCookie is None or not userDetailsCookie:
             logger.info("No user cookie")
@@ -93,14 +88,16 @@ def login(request):
                 target = ''
             logger.info("Entering login with username " + username + " and target " + target)
             
-            # TODO: Add username and target to login
+            request.username = username
+            request.target = target
 
         else:
             logger.info("User details were remembered")
-            unencodedUserDetails = pickle.loads(userDetailsCookie)
-            logger.info("User details were retrieved for user: " + unencodedUserDetails.userName)
+            unencodedUserDetails = next(serializers.deserialize('xml', userDetailsCookie))
+
+            logger.info("User details were retrieved for user: " + unencodedUserDetails.object.username)
             
-            # TODO: Set username for session
+            request.session['username'] = unencodedUserDetails.object.username
 
             if (target != None) and (target) and (not target == "null"):
                 return redirect(target)
@@ -119,8 +116,10 @@ def login(request):
 
         if (target != None) and (target) and (not target == "null"):
             nextView = target
+            response = render(request, 'app/' + nextView + '.html', {})
         else:
             nextView = 'feed'
+            response = render(request, 'app/' + nextView + '.html', {})
 
         try:
             logger.info("Creating the Database connection")
@@ -137,34 +136,56 @@ def login(request):
                 
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
+
                 if (row):
+                    columns = [col[0] for col in cursor.description]
+                    row = dict(zip(columns, row))
                     logger.info("User found")
-                    response = HttpResponse()
                     response.set_cookie('username', username)
                     if (not remember is None):
-                        currentUser = User.objects.create(userName=row["username"],
+                        currentUser = User(username=row["username"],
                                     hint=row["hint"], dateCreated=row["dateCreated"],
                                     lastLogin=row["lastLogin"], realName=row["realName"], 
                                     blabName=row["blabName"])
-                        response.set_cookie('user', pickle.dumps(currentUser))
+                        response = update_in_response(currentUser, response)
                     request.session['username'] = row['username']
 
-                    update = "UPDATE users SET lastLogin=NOW() WHERE username={row['" + row['username'] + "']};"
+                    update = "UPDATE app_user SET lastLogin=date('now') WHERE username='" + row['username'] + "';"
                     cursor.execute(update)
                 else:
                     logger.info("User not found")
 
-                    # TODO: Add attributes for errors and target
+                    request.error = "Login failed. Please try again."
+                    request.target = target
 
                     nextView = 'login'
+                    response = render(request, 'app/' + nextView + '.html', {})
         except:
 
             # TODO: Implement exceptions
 
             logger.error("Unexpected error:", sys.exc_info()[0])
 
-            logger.info("Redirecting to view: " + nextView)
-        return redirect(nextView)
+            nextView = 'login'
+            response = render(request, 'app/' + nextView + '.html', {})
+
+        logger.info("Redirecting to view: " + nextView)
+            
+        return response
+
+def logout(request):
+    logger.info("Processing logout")
+    request.session['username'] = None
+    response = redirect('login')
+    response.delete_cookie('user')
+    logger.info("Redirecting to login...")
+    return response
+
+def update_in_response(user, response):
+    cookie = serializers.serialize('xml', [user,])
+    response.set_cookie('user', cookie)
+    return response
+    
 
 def registerFinish(request):
     if(request.method == "GET"):
@@ -187,6 +208,7 @@ def processRegisterFinish(request):
         #form.addAttribute
         form.save()
         
+<<<<<<< HEAD
     return render (request, 'app/feed.html')
 '''
     username = request.session.get('username')
@@ -198,3 +220,6 @@ def processRegisterFinish(request):
 			return "register";
 		}
         '''
+=======
+    return redirect('feed')
+>>>>>>> eaf6956f605211fb0a7f082bd5b3a1c079a20367
