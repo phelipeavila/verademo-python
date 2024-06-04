@@ -80,7 +80,7 @@
 																		<tr>
 										<td>Username</td>
 										<td><div class="form-group">
-												<input id = "username" maxlength='100' type="text" class="form-control" value={{ username }} name="username" readonly>
+												{{ request.session.username }}
 											</div></td>
 									</tr>
 									<tr>
@@ -93,7 +93,7 @@
 									<tr>
 										<td>Confirm Password</td>
 										<td><div class="form-group">
-												<input id = "password" type="password" maxlength='100' class="form-control" name="cpassword"
+												<input id = "cpassword" type="password" maxlength='100' class="form-control" name="cpassword"
 													value="">
 											</div></td>
 									</tr>

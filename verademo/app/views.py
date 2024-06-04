@@ -7,9 +7,12 @@ import hashlib
 from django.views.generic import TemplateView
 from app.models import User
 from django.core import serializers
-import sys
 
-from .forms import UserForm
+from datetime import datetime
+import pickle
+import sys
+from app.models import User
+from .forms import UserForm, RegisterForm
 
 # Get logger
 logger = logging.getLogger("__name__")
@@ -74,7 +77,7 @@ def login(request):
         if request.session.get('username'):
             logger.info("User is already logged in - redirecting...")
             if (target != None) and (target) and (not target == "null"):
-                return redirectr(target)
+                return redirect(target)
             else:
                 return redirect('feed')
 
@@ -208,18 +211,4 @@ def processRegisterFinish(request):
         #form.addAttribute
         form.save()
         
-<<<<<<< HEAD
-    return render (request, 'app/feed.html')
-'''
-    username = request.session.get('username')
-
-		// Do the password and cpassword parameters match ?
-		if (password.compareTo(cpassword) != 0) {
-			logger.info("Password and Confirm Password do not match");
-			model.addAttribute("error", "The Password and Confirm Password values do not match. Please try again.");
-			return "register";
-		}
-        '''
-=======
     return redirect('feed')
->>>>>>> eaf6956f605211fb0a7f082bd5b3a1c079a20367
