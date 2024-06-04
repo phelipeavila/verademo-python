@@ -34,19 +34,10 @@ def finish_register(request):
 
 def home(request):
     # Equivalent of HomeController.java
-<<<<<<< HEAD
-    # TODO: Check if user is already logged in.
-    #       If so, redirect to user's feed
-    if request.user.is_authenticated:
-        return redirect('feed')
-    else:
-        return login(request)
-=======
     if request.session.get('username'):
         return redirect('feed')
     
     return login(request)
->>>>>>> e1b63133830a337c267f89abf1cf32a15e7df78c
 
 def feed(request):
     return render(request, 'app/feed.html', {})
@@ -56,28 +47,13 @@ def login(request):
         # Equivalent of UserController.java
         target = request.GET.get('target')
         username = request.GET.get('username')
-    # Equivalent of UserController.java
-    target = request.GET.get('target')
-    username = request.GET.get('username')
-    feed = request.GET.get('feed')
 
-<<<<<<< HEAD
-    # TODO: Check if user is already logged in.
-    #       If user is already logged in, redirect to 'feed' by default or target if exists
-    # if request.user.is_authenticated:
-    #     logger.info("User is already logged in - redirecting...")
-    #     if (target != None) and (target) and (not target == "null"):
-    #         return redirect('target')
-    #     else:
-    #         return redirect('feed')
-=======
         if request.session.get('username'):
             logger.info("User is already logged in - redirecting...")
             if (target != None) and (target) and (not target == "null"):
                 return redirect(target)
             else:
                 return redirect('feed')
->>>>>>> e1b63133830a337c267f89abf1cf32a15e7df78c
 
         userDetailsCookie = request.COOKIES.get('user')
         if userDetailsCookie is None or not userDetailsCookie:
