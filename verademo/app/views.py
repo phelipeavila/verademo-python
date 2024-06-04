@@ -103,9 +103,15 @@ def login(request):
             logger.info("Creating the Database connection")
             with connection.cursor() as cursor:
                 logger.info("Creating database query")
-                sqlQuery = "select username, password, password_hint, created_at, last_login, \
-                            real_name, blab_name from Users where username='" + username + "' \
-                            and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
+
+                # TODO: Replace with md5 hash after register uses MD5
+                # sqlQuery = "select username, password, hint, dateCreated, lastLogin, \
+                #             realName, blabName from app_user where username='" + username + "' \
+                #             and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
+                sqlQuery = "select username, password, hint, dateCreated, lastLogin, \
+                            realName, blabName from app_user where username='" + username + "' \
+                            and password='" + password + "';"
+                
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
                 if (row):
@@ -114,13 +120,13 @@ def login(request):
                     response.set_cookie('username', username)
                     if (not remember is None):
                         currentUser = User.objects.create(userName=row["username"],
-                                    hint=row["password_hint"], dateCreated=row["created_at"],
-                                    lastLogin=row["last_login"], realName=row["real_name"], 
-                                    blabName=row["blab_name"])
+                                    hint=row["hint"], dateCreated=row["dateCreated"],
+                                    lastLogin=row["lastLogin"], realName=row["realName"], 
+                                    blabName=row["blabName"])
                         response.set_cookie('user', pickle.dumps(currentUser))
                     request.session['username'] = row['username']
 
-                    update = "UPDATE users SET last_login=NOW() WHERE username={row['" + row['username'] + "']};"
+                    update = "UPDATE users SET lastLogin=NOW() WHERE username={row['" + row['username'] + "']};"
                     cursor.execute(update)
                 else:
                     logger.info("User not found")
@@ -134,7 +140,7 @@ def login(request):
 
             logger.error("Unexpected error:", sys.exc_info()[0])
 
-        logger.info("Redirecting to view: " + nextView)
+            logger.info("Redirecting to view: " + nextView)
         return redirect(nextView)
 
 '''
