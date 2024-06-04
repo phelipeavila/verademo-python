@@ -51,7 +51,7 @@ def login(request):
         if request.session.get('username'):
             logger.info("User is already logged in - redirecting...")
             if (target != None) and (target) and (not target == "null"):
-                return redirect(target)
+                return redirectr(target)
             else:
                 return redirect('feed')
 
@@ -65,7 +65,8 @@ def login(request):
                 target = ''
             logger.info("Entering login with username " + username + " and target " + target)
             
-            # TODO: Add username and target to login
+            request.username = username
+            request.target = target
 
         else:
             logger.info("User details were remembered")
@@ -92,10 +93,10 @@ def login(request):
 
         if (target != None) and (target) and (not target == "null"):
             nextView = target
-            response = redirect(nextView)
+            response = render(request, 'app/' + nextView + '.html', {})
         else:
             nextView = 'feed'
-            response = redirect(nextView)
+            response = render(request, 'app/' + nextView + '.html', {})
 
         try:
             logger.info("Creating the Database connection")
@@ -112,9 +113,10 @@ def login(request):
                 
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
-                columns = [col[0] for col in cursor.description]
-                row = dict(zip(columns, row))
+
                 if (row):
+                    columns = [col[0] for col in cursor.description]
+                    row = dict(zip(columns, row))
                     logger.info("User found")
                     response.set_cookie('username', username)
                     if (not remember is None):
@@ -130,10 +132,11 @@ def login(request):
                 else:
                     logger.info("User not found")
 
-                    # TODO: Add attributes for errors and target
+                    request.error = "Login failed. Please try again."
+                    request.target = target
 
                     nextView = 'login'
-                    response = redirect(nextView)
+                    response = render(request, 'app/' + nextView + '.html', {})
         except:
 
             # TODO: Implement exceptions
@@ -141,7 +144,7 @@ def login(request):
             logger.error("Unexpected error:", sys.exc_info()[0])
 
             nextView = 'login'
-            response = redirect(nextView)
+            response = render(request, 'app/' + nextView + '.html', {})
 
         logger.info("Redirecting to view: " + nextView)
             
@@ -173,4 +176,4 @@ def user_create_view(request):
     if form.is_valid():
         form.save()
         
-    return render (request, 'app/feed.html')
+    return redirect('feed')
