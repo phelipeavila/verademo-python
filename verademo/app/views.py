@@ -44,7 +44,7 @@ def feed(request):
 
 def login(request):
     if request.method == "GET":
-        # Equivalent of UserController.java
+
         target = request.GET.get('target')
         username = request.GET.get('username')
 
@@ -122,8 +122,7 @@ def login(request):
                                     hint=row["hint"], dateCreated=row["dateCreated"],
                                     lastLogin=row["lastLogin"], realName=row["realName"], 
                                     blabName=row["blabName"])
-                        cookie = serializers.serialize('xml', [currentUser,])
-                        response.set_cookie('user', cookie)
+                        response = update_in_response(currentUser, response)
                     request.session['username'] = row['username']
 
                     update = "UPDATE app_user SET lastLogin=date('now') WHERE username='" + row['username'] + "';"
@@ -147,6 +146,20 @@ def login(request):
         logger.info("Redirecting to view: " + nextView)
             
         return response
+
+def logout(request):
+    logger.info("Processing logout")
+    request.session['username'] = None
+    response = redirect('login')
+    response.delete_cookie('user')
+    logger.info("Redirecting to login...")
+    return response
+
+def update_in_response(user, response):
+    cookie = serializers.serialize('xml', [user,])
+    response.set_cookie('user', cookie)
+    return response
+    
 
 '''
 Interprets POST request from register form, adds user to database
