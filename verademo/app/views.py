@@ -7,6 +7,7 @@ import hashlib
 from django.views.generic import TemplateView
 from app.models import User
 import pickle
+import sys
 
 from .forms import UserForm
 
@@ -74,7 +75,7 @@ def login(request):
         else:
             logger.info("User details were remembered")
             unencodedUserDetails = pickle.loads(userDetailsCookie)
-            logger.info("User details were retrieved for user: " + unencodedUserDetails.UserName)
+            logger.info("User details were retrieved for user: " + unencodedUserDetails.userName)
             
             # TODO: Set username for session
 
@@ -98,16 +99,13 @@ def login(request):
         else:
             nextView = 'feed'
 
-        connect = None
-        sqlStatement = None
-
         try:
             logger.info("Creating the Database connection")
             with connection.cursor() as cursor:
                 logger.info("Creating database query")
                 sqlQuery = "select username, password, password_hint, created_at, last_login, \
-                            real_name, blab_name from users where username='" + username + "' \
-                            and password='" + hashlib.md5(password) + "';"
+                            real_name, blab_name from Users where username='" + username + "' \
+                            and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
                 if (row):
@@ -134,7 +132,7 @@ def login(request):
 
             # TODO: Implement exceptions
 
-            logger.error("Placeholder")
+            logger.error("Unexpected error:", sys.exc_info()[0])
 
         logger.info("Redirecting to view: " + nextView)
         return redirect(nextView)
