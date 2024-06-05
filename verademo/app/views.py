@@ -275,17 +275,3 @@ def update_in_response(user, response):
     response.set_cookie('user', cookie)
     return response
     
-
-'''
-Interprets POST request from register form, adds user to database
-TODO: Currently linked with register.html
-    - Redirect to login.html
-    - called by completion of register-finish.html
-    - maintiain /register URL
-'''
-def user_create_view(request):
-    form = UserForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        
-    return redirect('feed')
