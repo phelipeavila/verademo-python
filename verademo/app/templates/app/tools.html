@@ -54,10 +54,11 @@
 		<div>
 			<p>Check the uptime of a host here by pinging it. Example: 127.0.0.1</p>
 			<form method="post">
-				<label for="host">Host:</label> <input type="text" name="host"
-					<%if (request.getParameter("host") != null) {%>
-					value={{request.get(host)}} <input
+				<label for="host">Host:</label> input type="text" name="host"
+				{% if 'request.GET.get(host)' != null %}
+					value={{ 'request.GET.get(host)' }} <input
 					type="submit" value="Check" />
+                {% endif %}
 			</form>
 			<pre>${ping}</pre>
 		</div>

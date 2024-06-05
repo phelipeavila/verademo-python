@@ -250,3 +250,10 @@ def processRegisterFinish(request):
 
         
     return render (request, 'app/feed.html')
+
+
+def notImplemented(request):
+    return render(request, 'app/notImplemented.html')
+
+def reset(request):
+    return render(request, 'app/reset.html')
