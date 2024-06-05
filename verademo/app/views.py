@@ -17,6 +17,11 @@ from .forms import UserForm, RegisterForm
 logger = logging.getLogger("__name__")
 
 def feed(request):
+    username = request.session.get('username')
+    if not username:
+        logger.info("User is not Logged In - redirecting...")
+        return redirect('/login?target=feed')
+    request.currentUser = username
     return render(request, 'app/feed.html', {})
 
 def blabbers(request):
@@ -170,9 +175,6 @@ def home(request):
     
     return login(request)
 
-def feed(request):
-    return render(request, 'app/feed.html', {})
-
 def login(request):
     if request.method == "GET":
 
@@ -199,6 +201,8 @@ def login(request):
             request.username = username
             request.target = target
 
+            return render(request, 'app/login.html')
+
         else:
             logger.info("User details were remembered")
             unencodedUserDetails = next(serializers.deserialize('xml', userDetailsCookie))
@@ -212,7 +216,6 @@ def login(request):
             else:
                 return redirect('feed')
 
-        return render(request, 'app/login.html', { "username": username, "target": target })
     
     if request.method == "POST":
         logger.info("Processing login")
