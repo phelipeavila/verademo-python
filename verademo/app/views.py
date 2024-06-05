@@ -295,3 +295,4 @@ def notImplemented(request):
 
 def reset(request):
     return render(request, 'app/reset.html')
+
