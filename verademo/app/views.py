@@ -4,6 +4,7 @@ from django.db import connection
 import sqlite3
 import logging
 import base64
+import subprocess
 import hashlib
 from django.views.generic import TemplateView
 from app.models import User, Blabber
@@ -374,3 +375,54 @@ def notImplemented(request):
 
 def reset(request):
     return render(request, 'app/reset.html')
+
+def processTools(request):
+    value = request.POST.get('tools')
+    method = request.POST.get('method')
+    host = request.POST.get('host')
+    fortuneFile =request.GET.get('fortuneFile')
+    model = model.setattr("ping", host != None, host = ' ')
+
+    if (fortuneFile== None):
+        fortuneFile = "literature"
+    
+    model.setattr("fortunes", fortune(fortuneFile))
+
+    return 'tools'
+
+def fortune(fortuneFile):
+    cmd = "/bin/fortune" + fortuneFile
+    output = " "
+
+    while True:
+        try:
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout.readlines():
+                output += line
+                output += "\n"
+        except IOError as e:
+            logger.error(e)
+        else:
+            logger.error(e)
+
+        return output
+    
+def ping(host):
+    output = ""
+    logger.info("Pinging: " + host)
+
+    while True:
+        try:
+            p = subprocess.Popen("ping -c 1 " + host, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout.readlines():
+                output += line
+                output += "\n"
+
+            logger.info(p.__exit__)
+        except IOError as e:
+            logger.error(e)
+
+        else:
+            logger.error(e)
+
+        return output
