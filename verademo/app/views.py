@@ -294,3 +294,8 @@ def update_in_response(user, response):
     response.set_cookie('user', cookie)
     return response
     
+def notImplemented(request):
+    return render(request, 'app/notImplemented.html')
+
+def reset(request):
+    return render(request, 'app/reset.html')

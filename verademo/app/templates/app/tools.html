@@ -55,21 +55,21 @@
 			<p>Check the uptime of a host here by pinging it. Example: 127.0.0.1</p>
 			<form method="post">
 				<label for="host">Host:</label> <input type="text" name="host"
-					<%if (request.getParameter("host") != null) {%>
-					value={{request.get(host)}} <input
+					value={{ 'request.GET.get(host)' }} ><input
 					type="submit" value="Check" />
 			</form>
-			<pre>${ping}</pre>
+			<pre>${ ping }</pre>
 		</div>
 		<div>
-			<h5>Show a UNIX fortune from one of the 2 supported dictionaries.</h5>
-			<form method="post">
-				<select name="fortunefile">
-					<option value="literature">literature</option>
-					<option value="riddles">riddles</option>
-				</select> <input type="submit" value="Change" />
-			</form>
-			<pre>${fortunes}</pre>
+            <h5>Show a UNIX fortune from one of the 2 supported dictionaries</h5>
+            <form method="post">
+                <select name="fortunelife">
+                <option value={{'literature' }}>literature</option>
+                    <option value={{ 'riddles' }}>riddles</option>
+                </select> <input type="submit" value="Change"/>
+            </form>
+            <pre>${ fortune }</pre>
+			
 		</div>
 	</div>
 
