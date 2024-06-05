@@ -103,16 +103,18 @@ def processRegisterFinish(request):
                 #set variables to make easier to use
                 realName = form.cleaned_data.get('realName')
                 blabName = form.cleaned_data.get('blabName')
-                mysqlCurrentDateTime = datetime.now().strftime('YYYY-MM-DD HH:MM:SS')
+                mysqlCurrentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #create query
                 query = ''
-                query += "insert into users (username, password, created_at, real_name, blab_name) values("
+                query += "insert into app_user (username, password, dateCreated, realName, blabName) values("
                 query += ("'" + username + "',")
-                query += ("'" + realName + "',")
+                query += ("'" + password + "',")
+                
                 # TODO: Implement hashing
                 #query += ("'" + BCrypt.hashpw(password, BCrypt.gensalt()) + "',")
-                query += ("'" + password + "',")
+                
                 query += ("'" + mysqlCurrentDateTime + "',")
+                query += ("'" + realName + "',")
                 query += ("'" + blabName + "'")
                 query += (");")
                 #execute query
@@ -123,7 +125,7 @@ def processRegisterFinish(request):
                 # END EXAMPLE VULNERABILITY
         #TODO: Implement exceptions and final statement
         except: # SQLException, ClassNotFoundException as e:
-            logger.error()
+            logger.error("test")
         '''
         finally:
             try:
