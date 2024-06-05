@@ -51,12 +51,17 @@
 			<h3>Login</h3>
 		</div>
 
-		{% if request.error %}
+		<!-- <%
+			String error = (String) request.getAttribute("error");
+			if (null != error) {
+		%>
 		<div class="alert alert-danger" role="alert">
-			{{ request.error }}
+			<%=error%>
 		</div>
-		{% endif %}
 
+		<%
+			}
+		%> -->
 
 
 		<div class="row">

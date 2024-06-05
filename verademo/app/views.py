@@ -5,12 +5,10 @@ import logging
 import base64
 import hashlib
 from django.views.generic import TemplateView
-from app.models import User
-from django.core import serializers
-
 from datetime import datetime
 import pickle
 import sys
+
 from app.models import User
 from .forms import UserForm, RegisterForm
 
@@ -55,32 +53,35 @@ def showRegister(request):
 
 ''' Sends username into register-finish page'''
 def processRegister(request):
-    context = {
-        'username':request.POST.get('username')
-    }
-    return render(request, 'app/register-finish.html', context)
+    request.session['username'] = request.POST.get('username')
+    return render(request, 'app/register-finish.html')
 
 def home(request):
     # Equivalent of HomeController.java
-    if request.session.get('username'):
-        return redirect('feed')
-    
+    # TODO: Check if user is already logged in.
+    #       If so, redirect to user's feed
+    # if request.user.is_authenticated:
+        # return redirect('feed')
+    # else:
     return login(request)
 
 
 def login(request):
     if request.method == "GET":
-
+        # Equivalent of UserController.java
         target = request.GET.get('target')
         username = request.GET.get('username')
 
-        if request.session.get('username'):
-            logger.info("User is already logged in - redirecting...")
-            if (target != None) and (target) and (not target == "null"):
-                return redirect(target)
-            else:
-                return redirect('feed')
+        # TODO: Check if user is already logged in.
+        #       If user is already logged in, redirect to 'feed' by default or target if exists
+        # if request.user.is_authenticated:
+        #     logger.info("User is already logged in - redirecting...")
+        #     if (target != None) and (target) and (not target == "null"):
+        #         return redirect(target)
+        #     else:
+        #         return redirect('feed')
 
+        # TODO: Use cookies to remember users
         userDetailsCookie = request.COOKIES.get('user')
         if userDetailsCookie is None or not userDetailsCookie:
             logger.info("No user cookie")
@@ -91,16 +92,14 @@ def login(request):
                 target = ''
             logger.info("Entering login with username " + username + " and target " + target)
             
-            request.username = username
-            request.target = target
+            # TODO: Add username and target to login
 
         else:
             logger.info("User details were remembered")
-            unencodedUserDetails = next(serializers.deserialize('xml', userDetailsCookie))
-
-            logger.info("User details were retrieved for user: " + unencodedUserDetails.object.username)
+            unencodedUserDetails = pickle.loads(userDetailsCookie)
+            logger.info("User details were retrieved for user: " + unencodedUserDetails.userName)
             
-            request.session['username'] = unencodedUserDetails.object.username
+            # TODO: Set username for session
 
             if (target != None) and (target) and (not target == "null"):
                 return redirect(target)
@@ -119,10 +118,8 @@ def login(request):
 
         if (target != None) and (target) and (not target == "null"):
             nextView = target
-            response = render(request, 'app/' + nextView + '.html', {})
         else:
             nextView = 'feed'
-            response = render(request, 'app/' + nextView + '.html', {})
 
         try:
             logger.info("Creating the Database connection")
@@ -139,56 +136,34 @@ def login(request):
                 
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
-
                 if (row):
-                    columns = [col[0] for col in cursor.description]
-                    row = dict(zip(columns, row))
                     logger.info("User found")
+                    response = HttpResponse()
                     response.set_cookie('username', username)
                     if (not remember is None):
-                        currentUser = User(username=row["username"],
+                        currentUser = User.objects.create(userName=row["username"],
                                     hint=row["hint"], dateCreated=row["dateCreated"],
                                     lastLogin=row["lastLogin"], realName=row["realName"], 
                                     blabName=row["blabName"])
-                        response = update_in_response(currentUser, response)
+                        response.set_cookie('user', pickle.dumps(currentUser))
                     request.session['username'] = row['username']
 
-                    update = "UPDATE app_user SET lastLogin=date('now') WHERE username='" + row['username'] + "';"
+                    update = "UPDATE users SET lastLogin=NOW() WHERE username={row['" + row['username'] + "']};"
                     cursor.execute(update)
                 else:
                     logger.info("User not found")
 
-                    request.error = "Login failed. Please try again."
-                    request.target = target
+                    # TODO: Add attributes for errors and target
 
                     nextView = 'login'
-                    response = render(request, 'app/' + nextView + '.html', {})
         except:
 
             # TODO: Implement exceptions
 
             logger.error("Unexpected error:", sys.exc_info()[0])
 
-            nextView = 'login'
-            response = render(request, 'app/' + nextView + '.html', {})
-
-        logger.info("Redirecting to view: " + nextView)
-            
-        return response
-
-def logout(request):
-    logger.info("Processing logout")
-    request.session['username'] = None
-    response = redirect('login')
-    response.delete_cookie('user')
-    logger.info("Redirecting to login...")
-    return response
-
-def update_in_response(user, response):
-    cookie = serializers.serialize('xml', [user,])
-    response.set_cookie('user', cookie)
-    return response
-    
+            logger.info("Redirecting to view: " + nextView)
+        return redirect(nextView)
 
 def registerFinish(request):
     if(request.method == "GET"):
@@ -203,12 +178,75 @@ def showRegisterFinish():
 '''
 Interprets POST request from register form, adds user to database
 '''
+'''
+TODO:Manually input registrations using SQL statements.
+- may not work because of change to username field
+'''
 def processRegisterFinish(request):
     logger.info("Entering processRegisterFinish")
-    form = UserForm(request.POST or None)
-    
+    #create variables
+    username = request.session.get('username')
+    cpassword = request.POST.get('cpassword')
+    #fill in required username field
+    form = RegisterForm(request.POST or None)
+    #user now should have all the required fields
+
     if form.is_valid():
-        #form.addAttribute
-        form.save()
+        password = form.cleaned_data.get('password')
+        #Check if passwords from form match
+        if password != cpassword:
+            logger.info("Password and Confirm Password do not match")
+            request.error = "The Password and Confirm Password values do not match. Please try again."
+            return render(request, 'app/register.html')
+        sqlStatement = None
+        try:
+            # Get the Database Connection
+            logger.info("Creating the Database connection")
+            with connection.cursor() as cursor:
+                # START EXAMPLE VULNERABILITY 
+                # Execute the query
+
+                #set variables to make easier to use
+                realName = form.cleaned_data.get('realName')
+                blabName = form.cleaned_data.get('blabName')
+                mysqlCurrentDateTime = datetime.now().strftime('YYYY-MM-DD HH:MM:SS')
+                #create query
+                query = ''
+                query += "insert into users (username, password, created_at, real_name, blab_name) values("
+                query += ("'" + username + "',")
+                query += ("'" + realName + "',")
+                # TODO: Implement hashing
+                #query += ("'" + BCrypt.hashpw(password, BCrypt.gensalt()) + "',")
+                query += ("'" + password + "',")
+                query += ("'" + mysqlCurrentDateTime + "',")
+                query += ("'" + blabName + "'")
+                query += (");")
+                #execute query
+                #test
+                cursor.execute(query)
+                sqlStatement = cursor.fetchone() #<- variable for response
+                logger.info(query)
+                # END EXAMPLE VULNERABILITY
+        #TODO: Implement exceptions and final statement
+        except: # SQLException, ClassNotFoundException as e:
+            logger.error()
+        '''
+        finally:
+            try:
+                if sqlStatement != None:
+                    #sqlStatement.close();
+                
+            except SQLException as exceptSql
+                logger.error(exceptSql)
+            try:
+                if (connect != null) {
+                    connect.close();
+                }
+            } catch (SQLException exceptSql) {
+                logger.error(exceptSql);
+            }
+        '''
         
-    return redirect('feed')
+
+        
+    return render (request, 'app/feed.html')
