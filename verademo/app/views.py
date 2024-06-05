@@ -69,8 +69,7 @@ def showRegisterFinish():
 Interprets POST request from register form, adds user to database
 '''
 '''
-TODO:Manually input registrations using SQL statements.
-- may not work because of change to username field
+TODO:Handle Exceptions
 '''
 def processRegisterFinish(request):
     logger.info("Entering processRegisterFinish")
@@ -99,16 +98,16 @@ def processRegisterFinish(request):
                 #set variables to make easier to use
                 realName = form.cleaned_data.get('realName')
                 blabName = form.cleaned_data.get('blabName')
-                mysqlCurrentDateTime = datetime.now().strftime('YYYY-MM-DD HH:MM:SS')
+                mysqlCurrentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #create query
                 query = ''
-                query += "insert into users (username, password, created_at, real_name, blab_name) values("
+                query += "insert into app_user (username, password, dateCreated, realName, blabName) values("
                 query += ("'" + username + "',")
+                query += ("'" + password + "',")
+                query += ("'" + mysqlCurrentDateTime + "',")
                 query += ("'" + realName + "',")
                 # TODO: Implement hashing
                 #query += ("'" + BCrypt.hashpw(password, BCrypt.gensalt()) + "',")
-                query += ("'" + password + "',")
-                query += ("'" + mysqlCurrentDateTime + "',")
                 query += ("'" + blabName + "'")
                 query += (");")
                 #execute query
@@ -119,7 +118,8 @@ def processRegisterFinish(request):
                 # END EXAMPLE VULNERABILITY
         #TODO: Implement exceptions and final statement
         except: # SQLException, ClassNotFoundException as e:
-            logger.error()
+            logger.info("error") #<- temporary
+            #logger.error("error")
         '''
         finally:
             try:
