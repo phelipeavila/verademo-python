@@ -103,17 +103,18 @@ def processRegisterFinish(request):
                 #set variables to make easier to use
                 realName = form.cleaned_data.get('realName')
                 blabName = form.cleaned_data.get('blabName')
-                mysqlCurrentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                #mysqlCurrentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #create query
                 query = ''
-                query += "insert into app_user (username, password, dateCreated, realName, blabName) values("
+                query += "insert into app_user (username, password, created_at, real_name, blab_name) values("
                 query += ("'" + username + "',")
                 query += ("'" + password + "',")
                 
                 # TODO: Implement hashing
                 #query += ("'" + BCrypt.hashpw(password, BCrypt.gensalt()) + "',")
                 
-                query += ("'" + mysqlCurrentDateTime + "',")
+                #query += ("'" + mysqlCurrentDateTime + "',")
+                query += ("datetime('now'),")
                 query += ("'" + realName + "',")
                 query += ("'" + blabName + "'")
                 query += (");")
@@ -125,7 +126,7 @@ def processRegisterFinish(request):
                 # END EXAMPLE VULNERABILITY
         #TODO: Implement exceptions and final statement
         except: # SQLException, ClassNotFoundException as e:
-            logger.error("test")
+            logger.error("error")
         '''
         finally:
             try:
@@ -219,8 +220,8 @@ def login(request):
                 # sqlQuery = "select username, password, hint, dateCreated, lastLogin, \
                 #             realName, blabName from app_user where username='" + username + "' \
                 #             and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
-                sqlQuery = "select username, password, hint, dateCreated, lastLogin, \
-                            realName, blabName from app_user where username='" + username + "' \
+                sqlQuery = "select username, password, hint, created_at, last_login, \
+                            real_name, blab_name from app_user where username='" + username + "' \
                             and password='" + password + "';"
                 
                 cursor.execute(sqlQuery)
@@ -233,13 +234,13 @@ def login(request):
                     response.set_cookie('username', username)
                     if (not remember is None):
                         currentUser = User(username=row["username"],
-                                    hint=row["hint"], dateCreated=row["dateCreated"],
-                                    lastLogin=row["lastLogin"], realName=row["realName"], 
-                                    blabName=row["blabName"])
+                                    hint=row["hint"], created_at=row["created_at"],
+                                    last_login=row["last_login"], real_name=row["real_name"], 
+                                    blab_name=row["blab_name"])
                         response = update_in_response(currentUser, response)
                     request.session['username'] = row['username']
 
-                    update = "UPDATE app_user SET lastLogin=date('now') WHERE username='" + row['username'] + "';"
+                    update = "UPDATE app_user SET last_login=datetime('now') WHERE username='" + row['username'] + "';"
                     cursor.execute(update)
                 else:
                     logger.info("User not found")

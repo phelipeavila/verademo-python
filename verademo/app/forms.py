@@ -8,7 +8,7 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
-            'username','password','blabName','realName'
+            'username','password','blab_name','real_name'
         ]
 
 class RegisterForm(forms.Form):
