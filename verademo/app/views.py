@@ -131,10 +131,7 @@ def processRegisterFinish(request):
                 query = ''
                 query += "insert into app_user (username, password, created_at, real_name, blab_name) values("
                 query += ("'" + username + "',")
-                query += ("'" + password + "',")
-                
-                # TODO: Implement hashing
-                #query += ("'" + BCrypt.hashpw(password, BCrypt.gensalt()) + "',")
+                query += ("'" + hashlib.md5(password.encode('utf-8')).hexdigest() + "',")
                 
                 #query += ("'" + mysqlCurrentDateTime + "',")
                 query += ("datetime('now'),")
@@ -237,13 +234,9 @@ def login(request):
             with connection.cursor() as cursor:
                 logger.info("Creating database query")
 
-                # TODO: Replace with md5 hash after register uses MD5
-                # sqlQuery = "select username, password, hint, dateCreated, lastLogin, \
-                #             realName, blabName from app_user where username='" + username + "' \
-                #             and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
                 sqlQuery = "select username, password, hint, created_at, last_login, \
                             real_name, blab_name from app_user where username='" + username + "' \
-                            and password='" + password + "';"
+                            and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
                 
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
