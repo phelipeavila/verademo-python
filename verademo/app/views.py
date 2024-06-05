@@ -53,7 +53,9 @@ def showRegister(request):
 
 ''' Sends username into register-finish page'''
 def processRegister(request):
+    logger.info('Entering processRegister')
     request.session['username'] = request.POST.get('username')
+    
     return render(request, 'app/register-finish.html')
 
 def home(request):
@@ -171,14 +173,13 @@ def registerFinish(request):
     elif(request.method == "POST"):
         return processRegisterFinish(request)
 
+'''TODO: This shouldn't pass'''
 def showRegisterFinish():
     logger.info("Entering showRegisterFinish")
     pass
 
 '''
 Interprets POST request from register form, adds user to database
-'''
-'''
 TODO:Handle Exceptions
 '''
 def processRegisterFinish(request):
