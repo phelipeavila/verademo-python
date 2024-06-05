@@ -20,6 +20,7 @@ def feed(request):
     if not username:
         logger.info("User is not Logged In - redirecting...")
         return redirect('/login?target=feed')
+    request.currentUser = username
     return render(request, 'app/feed.html', {})
 
 def blabbers(request):
