@@ -51,9 +51,9 @@
 		<div class="page-header">
 			<h4>Profile</h4>
 		</div>
-        {% if error %}
+        {% if request.error %}
     	<div class="alert alert-danger" role="alert">
-        	{{ error }}
+        	{{ request.error }}
     	</div>
     	{% endif %}
 

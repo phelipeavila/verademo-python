@@ -7,10 +7,10 @@ import base64
 import subprocess
 import hashlib
 from django.views.generic import TemplateView
-from app.models import User
+from app.models import User, Blabber
 from django.core import serializers
 from datetime import datetime
-import sys
+import sys, os
 
 from .forms import UserForm, RegisterForm
 
@@ -28,9 +28,6 @@ def feed(request):
 def blabbers(request):
     return render(request, 'app/blabbers.html', {})
 
-def profile(request):
-    return render(request, 'app/profile.html', {})
-
 def tools(request):
     return render(request, 'app/tools.html', {})
 
@@ -41,7 +38,83 @@ def profile(request):
         return processProfile(request)
     
 def showProfile(request):
-    pass
+    logger.info("Entering showProfile")
+    username = request.session.get('username')
+    if not username:
+        logger.info("User is not Logged In - redirecting...")
+        return redirect("login?target=profile")
+    myHecklers = None
+    myInfo = None
+    sqlMyHecklers = ''
+    sqlMyHecklers += "SELECT users.username, users.blab_name, users.created_at " 
+    sqlMyHecklers += "FROM users LEFT JOIN listeners ON users.username = listeners.listener " 
+    sqlMyHecklers += "WHERE listeners.blabber=? AND listeners.status='Active';"
+    try:
+          
+        logger.info("Getting Database connection")
+        with connection.cursor() as cursor:    
+            # Find the Blabbers that this user listens to
+            logger.info(sqlMyHecklers)
+            cursor.execute(sqlMyHecklers, username)
+            myHecklersResults = cursor.fetchall()
+            hecklers=[]
+            for i in myHecklersResults:
+                
+                heckler = Blabber()
+                heckler.setUsername(i[0])
+                heckler.setBlabName(i[1])
+                heckler.setCreatedDate(i[2])
+                hecklers.add(heckler)
+            
+
+            # Get the audit trail for this user
+            events = []
+
+            # START EXAMPLE VULNERABILITY 
+            sqlMyEvents = "select event from users_history where blabber=\"" + username
+            + "\" ORDER BY eventid DESC; "
+            logger.info(sqlMyEvents)
+            cursor.execute(sqlMyEvents)
+            userHistoryResult = cursor.fetchall()
+            # END EXAMPLE VULNERABILITY 
+
+            for result in userHistoryResult :
+                events.add(result[0])
+
+            # Get the users information
+            sql = "SELECT username, real_name, blab_name FROM users WHERE username = '" + username + "'"
+            logger.info(sql)
+            cursor.execute(sql)
+            myInfoResults = cursor.fetchall()
+            myInfoResults.next()
+
+            # Send these values to our View
+            request.hecklers = hecklers
+            request.events = events
+            request.username = myInfoResults['username']
+            request.image = getProfileImageNameFromUsername(myInfoResults['username'])
+            request.realName = myInfoResults['real_name']
+            request.blabName = myInfoResults['blab_name']
+    except sqlite3.Error as ex :
+        logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
+    '''
+    finally:    
+        try:
+            if not myHecklers :
+                myHecklers.close()
+        
+        except sqlite3.Error as exceptSql :
+            logger.error(exceptSql.sqlite_errorcode, exceptSql.sqlite_errorname)
+        
+        try:
+            if (connect != null) {
+                connect.close();
+            }
+        except sqlite3.Error as exceptSql :
+            logger.error(exceptSql.sqlite_errorcode, exceptSql.sqlite_errorname)
+    ''' 
+        
+    return render(request, 'app/profile.html', {})
 
 def processProfile(request):
     pass
@@ -56,6 +129,7 @@ def register(request):
 renders the register.html file, called by a path in urls
 '''
 def showRegister(request):
+    logger.info("Entering showRegister")
     return render(request, 'app/register.html', {})
 
 ''' Sends username into register-finish page'''
@@ -69,7 +143,7 @@ def processRegister(request):
     try:
         
         with connection.cursor() as cursor:
-            sqlQuery = "SELECT username FROM app_user WHERE username = '" + username + "'"
+            sqlQuery = "SELECT username FROM users WHERE username = '" + username + "'"
             cursor.execute(sqlQuery)
             row = cursor.fetchone()
             if (row):
@@ -91,14 +165,12 @@ def registerFinish(request):
         return processRegisterFinish(request)
 
 '''TODO: This shouldn't pass'''
-def showRegisterFinish():
+def showRegisterFinish(request):
     logger.info("Entering showRegisterFinish")
-    pass
+    return render(request, 'app/register-finish', {})
 
 '''
 Interprets POST request from register form, adds user to database
-TODO:Manually input registrations using SQL statements.
-- may not work because of change to username field
 '''
 def processRegisterFinish(request):
     logger.info("Entering processRegisterFinish")
@@ -130,7 +202,7 @@ def processRegisterFinish(request):
                 #mysqlCurrentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #create query
                 query = ''
-                query += "insert into app_user (username, password, created_at, real_name, blab_name) values("
+                query += "insert into users (username, password, created_at, real_name, blab_name) values("
                 query += ("'" + username + "',")
                 query += ("'" + hashlib.md5(password.encode('utf-8')).hexdigest() + "',")
                 
@@ -235,10 +307,10 @@ def login(request):
             with connection.cursor() as cursor:
                 logger.info("Creating database query")
 
-                sqlQuery = "select username, password, hint, created_at, last_login, \
-                            real_name, blab_name from app_user where username='" + username + "' \
+                sqlQuery = "select username, password, password_hint, created_at, last_login, \
+                            real_name, blab_name from users where username='" + username + "' \
                             and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
-                
+
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
 
@@ -255,7 +327,7 @@ def login(request):
                         response = update_in_response(currentUser, response)
                     request.session['username'] = row['username']
 
-                    update = "UPDATE app_user SET last_login=datetime('now') WHERE username='" + row['username'] + "';"
+                    update = "UPDATE users SET last_login=datetime('now') WHERE username='" + row['username'] + "';"
                     cursor.execute(update)
                 else:
                     logger.info("User not found")
@@ -290,7 +362,16 @@ def update_in_response(user, response):
     cookie = serializers.serialize('xml', [user,])
     response.set_cookie('user', cookie)
     return response
-    
+
+def getProfileImageNameFromUsername(username):
+    f = os.path.realpath("/resources/images")
+    matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
+
+    if not matchingFiles:
+        return None
+    return matchingFiles[0]
+
+
 def notImplemented(request):
     return render(request, 'app/notImplemented.html')
 
