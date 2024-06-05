@@ -9,5 +9,5 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Blab)
 class BlabAdmin(admin.ModelAdmin):
-    list_display = ['id', 'content', 'postDate', 'commentCount']
+    list_display = ['blabid', 'content', 'timestamp']
 
