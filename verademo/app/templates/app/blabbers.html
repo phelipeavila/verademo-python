@@ -33,11 +33,16 @@
 		<div class="header clearfix">
 			<nav>
 				<ul class="nav nav-pills pull-right">
-					<li role="presentation"><a href="feed">Feed</a></li>
-					<li role="presentation" class="active"><a href="blabbers">Blabbers</a></li>
-					<li role="presentation"><a href="profile">Profile</a></li>
-					<li role="presentation"><a href="tools">Tools</a></li>
-					<li role="presentation"><a href="logout">Logout</a></li>
+					<li role="presentation"><a 
+						href="feed">Feed</a></li>
+					<li role="presentation" class="active"><a 
+						href="blabbers">Blabbers</a></li>
+					<li role="presentation"><a 
+						href="profile">Profile</a></li>
+					<li role="presentation"><a 
+						href="tools">Tools</a></li>
+					<li role="presentation"><a 
+						href="logout">Logout</a></li>
 				</ul>
 			</nav>
 			<img src="{% static 'images/Tokyoship_Talk_icon.svg' %}" height="100"
@@ -53,19 +58,13 @@
 			<h4>Choose Blabbers to Listen to</h4>
 		</div>
 		<div></div>
-        <!--
-		<%
-			String error = (String) request.getAttribute("error");
-			if (null != error) {
-		%>
-		<div class="alert alert-danger" role="alert">
-			<%=error%>
-		</div>
 
-		<%
-			}
-		%>
--->
+        {% if request.error %}
+		    <div class="alert alert-danger" role="alert">
+                {{ request.error }}
+		    </div>
+        {% endif %}
+
 		<div class="row">
 			<div class="col-md-12">
 				<div class="detailBox">
@@ -86,42 +85,32 @@
 								</tr>
 							</thead>
 							<tbody>
-                                <!--
-								<%
-									@SuppressWarnings("unchecked")
-									ArrayList<Blabber> blabbers = (ArrayList<Blabber>) request.getAttribute("blabbers");
-
-									for (Blabber blabber : blabbers) {
-								%>
-								<tr>
-									<td class="commenterImage">
-										<img src="resources/images/<%= blabber.getUsername() %>.png" />
-									</td>
-									<td class="commenterName">
-										<%= blabber.getBlabName() %>
-									</td>
-									<td class="commenterJoinDate">
-										<%= blabber.getCreatedDateString() %>
-									</td>
-									<td class="commenterListening">
-										&nbsp;<%= blabber.getNumberListening() %>&nbsp;
-									</td>
-									<td>
-										<form class="form-inline" role="form" method="POST"
-											action="blabbers">
-											<input type="hidden" name="blabberUsername"
-												value="<%= HtmlUtils.htmlEscape(blabber.getUsername()) %>" />
-											<input type="hidden" name="command"
-												value="<%=(blabber.getNumberListeners() == 1 ? "ignore" : "listen")%>" />
-											<input type="submit" class="btn btn-default pull-right" name="button"
-												value="<%=(blabber.getNumberListeners() == 1 ? "Ignore" : "Listen")%>" />
-										</form>
-									</td>
-								</tr>
-								<%
-									}
-								%>
-                                -->
+								{% for blabber in  blabbers%}
+									<tr> 
+										<td class="commenterImage">
+                                            <img src="{% static 'images/' %}{{ blabber.getUsername }}.png" />
+                                        </td>
+                                        <td class="commenterName">
+                                            {{ blabber.getBlabName }}
+                                        </td>
+                                        <td class="commenterJoinDate">
+                                            {{ blabber.getCreatedDateString }}
+                                        </td>
+                                        <td class="commenterListening">
+                                            {{ blabber.getNumberListening }}
+                                        </td>
+										<td>
+											<form class="form-inline" role="form" method="POST"
+                                                action="blabbers">
+                                                <input type="hidden" name="blabberUsername"
+                                                    value= {{ blabber.getUsername }} />
+                                                <input type="hidden" name="command"
+                                                    value= {{ blabber.getNumberListeners }}{% static "ignore : listen" %}/>
+                                                <input type="submit" class="btn btn-default pull-right" name="button"
+                                                    value= {{ blabber.getNumberListening }}{% static "ignore : listen" %} />
+                                            </form>
+                                        </td>
+								{% endfor %}
 							</tbody>
 						</table>
 					</div>
