@@ -6,10 +6,10 @@ import logging
 import base64
 import hashlib
 from django.views.generic import TemplateView
-from app.models import User
+from app.models import User, Blabber
 from django.core import serializers
 from datetime import datetime
-import sys
+import sys, os
 
 from .forms import UserForm, RegisterForm
 
@@ -27,9 +27,6 @@ def feed(request):
 def blabbers(request):
     return render(request, 'app/blabbers.html', {})
 
-def profile(request):
-    return render(request, 'app/profile.html', {})
-
 def tools(request):
     return render(request, 'app/tools.html', {})
 
@@ -42,9 +39,81 @@ def profile(request):
 def showProfile(request):
     logger.info("Entering showProfile")
     username = request.session.get('username')
-    if username is None:
+    if not username:
         logger.info("User is not Logged In - redirecting...")
         return redirect("login?target=profile")
+    myHecklers = None
+    myInfo = None
+    sqlMyHecklers = ''
+    sqlMyHecklers += "SELECT app_user.username, app_user.blab_name, app_user.created_at " 
+    sqlMyHecklers += "FROM app_user LEFT JOIN listeners ON app_user.username = listeners.listener " 
+    sqlMyHecklers += "WHERE listeners.blabber=? AND listeners.status='Active';"
+    try:
+          
+        logger.info("Getting Database connection")
+        with connection.cursor() as cursor:    
+            # Find the Blabbers that this user listens to
+            logger.info(sqlMyHecklers)
+            cursor.execute(sqlMyHecklers)
+            myHecklersResults = cursor.fetchall()
+            hecklers=[]
+            for i in myHecklersResults:
+                
+                heckler = Blabber()
+                heckler.setUsername(i[0])
+                heckler.setBlabName(i[1])
+                heckler.setCreatedDate(i[2])
+                hecklers.add(heckler)
+            
+
+            # Get the audit trail for this user
+            events = []
+
+            # START EXAMPLE VULNERABILITY 
+            sqlMyEvents = "select event from users_history where blabber=\"" + username
+            + "\" ORDER BY eventid DESC; "
+            logger.info(sqlMyEvents)
+            cursor.execute(sqlMyEvents)
+            userHistoryResult = cursor.fetchall()
+            # END EXAMPLE VULNERABILITY 
+
+            for result in userHistoryResult :
+                events.add(result[0])
+
+            # Get the users information
+            sql = "SELECT username, real_name, blab_name FROM users WHERE username = '" + username + "'"
+            logger.info(sql)
+            cursor.execute(sql)
+            myInfoResults = cursor.fetchall()
+            myInfoResults.next()
+
+            # Send these values to our View
+            request.hecklers = hecklers
+            request.events = events
+            request.username = myInfoResults['username']
+            request.image = getProfileImageNameFromUsername(myInfoResults['username'])
+            request.realName = myInfoResults['real_name']
+            request.blabName = myInfoResults['blab_name']
+    except sqlite3.Error as ex :
+        logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
+    '''
+    finally:    
+        try:
+            if not myHecklers :
+                myHecklers.close()
+        
+        except sqlite3.Error as exceptSql :
+            logger.error(exceptSql.sqlite_errorcode, exceptSql.sqlite_errorname)
+        
+        try:
+            if (connect != null) {
+                connect.close();
+            }
+        except sqlite3.Error as exceptSql :
+            logger.error(exceptSql.sqlite_errorcode, exceptSql.sqlite_errorname)
+    ''' 
+        
+    return render(request, 'app/profile.html', {})
 
 def processProfile(request):
     pass
@@ -301,7 +370,16 @@ def update_in_response(user, response):
     cookie = serializers.serialize('xml', [user,])
     response.set_cookie('user', cookie)
     return response
-    
+
+def getProfileImageNameFromUsername(username):
+    f = os.path.realpath("/resources/images")
+    matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
+
+    if not matchingFiles:
+        return None
+    return matchingFiles[0]
+
+
 def notImplemented(request):
     return render(request, 'app/notImplemented.html')
 
