@@ -5,10 +5,10 @@ class User(models.Model):
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     hint = models.CharField(max_length=100, null=True)
-    dateCreated = models.DateField(null=True)
-    lastLogin = models.DateField(null=True)
-    blabName=models.CharField(max_length=100, null=True)
-    realName=models.CharField(max_length=100, null=True)
+    created_at = models.DateTimeField(null=True)
+    last_login = models.DateTimeField(null=True)
+    real_name=models.CharField(max_length=100, null=True)
+    blab_name=models.CharField(max_length=100, null=True)
     
 class Blab(models.Model):
     content = models.TextField(max_length=1000)
@@ -43,13 +43,13 @@ class Blabber(models.Model):
         return self.username
     
     def getRealName(self):
-        return self.realName
+        return self.real_name
     
     def getBlabName(self):
-        return self.blabName
+        return self.blab_name
     
     def getCreatedDate(self):
-        return self.createdDate
+        return self.created_at
     
     def getNumListeners(self):
         return self.numberListeners
