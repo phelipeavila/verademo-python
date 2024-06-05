@@ -47,14 +47,14 @@ def showProfile(request):
     sqlMyHecklers = ''
     sqlMyHecklers += "SELECT users.username, users.blab_name, users.created_at " 
     sqlMyHecklers += "FROM users LEFT JOIN listeners ON users.username = listeners.listener " 
-    sqlMyHecklers += "WHERE listeners.blabber=? AND listeners.status='Active';"
+    sqlMyHecklers += "WHERE listeners.blabber='%s' AND listeners.status='Active';"
     try:
           
         logger.info("Getting Database connection")
         with connection.cursor() as cursor:    
             # Find the Blabbers that this user listens to
             logger.info(sqlMyHecklers)
-            cursor.execute(sqlMyHecklers, username)
+            cursor.execute(sqlMyHecklers % username)
             myHecklersResults = cursor.fetchall()
             hecklers=[]
             for i in myHecklersResults:
@@ -70,8 +70,7 @@ def showProfile(request):
             events = []
 
             # START EXAMPLE VULNERABILITY 
-            sqlMyEvents = "select event from users_history where blabber=\"" + username
-            + "\" ORDER BY eventid DESC; "
+            sqlMyEvents = "select event from users_history where blabber=\"" + username + "\" ORDER BY eventid DESC; "
             logger.info(sqlMyEvents)
             cursor.execute(sqlMyEvents)
             userHistoryResult = cursor.fetchall()
@@ -84,16 +83,15 @@ def showProfile(request):
             sql = "SELECT username, real_name, blab_name FROM users WHERE username = '" + username + "'"
             logger.info(sql)
             cursor.execute(sql)
-            myInfoResults = cursor.fetchall()
-            myInfoResults.next()
+            myInfoResults = cursor.fetchone()
 
             # Send these values to our View
             request.hecklers = hecklers
             request.events = events
-            request.username = myInfoResults['username']
-            request.image = getProfileImageNameFromUsername(myInfoResults['username'])
-            request.realName = myInfoResults['real_name']
-            request.blabName = myInfoResults['blab_name']
+            request.username = myInfoResults[0]
+            request.image = getProfileImageNameFromUsername(myInfoResults[0])
+            request.realName = myInfoResults[1]
+            request.blabName = myInfoResults[2]
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     '''
@@ -363,7 +361,7 @@ def update_in_response(user, response):
     return response
 
 def getProfileImageNameFromUsername(username):
-    f = os.path.realpath("/resources/images")
+    f = os.path.realpath("./resources/images")
     matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
 
     if not matchingFiles:
