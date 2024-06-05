@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpRequest
 from django.db import connection
+import sqlite3
 import logging
 import base64
 import hashlib
@@ -54,9 +55,28 @@ def showRegister(request):
 ''' Sends username into register-finish page'''
 def processRegister(request):
     logger.info('Entering processRegister')
-    request.session['username'] = request.POST.get('username')
+    username = request.POST.get('username')
+    request.session['username'] = username
+
+    # Get the Database Connection
+    logger.info("Creating the Database connection");
+    try:
+        
+        with connection.cursor() as cursor:
+            sqlQuery = "SELECT username FROM app_user WHERE username = '" + username + "'"
+            cursor.execute(sqlQuery)
+            row = cursor.fetchone()
+            if (row):
+                request.error = "Username '" + username + "' already exists!"
+                return render(request, 'app/register.html')
+            else:
+                return render(request, 'app/register-finish.html')
+    except sqlite3.Error as ex :
+        logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     
-    return render(request, 'app/register-finish.html')
+    
+    
+    return render(request, 'app/register.html')
 
 def registerFinish(request):
     if(request.method == "GET"):
@@ -71,8 +91,6 @@ def showRegisterFinish():
 
 '''
 Interprets POST request from register form, adds user to database
-'''
-'''
 TODO:Manually input registrations using SQL statements.
 - may not work because of change to username field
 '''
@@ -119,14 +137,14 @@ def processRegisterFinish(request):
                 query += ("'" + blabName + "'")
                 query += (");")
                 #execute query
-                #test
                 cursor.execute(query)
                 sqlStatement = cursor.fetchone() #<- variable for response
                 logger.info(query)
                 # END EXAMPLE VULNERABILITY
         #TODO: Implement exceptions and final statement
-        except: # SQLException, ClassNotFoundException as e:
-            logger.error("error")
+        except sqlite3.Error as er:
+            logger.error(er.sqlite_errorcode,er.sqlite_errorname)
+        # except ClassNotFoundException as
         '''
         finally:
             try:

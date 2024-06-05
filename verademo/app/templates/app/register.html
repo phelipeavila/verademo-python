@@ -49,7 +49,7 @@
 		<div class="page-header">
 			<h3>Register</h3>
 		</div>
-		<!--TODO: Check if request.session is necessary or if just {{ error }} works-->
+
 		{% if request.error %}
     	<div class="alert alert-danger" role="alert">
         	{{ request.error }}
@@ -64,11 +64,7 @@
 						<h3 class="panel-title">Please provide your user information
 							to register for Blab</h3>
 					</div>
-					<!--
-					<%
-					String username = (String) request.getSession().getAttribute("username");
-					if (username == null) username = "";
-					%>-->
+
 					<div class="panel-body">
 						<!-- TODO: Link form post method to User model-->
 						<form method="POST" action="register">
@@ -80,9 +76,13 @@
 									<tr>
 										<td>Username</td>
 										<td><div class="form-group">
-												<input id='username' type="text" maxlength='100' class="form-control" name="username"
-													{% comment %}value="<%=(String) request.getAttribute("username")%>" {% endcomment %}>
-											</div></td>
+											{% if request.session.username %}
+												<input id='username' type="text" maxlength='100' class="form-control" name="username" value={{ request.session.username }}>											</div></td>
+
+											{% else %}
+												<input id='username' type="text" maxlength='100' class="form-control" name="username" value = "">											</div></td>
+
+											{% endif %}										</div></td>
 									</tr>
 									<tr>
 										<td><button type="submit" class="btn btn-primary"
