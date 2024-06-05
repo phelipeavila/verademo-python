@@ -35,7 +35,11 @@ def profile(request):
         return processProfile(request)
     
 def showProfile(request):
-    pass
+    logger.info("Entering showProfile")
+    username = request.session.get('username')
+    if username is None:
+        logger.info("User is not Logged In - redirecting...")
+        return redirect("login?target=profile")
 
 def processProfile(request):
     pass
@@ -50,6 +54,7 @@ def register(request):
 renders the register.html file, called by a path in urls
 '''
 def showRegister(request):
+    logger.info("Entering showRegister")
     return render(request, 'app/register.html', {})
 
 ''' Sends username into register-finish page'''
@@ -85,9 +90,9 @@ def registerFinish(request):
         return processRegisterFinish(request)
 
 '''TODO: This shouldn't pass'''
-def showRegisterFinish():
+def showRegisterFinish(request):
     logger.info("Entering showRegisterFinish")
-    pass
+    return render(request, 'app/register-finish', {})
 
 '''
 Interprets POST request from register form, adds user to database
