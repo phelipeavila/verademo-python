@@ -6,7 +6,7 @@ import logging
 import base64
 import hashlib
 from django.views.generic import TemplateView
-from app.models import User
+from app.models import User, Blabber, Blab
 from django.core import serializers
 from datetime import datetime
 import sys
@@ -16,13 +16,140 @@ from .forms import UserForm, RegisterForm
 # Get logger
 logger = logging.getLogger("__name__")
 
+sqlBlabsByMe = ('''SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid
+			    FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid
+			    WHERE blabs.blabber = ? GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;''')
+
+sqlBlabsForMe = ('''SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid
+			    FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber
+			    LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = ?
+			    GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT %d OFFSET %d;''')
+
 def feed(request):
+    if request.method == "GET":
+        username = request.session.get('username')
+        if not username:
+            logger.info("User is not Logged In - redirecting...")
+            return redirect('/login?target=feed')
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        try:
+            logger.info("Creating the Database connection")
+            with connection.cursor() as cursor:
+
+                # TODO: Find the Blabs that this user listens to
+
+                logger.info("Executing query to get all 'Blabs for me'")
+                # cursor.execute(sqlBlabsForMe, username)
+                # blabsForMeResults = cursor.fetchall()
+
+                feedBlabs = []
+                # for blab in blabsForMeResults:
+                #     author = Blabber()
+                    
+                #     # TODO: Add all blabs in results to feedBlabs list
+                
+                request.blabsByOthers = feedBlabs
+                request.currentUser = username
+
+                # Find the Blabs by this user
+
+                logger.info("Executing query to get all of user's Blabs")
+                # cursor.execute(sqlBlabsByMe, username)
+                # blabsByMeResults = cursor.fetchall()
+
+                myBlabs = []
+                # for blab in myBlabs:
+                #     post = Blab()
+
+                #     # TODO: Add all blabs in results to myBlabs list
+                    
+                request.blabsByMe = myBlabs
+
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+            nextView = 'login'
+            response = render(request, 'app/' + nextView + '.html', {})
+            
+        return render(request, 'app/feed.html', {})
+
+    if request.method == "POST":
+        blab = request.POST.get('blab')
+        response = redirect('feed')
+        logger.info("Processing Blabs")
+
+        username = request.session.get('username')
+        if (not username):
+            logger.info("User is not Logged In - redirecting...")
+            return redirect('/login?target=feed')
+        
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        try :
+            logger.info("Creating the Database connection")
+            with connection.cursor() as cursor:
+
+                logger.info("Creating query to add new Blab")
+                addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values (?, ?, datetime('now'));"
+
+                logger.info("Executing query to add new blab")
+                # addBlabResult = cursor.execute(addBlabSql, (username, blab))
+
+                # if addBlabResult:
+                #     request.error = "Failed to add comment"
+
+                response = redirect("feed")
+
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+        return response
+    
+def morefeed(request):
+    count = request.GET.get('count')
+    length = request.GET.get('len')
+
+    template = ("<li><div>" + "\t<div class=\"commenterImage\">" + "\t\t<img src=\"resources/images/{username}.png\">" +
+				"\t</div>" + "\t<div class=\"commentText\">" + "\t\t<p>{content}</p>" +
+				"\t\t<span class=\"date sub-text\">by {blab_name} on {timestamp}</span><br>" +
+				"\t\t<span class=\"date sub-text\"><a href=\"blab?blabid={blabid}\">{count} Comments</a></span>" + "\t</div>" +
+				"</div></li>")
+    
+    try:
+        cnt = int(count)
+        len = int(length)
+    except ValueError:
+        redirect('feed')
+
     username = request.session.get('username')
-    if not username:
-        logger.info("User is not Logged In - redirecting...")
-        return redirect('/login?target=feed')
-    request.currentUser = username
-    return render(request, 'app/feed.html', {})
+
+    try :
+        logger.info("Creating the Database connection")
+        with connection.cursor() as cursor:
+
+            logger.info("Executing query to see more Blabs")
+            # cursor.execute(sqlBlabsForMe, username)
+            # results = cursor.fetchall()
+            # ret = ""
+            # for blab in results:
+
+
+            
+
+    except:
+
+        # TODO: Implement exceptions
+
+        logger.error("Unexpected error:", sys.exc_info()[0])
+
+
 
 def blabbers(request):
     return render(request, 'app/blabbers.html', {})
@@ -64,7 +191,7 @@ def processRegister(request):
     request.session['username'] = username
 
     # Get the Database Connection
-    logger.info("Creating the Database connection");
+    logger.info("Creating the Database connection")
     try:
         
         with connection.cursor() as cursor:
