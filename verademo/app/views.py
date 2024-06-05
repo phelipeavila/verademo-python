@@ -45,8 +45,8 @@ def showProfile(request):
     myHecklers = None
     myInfo = None
     sqlMyHecklers = ''
-    sqlMyHecklers += "SELECT app_user.username, app_user.blab_name, app_user.created_at " 
-    sqlMyHecklers += "FROM app_user LEFT JOIN listeners ON app_user.username = listeners.listener " 
+    sqlMyHecklers += "SELECT users.username, users.blab_name, users.created_at " 
+    sqlMyHecklers += "FROM users LEFT JOIN listeners ON users.username = listeners.listener " 
     sqlMyHecklers += "WHERE listeners.blabber=? AND listeners.status='Active';"
     try:
           
@@ -54,7 +54,7 @@ def showProfile(request):
         with connection.cursor() as cursor:    
             # Find the Blabbers that this user listens to
             logger.info(sqlMyHecklers)
-            cursor.execute(sqlMyHecklers)
+            cursor.execute(sqlMyHecklers, username)
             myHecklersResults = cursor.fetchall()
             hecklers=[]
             for i in myHecklersResults:
@@ -142,7 +142,7 @@ def processRegister(request):
     try:
         
         with connection.cursor() as cursor:
-            sqlQuery = "SELECT username FROM app_user WHERE username = '" + username + "'"
+            sqlQuery = "SELECT username FROM users WHERE username = '" + username + "'"
             cursor.execute(sqlQuery)
             row = cursor.fetchone()
             if (row):
@@ -170,8 +170,6 @@ def showRegisterFinish(request):
 
 '''
 Interprets POST request from register form, adds user to database
-TODO:Manually input registrations using SQL statements.
-- may not work because of change to username field
 '''
 def processRegisterFinish(request):
     logger.info("Entering processRegisterFinish")
@@ -203,7 +201,7 @@ def processRegisterFinish(request):
                 #mysqlCurrentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #create query
                 query = ''
-                query += "insert into app_user (username, password, created_at, real_name, blab_name) values("
+                query += "insert into users (username, password, created_at, real_name, blab_name) values("
                 query += ("'" + username + "',")
                 query += ("'" + password + "',")
                 
@@ -315,8 +313,8 @@ def login(request):
                 # sqlQuery = "select username, password, hint, dateCreated, lastLogin, \
                 #             realName, blabName from app_user where username='" + username + "' \
                 #             and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
-                sqlQuery = "select username, password, hint, created_at, last_login, \
-                            real_name, blab_name from app_user where username='" + username + "' \
+                sqlQuery = "select username, password, password_hint, created_at, last_login, \
+                            real_name, blab_name from users where username='" + username + "' \
                             and password='" + password + "';"
                 
                 cursor.execute(sqlQuery)
@@ -335,7 +333,7 @@ def login(request):
                         response = update_in_response(currentUser, response)
                     request.session['username'] = row['username']
 
-                    update = "UPDATE app_user SET last_login=datetime('now') WHERE username='" + row['username'] + "';"
+                    update = "UPDATE users SET last_login=datetime('now') WHERE username='" + row['username'] + "';"
                     cursor.execute(update)
                 else:
                     logger.info("User not found")
