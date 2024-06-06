@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 from app.models import User, Blabber
 from django.core import serializers
 from datetime import datetime
+
 import sys, os
 
 from .forms import UserForm, RegisterForm
@@ -379,18 +380,22 @@ def reset(request):
     return render(request, 'app/reset.html')
 
 def processTools(request):
-    value = request.POST.get('tools')
-    method = request.POST.get('method')
-    host = request.POST.get('host')
+    value = request.GET.get('tools')
+    method = request.GET.get('method')
+    host = request.GET.get('host')
     fortuneFile =request.GET.get('fortuneFile')
-    model = model.setattr("ping", host != None, host = ' ')
+    if host != None:
+        request.ping = ping(host)
+    else:
+        request.ping = ""
 
-    if (fortuneFile== None):
+
+    if (fortuneFile == None):
         fortuneFile = "literature"
     
-    model.setattr("fortunes", fortune(fortuneFile))
+    
 
-    return 'tools'
+    return render(request, 'app/tools.html')
 
 def fortune(fortuneFile):
     cmd = "/bin/fortune" + fortuneFile
@@ -415,7 +420,7 @@ def ping(host):
 
     while True:
         try:
-            p = subprocess.Popen("ping -c 1 " + host, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = os.system("ping -c 1 -w2 " + host + " > /dev/null 2>&1")
             for line in p.stdout.readlines():
                 output += line
                 output += "\n"
