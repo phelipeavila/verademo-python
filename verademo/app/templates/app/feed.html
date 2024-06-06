@@ -104,10 +104,11 @@
                         </div>
                         <div class="actionBox">
                             <div class="blabber">
-                                <form class="form-inline" role="form" method="POST" action="feed">
+                                <form class="form-inline" role="form" method="POST" action="feed" >
                                     <div class="form-group">
+                                        {% csrf_token %}
                                         <input class="form-control" type="text"
-                                            placeholder={{ "Blab something now..." }} name={{"blab"}} />
+                                            placeholder="Blab something now..." name="blab" />
                                     </div>
                                     <div class="form-group">
                                         <button class="btn btn-default">Add</button>
@@ -116,17 +117,19 @@
                             </div> 
                             <ul class="commentList">
                                 {% block content %}
+                                {% with myBlabs=request.blabsByMe %}
                                 {% for post in myBlabs %}
                                 <li>
                                     <div class="commentText">
-                                        <p class=""> {{" post.getContent() "}} </p>
-                                        <span class="date sub-text">by you on {{" post.getPostDateString() "}} </span><br/>
+                                        <p class=""> {{post.getContent}} </p>
+                                        <span class="date sub-text">by you on {{post.getPostDateString}} </span><br/>
                                         <span class="date sub-text">
-                                            <a href={{" blab ? blabid = post.getId() "}}> {{" post.getCommentCount() "}} Comments</a>
+                                            <a href="blab?blabid={{post.getId}}"> {{post.getCommentCount}} Comments</a>
                                         </span>
                                     </div>
                                 </li>
                                 {% endfor %}
+                                {% endwith %}
                                 {% endblock %}
                             </ul>
                         </div>
