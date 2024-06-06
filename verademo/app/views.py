@@ -29,9 +29,6 @@ def feed(request):
 def blabbers(request):
     return render(request, 'app/blabbers.html', {})
 
-def tools(request):
-    return render(request, 'app/tools.html', {})
-
 def profile(request):
     if(request.method == "GET"):
         return showProfile(request)
@@ -377,21 +374,39 @@ def notImplemented(request):
 def reset(request):
     return render(request, 'app/reset.html')
 
+def tools(request):
+    if(request.method == "GET"):
+        return showTools(request)
+    elif(request.method == "POST"):
+        return processTools(request)
+    
+def showTools(request):
+    return render(request, 'app/tools.html', {})
+
 def processTools(request):
-    value = request.GET.get('tools')
-    method = request.GET.get('method')
-    host = request.GET.get('host')
-    fortuneFile =request.GET.get('fortuneFile')
-    if host != None:
-        request.ping = ping(host)
-    else:
-        request.ping = ""
+    host = request.POST.get('host')
+    fortuneFile = request.POST.get('fortuneFile')
+    ping_result = ping(host) if host else ""
+    
+    if not fortuneFile:
+        fortuneFile = 'literature'
+        fortune(fortuneFile)
+
+    # Previous Logic
+    '''logger.info("Processing tools")
+    toolMenu = request.POST.get('/tools')
+    host = request.POST.get('host')
+    form = RegisterForm(request.POST or None)
+    if form.is_valid():
+        cHost = form.cleaned_data.get('host')
+        if host is not None:
+            logger.info("Host: " + host)
+            ping(host) '''
 
 
-    if (fortuneFile == None):
-        fortuneFile = "literature"
-    
-    
+
+
+
 
     return render(request, 'app/tools.html')
 
@@ -399,7 +414,19 @@ def fortune(fortuneFile):
     cmd = "/bin/fortune" + fortuneFile
     output = " "
 
-    while True:
+    try: 
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+            b'output += line + "\n"'.decode("utf-8")
+            
+    except IOError as e:
+        print("Error occurred:", e)
+        logger.error(e)
+
+        return output
+
+
+    '''while True:
         try:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in p.stdout.readlines():
@@ -410,10 +437,29 @@ def fortune(fortuneFile):
         else:
             logger.error(e)
 
-        return output
+        return output'''
     
+
 def ping(host):
     output = ""
+    
+    try:
+        p = subprocess.Popen(['ping', '-c', '1', host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        stdout, stderr = p.communicate(timeout=5)
+    
+        output = stdout.decode() if stdout else ""
+        print("Exit Code:", p.returncode)
+    except subprocess.TimeoutExpired:
+        print("Ping request timed out")
+    except Exception as e:
+        print("Error occurred:", e)
+    
+    return output
+
+   
+   
+''' output = ""
     logger.info("Pinging: " + host)
 
     while True:
@@ -430,4 +476,4 @@ def ping(host):
         else:
             logger.error(e)
 
-        return output
+        return output '''
