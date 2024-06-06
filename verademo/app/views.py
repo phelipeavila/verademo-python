@@ -4,6 +4,7 @@ from django.db import connection
 import sqlite3
 import logging
 import base64
+import subprocess
 import hashlib
 from django.views.generic import TemplateView
 from app.models import User, Blabber, Blab, Blabber
@@ -175,14 +176,14 @@ def showProfile(request):
     sqlMyHecklers = ''
     sqlMyHecklers += "SELECT users.username, users.blab_name, users.created_at " 
     sqlMyHecklers += "FROM users LEFT JOIN listeners ON users.username = listeners.listener " 
-    sqlMyHecklers += "WHERE listeners.blabber=? AND listeners.status='Active';"
+    sqlMyHecklers += "WHERE listeners.blabber='%s' AND listeners.status='Active';"
     try:
           
         logger.info("Getting Database connection")
         with connection.cursor() as cursor:    
             # Find the Blabbers that this user listens to
             logger.info(sqlMyHecklers)
-            cursor.execute(sqlMyHecklers, username)
+            cursor.execute(sqlMyHecklers % username)
             myHecklersResults = cursor.fetchall()
             hecklers=[]
             for i in myHecklersResults:
@@ -198,8 +199,7 @@ def showProfile(request):
             events = []
 
             # START EXAMPLE VULNERABILITY 
-            sqlMyEvents = "select event from users_history where blabber=\"" + username
-            + "\" ORDER BY eventid DESC; "
+            sqlMyEvents = "select event from users_history where blabber=\"" + username + "\" ORDER BY eventid DESC; "
             logger.info(sqlMyEvents)
             cursor.execute(sqlMyEvents)
             userHistoryResult = cursor.fetchall()
@@ -212,16 +212,15 @@ def showProfile(request):
             sql = "SELECT username, real_name, blab_name FROM users WHERE username = '" + username + "'"
             logger.info(sql)
             cursor.execute(sql)
-            myInfoResults = cursor.fetchall()
-            myInfoResults.next()
+            myInfoResults = cursor.fetchone()
 
             # Send these values to our View
             request.hecklers = hecklers
             request.events = events
-            request.username = myInfoResults['username']
-            request.image = getProfileImageNameFromUsername(myInfoResults['username'])
-            request.realName = myInfoResults['real_name']
-            request.blabName = myInfoResults['blab_name']
+            request.username = myInfoResults[0]
+            request.image = getProfileImageNameFromUsername(myInfoResults[0])
+            request.realName = myInfoResults[1]
+            request.blabName = myInfoResults[2]
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     '''
@@ -491,7 +490,7 @@ def update_in_response(user, response):
     return response
 
 def getProfileImageNameFromUsername(username):
-    f = os.path.realpath("/resources/images")
+    f = os.path.realpath("./resources/images")
     matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
 
     if not matchingFiles:
@@ -504,3 +503,54 @@ def notImplemented(request):
 
 def reset(request):
     return render(request, 'app/reset.html')
+
+def processTools(request):
+    value = request.POST.get('tools')
+    method = request.POST.get('method')
+    host = request.POST.get('host')
+    fortuneFile =request.GET.get('fortuneFile')
+    model = model.setattr("ping", host != None, host = ' ')
+
+    if (fortuneFile== None):
+        fortuneFile = "literature"
+    
+    model.setattr("fortunes", fortune(fortuneFile))
+
+    return 'tools'
+
+def fortune(fortuneFile):
+    cmd = "/bin/fortune" + fortuneFile
+    output = " "
+
+    while True:
+        try:
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout.readlines():
+                output += line
+                output += "\n"
+        except IOError as e:
+            logger.error(e)
+        else:
+            logger.error(e)
+
+        return output
+    
+def ping(host):
+    output = ""
+    logger.info("Pinging: " + host)
+
+    while True:
+        try:
+            p = subprocess.Popen("ping -c 1 " + host, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout.readlines():
+                output += line
+                output += "\n"
+
+            logger.info(p.__exit__)
+        except IOError as e:
+            logger.error(e)
+
+        else:
+            logger.error(e)
+
+        return output
