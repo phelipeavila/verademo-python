@@ -454,8 +454,9 @@ def ping(host):
         print("Ping request timed out")
     except Exception as e:
         print("Error occurred:", e)
-    
-    return render('app/tools.html', {output})
+    # TO FIX ERROR
+    # return render(output, 'app/tools.html')
+    return output
 
    
    

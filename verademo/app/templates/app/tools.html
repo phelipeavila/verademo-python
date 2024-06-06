@@ -57,21 +57,21 @@
 			<form method="post">
                 {% csrf_token %}
 				<label for="host">Host:</label> <input type="text" name="host"
-					value={{ 'request.GET.get(host)' }} ><input
+					value={{ request.META.HTTP_HOST }} ><input
 					type="submit" value="Check" />
 			</form>
-			<pre>${ping}</pre>
+			<pre>{{ request.ping }}</pre>
 		</div>
 		<div>
             <h5>Show a UNIX fortune from one of the 2 supported dictionaries</h5>
             <form method="post">
                 {% csrf_token %}
                 <select name="fortunelife">
-                <option value={{literature }}>literature</option>
-                    <option value={{ 'riddles' }}>riddles</option>
+                <option value={{ literature }}>literature</option>
+                    <option value={{ riddles }}>riddles</option>
                 </select> <input type="submit" value="Change"/>
             </form>
-            <pre>${fortune}</pre>
+            <pre>${{ request.fortune }}</pre>
 			
 		</div>
 	</div>
