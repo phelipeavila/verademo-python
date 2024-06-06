@@ -38,8 +38,6 @@ def feed(request):
             logger.info("Creating the Database connection")
             with connection.cursor() as cursor:
 
-                # TODO: Find the Blabs that this user listens to
-
                 logger.info("Executing query to get all 'Blabs for me'")
                 blabsForMe = sqlBlabsForMe.format(10, 0)
                 cursor.execute(blabsForMe, (username,))
@@ -52,8 +50,14 @@ def feed(request):
                     author.blabName = blab[1]
                     
                     post = Blab()
+                    post.setId(blab[5])
+                    post.setContent(blab[2])
+                    post.setPostDate(blab[3])
+                    post.setCommentCount(blab[4])
+                    post.setAuthor(author)
+
+                    feedBlabs.append(post)
                     
-                
                 request.blabsByOthers = feedBlabs
                 request.currentUser = username
 
@@ -64,10 +68,14 @@ def feed(request):
                 blabsByMeResults = cursor.fetchall()
 
                 myBlabs = []
-                # for blab in myBlabs:
-                #     post = Blab()
+                for blab in blabsByMeResults:
+                    post = Blab()
+                    post.setId(blab[3])
+                    post.setContent(blab[0])
+                    post.setPostDate(blab[1])
+                    post.setCommentCount(blab[2])
 
-                #     # TODO: Add all blabs in results to myBlabs list
+                    myBlabs.append(post)
                     
                 request.blabsByMe = myBlabs
 
@@ -102,12 +110,10 @@ def feed(request):
                 addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values (%s, %s, datetime('now'));"
 
                 logger.info("Executing query to add new blab")
-                # addBlabResult = cursor.execute(addBlabSql, (username, blab))
+                cursor.execute(addBlabSql, (username, blab))
 
-                # if addBlabResult:
-                #     request.error = "Failed to add comment"
-
-                response = redirect("feed")
+                if not cursor.rowcount:
+                    request.error = "Failed to add comment"
 
         except:
 

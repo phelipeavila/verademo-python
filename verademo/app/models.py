@@ -29,7 +29,7 @@ class Blab(models.Model):
     author = None
     
     def getId(self):
-        return self.id
+        return self.blabid
 
     def setId(self, blabid):
         self.blabid = blabid
