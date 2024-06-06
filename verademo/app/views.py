@@ -40,7 +40,7 @@ def feed(request):
                 # TODO: Find the Blabs that this user listens to
 
                 logger.info("Executing query to get all 'Blabs for me'")
-                # cursor.execute(sqlBlabsForMe, username)
+                # cursor.execute(sqlBlabsForMe, (username))
                 # blabsForMeResults = cursor.fetchall()
 
                 feedBlabs = []
@@ -135,10 +135,11 @@ def morefeed(request):
         with connection.cursor() as cursor:
 
             logger.info("Executing query to see more Blabs")
-            # cursor.execute(sqlBlabsForMe, username)
-            # results = cursor.fetchall()
-            # ret = ""
-            # for blab in results:
+            cursor.execute(sqlBlabsForMe, (username))
+            results = cursor.fetchall()
+            ret = ""
+            for blab in results:
+                ret += template.format(username = blab[''])
 
 
             
