@@ -1,6 +1,7 @@
 from django.db import models
+import datetime
 
-# Create your models h
+# Create your models here
 class User(models.Model):
     
     class Meta:
@@ -18,48 +19,101 @@ class Blab(models.Model):
     class Meta:
         db_table='blabs'
 
+    date_format = "%b %d %Y"
+
     blabid = models.IntegerField('''max_length=11''',null=False,primary_key=True)
     blabber = models.TextField(max_length=100,null=False)
-    content = models.TextField(max_length=250, null=True)
     timestamp = models.DateTimeField(null=True)
+    content = models.TextField(max_length=250, null=True)
+    commentCount = 0
+    author = None
     
-    def content(self):
+    def getId(self):
+        return self.id
+
+    def setId(self, blabid):
+        self.blabid = blabid
+
+    def getContent(self):
         return self.content
-    
-    def postDate(self):
+
+    def setContent(self, content):
+        self.content = content
+
+    def getPostDate(self):
         return self.timestamp
     
+    def getPostDateString(self):
+        return self.timestamp.strftime(self.date_format)
+
+    def setPostDate(self, timestamp):
+        self.timestamp = timestamp
+
+    def getAuthor(self):
+        return self.author
+    
+    def setAuthor(self, author):
+        self.author = author
+
     def getCommentCount(self):
         return self.commentCount
-    
-    def getAuthor(self):
-        return self.blabber
+
+    def setCommentCount(self, count):
+        self.commentCount = count
      
-class Blabber(models.Model):
-    username = models.TextField(max_length=100)
-    realName = models.TextField(max_length=100)
-    blabName = models.TextField(max_length=100)
-    createdDate = models.DateTimeField(auto_now_add=True)
-    numberListeners = models.IntegerField(default=0)
-    numberListening = models.IntegerField(default=0)
+class Blabber():
+
+    id = None
+    username = None
+    realName = None
+    blabName = None
+    createdDate = None
+    numberListeners = None
+    numberListening = None
+
+    date_format = "%b %d %Y"
+
+    def getId(self):
+        return self.id
     
-    def user(self):
+    def setId(self, id):
+        self.id = id
+    
+    def getUsername(self):
         return self.username
+        
+    def setUsername(self, username):
+        self.username = username
+
+    def getRealname(self):
+        return self.realName
     
-    def getRealName(self):
-        return self.real_name
-    
+    def setRealName(self, realName):
+        self.realName = realName
+
     def getBlabName(self):
-        return self.blab_name
+        return self.blabName
     
     def getCreatedDate(self):
-        return self.created_at
+        return self.createdDate
     
-    def getNumListeners(self):
+    def getCreatedDateString(self):
+        return self.createdDate.strftime(self.date_format)
+
+    def setCreatedDate(self, createdDate):
+        self.createdDate = createdDate
+
+    def getNumberListeners(self):
         return self.numberListeners
     
-    def getNumListening(self):
+    def setNumberListeners(self, numberListeners):
+        self.numberListeners = numberListeners
+
+    def getNumberListening(self):
         return self.numberListening
+    
+    def setNumberListening(self, numberListening):
+        self.numberListening = numberListening
     
 class Comment(models.Model):
 
@@ -69,8 +123,38 @@ class Comment(models.Model):
     content = models.TextField(max_length=250, null=True)
     timestamp = models.DateTimeField(null=True)
 
+    date_format = "%b %d %Y"
+
     class Meta:
         db_table = 'comments'
+
+    def getId(self):
+        return self.commentid
+
+    def setId(self, commentid):
+        self.commentid = commentid
+
+    def getContent(self):
+        return self.content
+
+    def setContent(self, content):
+        self.content = content
+
+    def getTimestamp(self):
+        return self.timestamp
+    
+    def getTimestampString(self):
+        return self.timestamp.strftime(self.date_format)
+
+    def setTimestamp(self, timestamp):
+        self.timestamp = timestamp
+
+    def getAuthor(self):
+        return self.blabber
+    
+    def setAuthor(self, blabber):
+        self.blabber = blabber
+
 
 class Listener(models.Model):
     blabber = models.TextField(max_length=100,null=False)

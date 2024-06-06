@@ -17,14 +17,14 @@ from .forms import UserForm, RegisterForm
 # Get logger
 logger = logging.getLogger("__name__")
 
-sqlBlabsByMe = ('''SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid
-			    FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid
-			    WHERE blabs.blabber = ? GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;''')
+sqlBlabsByMe = ("SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
+			    "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
+			    "WHERE blabs.blabber = %s GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
 
-sqlBlabsForMe = ('''SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid
-			    FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber
-			    LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = ?
-			    GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT %d OFFSET %d;''')
+sqlBlabsForMe = ("SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
+			    "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
+			    "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = %s "
+			    "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
 
 def feed(request):
     if request.method == "GET":
@@ -41,14 +41,18 @@ def feed(request):
                 # TODO: Find the Blabs that this user listens to
 
                 logger.info("Executing query to get all 'Blabs for me'")
-                # cursor.execute(sqlBlabsForMe, (username))
-                # blabsForMeResults = cursor.fetchall()
+                blabsForMe = sqlBlabsForMe.format(10, 0)
+                cursor.execute(blabsForMe, (username,))
+                blabsForMeResults = cursor.fetchall()
 
                 feedBlabs = []
-                # for blab in blabsForMeResults:
-                #     author = Blabber()
+                for blab in blabsForMeResults:
+                    author = Blabber()
+                    author.username = blab[0]
+                    author.blabName = blab[1]
                     
-                #     # TODO: Add all blabs in results to feedBlabs list
+                    post = Blab()
+                    
                 
                 request.blabsByOthers = feedBlabs
                 request.currentUser = username
@@ -56,8 +60,8 @@ def feed(request):
                 # Find the Blabs by this user
 
                 logger.info("Executing query to get all of user's Blabs")
-                # cursor.execute(sqlBlabsByMe, username)
-                # blabsByMeResults = cursor.fetchall()
+                cursor.execute(sqlBlabsByMe, (username,))
+                blabsByMeResults = cursor.fetchall()
 
                 myBlabs = []
                 # for blab in myBlabs:
@@ -95,7 +99,7 @@ def feed(request):
             with connection.cursor() as cursor:
 
                 logger.info("Creating query to add new Blab")
-                addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values (?, ?, datetime('now'));"
+                addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values (%s, %s, datetime('now'));"
 
                 logger.info("Executing query to add new blab")
                 # addBlabResult = cursor.execute(addBlabSql, (username, blab))
@@ -136,21 +140,20 @@ def morefeed(request):
         with connection.cursor() as cursor:
 
             logger.info("Executing query to see more Blabs")
-            cursor.execute(sqlBlabsForMe, (username))
+            blabsForMe = sqlBlabsForMe.format(len, cnt)
+            cursor.execute(blabsForMe, (username,))
             results = cursor.fetchall()
             ret = ""
             for blab in results:
-                ret += template.format(username = blab[''])
-
-
-            
-
+                ret += template.format(username = blab[0], content = blab[2], blab_name = blab[1],
+                                       timestamp = blab[3], blabid = blab[5], count = blab[4])
     except:
 
         # TODO: Implement exceptions
 
         logger.error("Unexpected error:", sys.exc_info()[0])
 
+    return ret
 
 
 def blabbers(request):
