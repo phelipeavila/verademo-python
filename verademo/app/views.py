@@ -4,13 +4,14 @@ from django.db import connection
 import sqlite3
 import logging
 import base64
+import subprocess
 import hashlib
 from django.views.generic import TemplateView
-from app.models import User
+from app.models import User, Blabber
 from django.core import serializers
 from datetime import datetime
-import sys
-import subprocess
+
+import sys, os
 
 from .forms import UserForm, RegisterForm
 
@@ -29,19 +30,87 @@ def blabbers(request):
     return render(request, 'app/blabbers.html', {})
 
 def profile(request):
-    return render(request, 'app/profile.html', {})
-
-def tools(request):
-    return render(request, 'app/tools.html', {})
-
-def profile(request):
     if(request.method == "GET"):
         return showProfile(request)
     elif(request.method == "POST"):
         return processProfile(request)
     
 def showProfile(request):
-    pass
+    logger.info("Entering showProfile")
+    username = request.session.get('username')
+    if not username:
+        logger.info("User is not Logged In - redirecting...")
+        return redirect("login?target=profile")
+    myHecklers = None
+    myInfo = None
+    sqlMyHecklers = ''
+    sqlMyHecklers += "SELECT users.username, users.blab_name, users.created_at " 
+    sqlMyHecklers += "FROM users LEFT JOIN listeners ON users.username = listeners.listener " 
+    sqlMyHecklers += "WHERE listeners.blabber='%s' AND listeners.status='Active';"
+    try:
+          
+        logger.info("Getting Database connection")
+        with connection.cursor() as cursor:    
+            # Find the Blabbers that this user listens to
+            logger.info(sqlMyHecklers)
+            cursor.execute(sqlMyHecklers % username)
+            myHecklersResults = cursor.fetchall()
+            hecklers=[]
+            for i in myHecklersResults:
+                
+                heckler = Blabber()
+                heckler.setUsername(i[0])
+                heckler.setBlabName(i[1])
+                heckler.setCreatedDate(i[2])
+                hecklers.add(heckler)
+            
+
+            # Get the audit trail for this user
+            events = []
+
+            # START EXAMPLE VULNERABILITY 
+            sqlMyEvents = "select event from users_history where blabber=\"" + username + "\" ORDER BY eventid DESC; "
+            logger.info(sqlMyEvents)
+            cursor.execute(sqlMyEvents)
+            userHistoryResult = cursor.fetchall()
+            # END EXAMPLE VULNERABILITY 
+
+            for result in userHistoryResult :
+                events.add(result[0])
+
+            # Get the users information
+            sql = "SELECT username, real_name, blab_name FROM users WHERE username = '" + username + "'"
+            logger.info(sql)
+            cursor.execute(sql)
+            myInfoResults = cursor.fetchone()
+
+            # Send these values to our View
+            request.hecklers = hecklers
+            request.events = events
+            request.username = myInfoResults[0]
+            request.image = getProfileImageNameFromUsername(myInfoResults[0])
+            request.realName = myInfoResults[1]
+            request.blabName = myInfoResults[2]
+    except sqlite3.Error as ex :
+        logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
+    '''
+    finally:    
+        try:
+            if not myHecklers :
+                myHecklers.close()
+        
+        except sqlite3.Error as exceptSql :
+            logger.error(exceptSql.sqlite_errorcode, exceptSql.sqlite_errorname)
+        
+        try:
+            if (connect != null) {
+                connect.close();
+            }
+        except sqlite3.Error as exceptSql :
+            logger.error(exceptSql.sqlite_errorcode, exceptSql.sqlite_errorname)
+    ''' 
+        
+    return render(request, 'app/profile.html', {})
 
 def processProfile(request):
     pass
@@ -56,6 +125,7 @@ def register(request):
 renders the register.html file, called by a path in urls
 '''
 def showRegister(request):
+    logger.info("Entering showRegister")
     return render(request, 'app/register.html', {})
 
 ''' Sends username into register-finish page'''
@@ -69,7 +139,7 @@ def processRegister(request):
     try:
         
         with connection.cursor() as cursor:
-            sqlQuery = "SELECT username FROM app_user WHERE username = '" + username + "'"
+            sqlQuery = "SELECT username FROM users WHERE username = '" + username + "'"
             cursor.execute(sqlQuery)
             row = cursor.fetchone()
             if (row):
@@ -91,14 +161,12 @@ def registerFinish(request):
         return processRegisterFinish(request)
 
 '''TODO: This shouldn't pass'''
-def showRegisterFinish():
+def showRegisterFinish(request):
     logger.info("Entering showRegisterFinish")
-    pass
+    return render(request, 'app/register-finish', {})
 
 '''
 Interprets POST request from register form, adds user to database
-TODO:Manually input registrations using SQL statements.
-- may not work because of change to username field
 '''
 def processRegisterFinish(request):
     logger.info("Entering processRegisterFinish")
@@ -130,12 +198,9 @@ def processRegisterFinish(request):
                 #mysqlCurrentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #create query
                 query = ''
-                query += "insert into app_user (username, password, created_at, real_name, blab_name) values("
+                query += "insert into users (username, password, created_at, real_name, blab_name) values("
                 query += ("'" + username + "',")
-                query += ("'" + password + "',")
-                
-                # TODO: Implement hashing
-                #query += ("'" + BCrypt.hashpw(password, BCrypt.gensalt()) + "',")
+                query += ("'" + hashlib.md5(password.encode('utf-8')).hexdigest() + "',")
                 
                 #query += ("'" + mysqlCurrentDateTime + "',")
                 query += ("datetime('now'),")
@@ -238,14 +303,10 @@ def login(request):
             with connection.cursor() as cursor:
                 logger.info("Creating database query")
 
-                # TODO: Replace with md5 hash after register uses MD5
-                # sqlQuery = "select username, password, hint, dateCreated, lastLogin, \
-                #             realName, blabName from app_user where username='" + username + "' \
-                #             and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
-                sqlQuery = "select username, password, hint, created_at, last_login, \
-                            real_name, blab_name from app_user where username='" + username + "' \
-                            and password='" + password + "';"
-                
+                sqlQuery = "select username, password, password_hint, created_at, last_login, \
+                            real_name, blab_name from users where username='" + username + "' \
+                            and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
+
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
 
@@ -262,7 +323,7 @@ def login(request):
                         response = update_in_response(currentUser, response)
                     request.session['username'] = row['username']
 
-                    update = "UPDATE app_user SET last_login=datetime('now') WHERE username='" + row['username'] + "';"
+                    update = "UPDATE users SET last_login=datetime('now') WHERE username='" + row['username'] + "';"
                     cursor.execute(update)
                 else:
                     logger.info("User not found")
@@ -297,32 +358,75 @@ def update_in_response(user, response):
     cookie = serializers.serialize('xml', [user,])
     response.set_cookie('user', cookie)
     return response
-    
+
+def getProfileImageNameFromUsername(username):
+    f = os.path.realpath("./resources/images")
+    matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
+
+    if not matchingFiles:
+        return None
+    return matchingFiles[0]
+
+
 def notImplemented(request):
     return render(request, 'app/notImplemented.html')
 
 def reset(request):
     return render(request, 'app/reset.html')
 
-def processTools(request):
-    value = request.POST.get('tools')
-    method = request.POST.get('method')
-    host = request.POST.get('host')
-    fortuneFile =request.GET.get('fortuneFile')
-    model = model.setattr("ping", host != None, host = ' ')
-
-    if (fortuneFile== None):
-        fortuneFile = "literature"
+def tools(request):
+    if(request.method == "GET"):
+        return showTools(request)
+    elif(request.method == "POST"):
+        return processTools(request)
     
-    model.setattr("fortunes", fortune(fortuneFile))
+def showTools(request):
+    return render(request, 'app/tools.html', {})
 
-    return 'tools'
+def processTools(request):
+    host = request.POST.get('host')
+    fortuneFile = request.POST.get('fortuneFile')
+    ping_result = ping(host) if host else ""
+    
+    if not fortuneFile:
+        fortuneFile = 'literature'
+        fortune(fortuneFile)
+
+    # Previous Logic
+    '''logger.info("Processing tools")
+    toolMenu = request.POST.get('/tools')
+    host = request.POST.get('host')
+    form = RegisterForm(request.POST or None)
+    if form.is_valid():
+        cHost = form.cleaned_data.get('host')
+        if host is not None:
+            logger.info("Host: " + host)
+            ping(host) '''
+
+
+
+
+
+
+    return render(request, 'app/tools.html')
 
 def fortune(fortuneFile):
     cmd = "/bin/fortune" + fortuneFile
     output = " "
 
-    while True:
+    try: 
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+            b'output += line + "\n"'.decode("utf-8")
+            
+    except IOError as e:
+        print("Error occurred:", e)
+        logger.error(e)
+
+        return output
+
+
+    '''while True:
         try:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in p.stdout.readlines():
@@ -333,15 +437,34 @@ def fortune(fortuneFile):
         else:
             logger.error(e)
 
-        return output
+        return output'''
     
+
 def ping(host):
     output = ""
+    
+    try:
+        p = subprocess.Popen(['ping', '-c', '1', host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        stdout, stderr = p.communicate(timeout=5)
+    
+        output = stdout.decode() if stdout else ""
+        print("Exit Code:", p.returncode)
+    except subprocess.TimeoutExpired:
+        print("Ping request timed out")
+    except Exception as e:
+        print("Error occurred:", e)
+    
+    return output
+
+   
+   
+''' output = ""
     logger.info("Pinging: " + host)
 
     while True:
         try:
-            p = subprocess.Popen("ping -c 1 " + host, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = os.system("ping -c 1 -w2 " + host + " > /dev/null 2>&1")
             for line in p.stdout.readlines():
                 output += line
                 output += "\n"
@@ -353,12 +476,4 @@ def ping(host):
         else:
             logger.error(e)
 
-        return output
-
-
-
-
-        
-        
-
-
+        return output '''
