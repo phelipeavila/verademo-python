@@ -7,7 +7,7 @@ import base64
 import subprocess
 import hashlib
 from django.views.generic import TemplateView
-from app.models import User, Blabber, Blab, Blabber
+from app.models import User, Blabber, Blab, Blabber, Comment
 from django.core import serializers
 from datetime import datetime
 import sys, os
@@ -160,6 +160,72 @@ def morefeed(request):
         logger.error("Unexpected error:", sys.exc_info()[0])
 
     return ret
+
+def blab(request):
+    if request.method == "GET":
+        blabid = request.GET.get('blabid')
+        response = redirect('feed')
+        logger.info("Showing Blab")
+        
+        username = request.session.get('username')
+        if not username:
+            logger.info("User is not Logged In - redirecting...")
+            return redirect("login?target=feed")
+        
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        blabDetailsSql = ("SELECT blabs.content, users.blab_name "
+			    "FROM blabs INNER JOIN users ON blabs.blabber = users.username " + "WHERE blabs.blabid = %s;")
+
+        blabCommentsSql = ("SELECT users.username, users.blab_name, comments.content, comments.timestamp "
+				"FROM comments INNER JOIN users ON comments.blabber = users.username "
+				"WHERE comments.blabid = %s ORDER BY comments.timestamp DESC;")
+        
+        try :
+            logger.info("Creating the Database connection")
+            with connection.cursor() as cursor:
+
+                logger.info("Executing query to see Blab details")
+                cursor.execute(blabDetailsSql, (blabid,))
+                blabDetailsResults = cursor.fetchone()
+
+                if (blabDetailsResults):
+                    request.content = blabDetailsResults[0]
+                    request.blab_name = blabDetailsResults[1]
+                    request.blabid = blabid
+
+                    # Get comments
+                    logger.info("Executing query to get all comments")
+                    cursor.execute(blabCommentsSql, (blabid,))
+                    blabCommentsResults = cursor.fetchall()
+
+                    comments = []
+                    for blab in blabCommentsResults:
+                        author = Blabber()
+                        author.setUsername(blab[0])
+                        author.setBlabName(blab[1])
+
+                        comment = Comment()
+                        comment.setContent(blab[2])
+                        comment.setTimestamp(blab[3])
+                        comment.setAuthor(author)
+
+                        comments.append(comment)
+                    request.comments = comments
+
+                    response = render(request, 'app/blab.html', {})
+
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+        return response
+    
+    if request.method == "POST":
+        comment = request.POST.get('comment')
+        blabid = request.POST.get('blabid')
 
 
 def blabbers(request):
