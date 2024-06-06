@@ -20,7 +20,7 @@ class Blab(models.Model):
 
     blabid = models.IntegerField('''max_length=11''',null=False,primary_key=True)
     blabber = models.TextField(max_length=100,null=False)
-    content = models.TextField(max_length=250, null=True)
+    content = models.TextField(max_length=250,null=True)
     timestamp = models.DateTimeField(null=True)
     
     def content(self):
@@ -28,9 +28,6 @@ class Blab(models.Model):
     
     def postDate(self):
         return self.timestamp
-    
-    def getCommentCount(self):
-        return self.commentCount
     
     def getAuthor(self):
         return self.blabber

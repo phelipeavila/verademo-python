@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponseForbidden, JsonResponse
 from django.db import connection
 import sqlite3
 import logging
@@ -16,6 +16,12 @@ from .forms import UserForm, RegisterForm
 
 # Get logger
 logger = logging.getLogger("__name__")
+
+'''
+GENERAL FORMATTING:
+url path name (register, profile, ...) calls different subfunction based on input packet type
+'''
+
 
 def feed(request):
     username = request.session.get('username')
@@ -114,8 +120,107 @@ def showProfile(request):
         
     return render(request, 'app/profile.html', {})
 
+'''TODO: Connect form to profile update
+TODO: Test sqlite3 error handling'''
 def processProfile(request):
-    pass
+    response = JsonResponse({})
+    realName = request.POST.get('realName')
+    blabName = request.POST.get('blabName')
+    username = request.POST.get('username')
+    file = request.POST.get('file')
+    logger.info("entering processProfile")
+    sessionUsername = request.session.get('username')
+
+    # Ensure user is logged in
+    if not sessionUsername:
+        logger.info("User is not Logged In = redirecting...")
+        response.write({'message':"<script>alert('Error - please login');</script>"})
+        response.status_code = 403
+        return response
+        #TODO: Resolve request/response status and ensure same funcitonality
+        
+    logger.info("User is Logged In - continuing... UA=" + request.headers['User-Agent'] + " U=" + sessionUsername)
+    oldUsername = sessionUsername
+
+    # Update user information
+
+    try:
+        logger.info("Getting Database connection")
+        # Get the Database Connectionß
+        with connection.cursor() as cursor:
+            logger.info("Preparing the update Prepared Statement")
+            update = "UPDATE users SET real_name=%s, blab_name=%s WHERE username=%s;"
+            logger.info("Executing the update Prepared Statement")
+            cursor.execute(update, (realName,blabName,sessionUsername))
+            updateResult = cursor.fetchone()
+
+            # If there is a record...
+            if updateResult:
+                # failure
+                response.status_code = 500
+                response.write({'message':"<script>alert('An error occurred, please try again.');</script>"})
+                return response
+            
+    except sqlite3.Error as ex :
+        logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
+
+    # Rename profile image if username changes
+    if username != oldUsername :
+        '''
+        if usernameExists(username):
+            response.status_code = 409
+            response.write({'message':"<script>alert('That username already exists. Please try another.');</script>"})
+            return response
+
+        if not updateUsername(oldUsername, username):
+            response.status_code = 500
+            response.write({'message':"<script>alert('An error occurred, please try again.');</script>"})
+            return response
+        '''
+        # Update all session and cookie logic
+        request.session.username = username
+        response.set_cookie('username',username)
+        
+
+        # Update remember me functionality
+        userDetailsCookie = request.COOKIES.get('user')
+        if userDetailsCookie is not None:
+            unencodedUserDetails = next(serializers.deserialize('xml', userDetailsCookie))
+            unencodedUserDetails.object.username = username
+            response = updateInResponse(unencodedUserDetails.object, response)
+        
+
+        # Update user profile image
+        if file:
+            imageDir = os.path.realpath("./resources/images")
+            
+
+            # Get old image name, if any, to delete
+            oldImage = getProfileImageNameFromUsername(username)
+            if oldImage:
+                os.remove(os.path.join(imageDir,oldImage))
+            
+    '''
+
+            # TODO: check if file is png first
+            try {
+                String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+                String path = imageDir + username + extension;
+
+                logger.info("Saving new profile image: " + path);
+
+                file.transferTo(new File(path)); // will delete any existing file first
+            } catch (IllegalStateException | IOException ex) {
+                logger.error(ex);
+            }
+        }
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        String msg = "Successfully changed values!\\\\nusername: %1$s\\\\nReal Name: %2$s\\\\nBlab Name: %3$s";
+        String respTemplate = "{\"values\": {\"username\": \"%1$s\", \"realName\": \"%2$s\", \"blabName\": \"%3$s\"}, \"message\": \"<script>alert('"
+                + msg + "');</script>\"}";
+        return String.format(respTemplate, username.toLowerCase(), realName, blabName);
+'''
 
 def register(request):
     if(request.method == "GET"):
@@ -319,10 +424,10 @@ def login(request):
                     response.set_cookie('username', username)
                     if (not remember is None):
                         currentUser = User(username=row["username"],
-                                    hint=row["hint"], created_at=row["created_at"],
+                                    password_hint=row["password_hint"], created_at=row["created_at"],
                                     last_login=row["last_login"], real_name=row["real_name"], 
                                     blab_name=row["blab_name"])
-                        response = update_in_response(currentUser, response)
+                        response = updateInResponse(currentUser, response)
                     request.session['username'] = row['username']
 
                     update = "UPDATE users SET last_login=datetime('now') WHERE username='" + row['username'] + "';"
@@ -356,11 +461,15 @@ def logout(request):
     logger.info("Redirecting to login...")
     return response
 
-def update_in_response(user, response):
+def updateInResponse(user, response):
     cookie = serializers.serialize('xml', [user,])
     response.set_cookie('user', cookie)
     return response
 
+
+'''
+Takes a username and searches for the profile image for that user
+'''
 def getProfileImageNameFromUsername(username):
     f = os.path.realpath("./resources/images")
     matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
@@ -369,6 +478,8 @@ def getProfileImageNameFromUsername(username):
         return None
     return matchingFiles[0]
 
+def downloadImage(request):
+    pass
 
 def notImplemented(request):
     return render(request, 'app/notImplemented.html')
