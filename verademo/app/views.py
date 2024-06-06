@@ -7,9 +7,10 @@ import base64
 import subprocess
 import hashlib
 from django.views.generic import TemplateView
-from app.models import User, Blabber
+from app.models import User, Blabber, Blab, Blabber
 from django.core import serializers
 from datetime import datetime
+
 import sys, os
 
 from .forms import UserForm, RegisterForm
@@ -17,25 +18,153 @@ from .forms import UserForm, RegisterForm
 # Get logger
 logger = logging.getLogger("__name__")
 
-'''
-GENERAL FORMATTING:
-url path name (register, profile, ...) calls different subfunction based on input packet type
-'''
+sqlBlabsByMe = ("SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
+			    "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
+			    "WHERE blabs.blabber = %s GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
 
+sqlBlabsForMe = ("SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
+			    "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
+			    "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = %s "
+			    "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
 
 def feed(request):
+    if request.method == "GET":
+        username = request.session.get('username')
+        if not username:
+            logger.info("User is not Logged In - redirecting...")
+            return redirect('/login?target=feed')
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        try:
+            logger.info("Creating the Database connection")
+            with connection.cursor() as cursor:
+
+                logger.info("Executing query to get all 'Blabs for me'")
+                blabsForMe = sqlBlabsForMe.format(10, 0)
+                cursor.execute(blabsForMe, (username,))
+                blabsForMeResults = cursor.fetchall()
+
+                feedBlabs = []
+                for blab in blabsForMeResults:
+                    author = Blabber()
+                    author.username = blab[0]
+                    author.blabName = blab[1]
+                    
+                    post = Blab()
+                    post.setId(blab[5])
+                    post.setContent(blab[2])
+                    post.setPostDate(blab[3])
+                    post.setCommentCount(blab[4])
+                    post.setAuthor(author)
+
+                    feedBlabs.append(post)
+                    
+                request.blabsByOthers = feedBlabs
+                request.currentUser = username
+
+                # Find the Blabs by this user
+
+                logger.info("Executing query to get all of user's Blabs")
+                cursor.execute(sqlBlabsByMe, (username,))
+                blabsByMeResults = cursor.fetchall()
+
+                myBlabs = []
+                for blab in blabsByMeResults:
+                    post = Blab()
+                    post.setId(blab[3])
+                    post.setContent(blab[0])
+                    post.setPostDate(blab[1])
+                    post.setCommentCount(blab[2])
+
+                    myBlabs.append(post)
+                    
+                request.blabsByMe = myBlabs
+
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+            nextView = 'login'
+            response = render(request, 'app/' + nextView + '.html', {})
+            
+        return render(request, 'app/feed.html', {})
+
+    if request.method == "POST":
+        blab = request.POST.get('blab')
+        response = redirect('feed')
+        logger.info("Processing Blabs")
+
+        username = request.session.get('username')
+        if (not username):
+            logger.info("User is not Logged In - redirecting...")
+            return redirect('/login?target=feed')
+        
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        try :
+            logger.info("Creating the Database connection")
+            with connection.cursor() as cursor:
+
+                logger.info("Creating query to add new Blab")
+                addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values (%s, %s, datetime('now'));"
+
+                logger.info("Executing query to add new blab")
+                cursor.execute(addBlabSql, (username, blab))
+
+                if not cursor.rowcount:
+                    request.error = "Failed to add comment"
+
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+        return response
+    
+def morefeed(request):
+    count = request.GET.get('count')
+    length = request.GET.get('len')
+
+    template = ("<li><div>" + "\t<div class=\"commenterImage\">" + "\t\t<img src=\"resources/images/{username}.png\">" +
+				"\t</div>" + "\t<div class=\"commentText\">" + "\t\t<p>{content}</p>" +
+				"\t\t<span class=\"date sub-text\">by {blab_name} on {timestamp}</span><br>" +
+				"\t\t<span class=\"date sub-text\"><a href=\"blab?blabid={blabid}\">{count} Comments</a></span>" + "\t</div>" +
+				"</div></li>")
+    
+    try:
+        cnt = int(count)
+        len = int(length)
+    except ValueError:
+        redirect('feed')
+
     username = request.session.get('username')
-    if not username:
-        logger.info("User is not Logged In - redirecting...")
-        return redirect('/login?target=feed')
-    request.currentUser = username
-    return render(request, 'app/feed.html', {})
+
+    try :
+        logger.info("Creating the Database connection")
+        with connection.cursor() as cursor:
+
+            logger.info("Executing query to see more Blabs")
+            blabsForMe = sqlBlabsForMe.format(len, cnt)
+            cursor.execute(blabsForMe, (username,))
+            results = cursor.fetchall()
+            ret = ""
+            for blab in results:
+                ret += template.format(username = blab[0], content = blab[2], blab_name = blab[1],
+                                       timestamp = blab[3], blabid = blab[5], count = blab[4])
+    except:
+
+        # TODO: Implement exceptions
+
+        logger.error("Unexpected error:", sys.exc_info()[0])
+
+    return ret
+
 
 def blabbers(request):
     return render(request, 'app/blabbers.html', {})
-
-def tools(request):
-    return render(request, 'app/tools.html', {})
 
 def profile(request):
     if(request.method == "GET"):
@@ -242,7 +371,7 @@ def processRegister(request):
     request.session['username'] = username
 
     # Get the Database Connection
-    logger.info("Creating the Database connection");
+    logger.info("Creating the Database connection")
     try:
         
         with connection.cursor() as cursor:
@@ -487,25 +616,59 @@ def notImplemented(request):
 def reset(request):
     return render(request, 'app/reset.html')
 
-def processTools(request):
-    value = request.POST.get('tools')
-    method = request.POST.get('method')
-    host = request.POST.get('host')
-    fortuneFile =request.GET.get('fortuneFile')
-    model = model.setattr("ping", host != None, host = ' ')
-
-    if (fortuneFile== None):
-        fortuneFile = "literature"
+def tools(request):
+    if(request.method == "GET"):
+        return showTools(request)
+    elif(request.method == "POST"):
+        return processTools(request)
     
-    model.setattr("fortunes", fortune(fortuneFile))
+def showTools(request):
+    return render(request, 'app/tools.html', {})
 
-    return 'tools'
+def processTools(request):
+    host = request.POST.get('host')
+    fortuneFile = request.POST.get('fortuneFile')
+    ping_result = ping(host) if host else ""
+    
+    if not fortuneFile:
+        fortuneFile = 'literature'
+        fortune(fortuneFile)
+
+    # Previous Logic
+    '''logger.info("Processing tools")
+    toolMenu = request.POST.get('/tools')
+    host = request.POST.get('host')
+    form = RegisterForm(request.POST or None)
+    if form.is_valid():
+        cHost = form.cleaned_data.get('host')
+        if host is not None:
+            logger.info("Host: " + host)
+            ping(host) '''
+
+
+
+
+
+
+    return render(request, 'app/tools.html')
 
 def fortune(fortuneFile):
     cmd = "/bin/fortune" + fortuneFile
     output = " "
 
-    while True:
+    try: 
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+            b'output += line + "\n"'.decode("utf-8")
+            
+    except IOError as e:
+        print("Error occurred:", e)
+        logger.error(e)
+
+        return output
+
+
+    '''while True:
         try:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in p.stdout.readlines():
@@ -516,15 +679,35 @@ def fortune(fortuneFile):
         else:
             logger.error(e)
 
-        return output
+        return output'''
     
+
 def ping(host):
     output = ""
+    
+    try:
+        p = subprocess.Popen(['ping', '-c', '1', host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        stdout, stderr = p.communicate(timeout=5)
+    
+        output = stdout.decode() if stdout else ""
+        print("Exit Code:", p.returncode)
+    except subprocess.TimeoutExpired:
+        print("Ping request timed out")
+    except Exception as e:
+        print("Error occurred:", e)
+    # TO FIX ERROR, CRASH ON PING
+    # return render(output, 'app/tools.html')
+    return output
+
+   
+   
+''' output = ""
     logger.info("Pinging: " + host)
 
     while True:
         try:
-            p = subprocess.Popen("ping -c 1 " + host, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = os.system("ping -c 1 -w2 " + host + " > /dev/null 2>&1")
             for line in p.stdout.readlines():
                 output += line
                 output += "\n"
@@ -536,4 +719,4 @@ def ping(host):
         else:
             logger.error(e)
 
-        return output
+        return output '''
