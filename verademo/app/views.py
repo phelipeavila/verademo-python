@@ -455,7 +455,7 @@ def ping(host):
     except Exception as e:
         print("Error occurred:", e)
     
-    return output
+    return render('app/tools.html', {output})
 
    
    
