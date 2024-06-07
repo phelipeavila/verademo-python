@@ -462,7 +462,11 @@ def pingView(request):
     host = request.GET.get('host')
     result =""
     if host:
-        result = ping(host)
+        try:
+            result = ping(host)
+        except Exception as e:
+            print("Error:", e)
+            logger.error(e)
 
     print(f"Host: {host}")
     print(f"Result: {result}")
