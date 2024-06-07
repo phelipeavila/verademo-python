@@ -65,13 +65,15 @@
 						<label>Your Profile</label>
 					</div>
 					<div class="actionBox">
-						<form method="post" action="profile" id="updateprofile" enctype="multipart/form-data">
+						<form method="POST" action="profile" id="updateprofile" enctype="multipart/form-data">
+							{% csrf_token %}
+							{{ form }}
 							<input type="hidden" name="returnPath" value="">
 							<table class="table table-condensed">
 								<tbody>
 									<tr>
 										<td class="commenterImage">
-											<img id="profileImage" src="verademo/resources/images/{{ request.image }}" />
+											<img id="profileImage" src="{% static 'images/' %}{{ request.image }}" />
 										</td>
 										<td>
 											<div class="form-group">

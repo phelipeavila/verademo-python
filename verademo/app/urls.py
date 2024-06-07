@@ -17,7 +17,8 @@ urlpatterns = [
     path('tools', views.tools, name='tools'),
     path('notImplemented', views.notImplemented, name='notImplemented'),
     path('reset', views.reset, name='reset'),
-    path('blab', views.blab, name='blab')
+    path('downloadprofileimage', views.downloadImage, name='downloadProfileImage'),
+    path('blab', views.blab, name='blab'),
     #path('hello/',views.say_hello),
     # path('register/', views.register),
 ]
