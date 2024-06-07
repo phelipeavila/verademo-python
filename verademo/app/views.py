@@ -319,7 +319,7 @@ def showProfile(request):
 '''TODO: Connect form to profile update
 TODO: Test sqlite3 error handling'''
 def processProfile(request):
-    response = JsonResponse({})
+    response = JsonResponse()
     realName = request.POST.get('realName')
     blabName = request.POST.get('blabName')
     username = request.POST.get('username')
@@ -387,36 +387,37 @@ def processProfile(request):
         
 
         # Update user profile image
-        if file:
-            
-            imageDir = os.path.realpath("./resources/images")
-            
+    if file:
+        
+        imageDir = os.path.realpath("./resources/images")
+        
 
-            # Get old image name, if any, to delete
-            oldImage = getProfileImageNameFromUsername(username)
-            if oldImage:
-                os.remove(os.path.join(imageDir,oldImage))
-            
+        # Get old image name, if any, to delete
+        oldImage = getProfileImageNameFromUsername(username)
+        if oldImage:
+            os.remove(os.path.join(imageDir,oldImage))
+        
 
-            # TODO: check if file is png first
-            try:
-                #Potential VULN? ending with .png, having different file type
-                extension = file.name.lower().endswith('.png')
-                if extension:
-                    path = imageDir + username + extension
-                else:
-                    response.status_code = 422
-                    response.write({'message':"<script>alert('File must end in .png');</script>"})
-                    return response
-                logger.info("Saving new profile image: " + path)
+        # TODO: check if file is png first
+        try:
+            #Potential VULN? ending with .png, having different file type
+            extension = file.name.lower().endswith('.png')
+            if extension:
+                path = imageDir + username + extension
+            else:
+                response.status_code = 422
+                response.write({'message':"<script>alert('File must end in .png');</script>"})
+                return response
+            logger.info("Saving new profile image: " + path)
 
-                os.rename(file.path, path)
-                file.save()
-            except IOException as ex :
-                logger.error(ex)
-            except IllegalStateException as e:
-                logger.error(e)
-
+            os.rename(file.path, path)
+            file.save()
+        except Exception as ex :
+            logger.error(ex)
+        '''
+        except IllegalStateException as e:
+            logger.error(e)
+        '''
         response.status_code = 200
         msg = f"<script>alert('Successfully changed values!\\\\nusername:{username.lower()}\\\\nReal Name: {realName}\\\\nBlab Name: {blabName}');</script>"
         response.write({"values": {"username": {username.lower()}, "realName": {realName}, "blabName": {blabName}, 'message':msg}})
