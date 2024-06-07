@@ -134,10 +134,19 @@ LOGGING = {
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "formatter": "basic",
         },
     },
-    "root": {
-        "handlers": ["console"],
-        "level": "DEBUG",
+    "formatters": {
+        "basic": {
+            "format": "{levelname} {module} - {message}",
+            "style": "{",
+        },
+    },
+    "loggers": {
+        "": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+        },
     },
 }

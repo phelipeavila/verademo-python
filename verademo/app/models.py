@@ -94,6 +94,9 @@ class Blabber():
     def getBlabName(self):
         return self.blabName
     
+    def setBlabName(self, blabName):
+        self.blabName = blabName
+
     def getCreatedDate(self):
         return self.createdDate
     

@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 from app.models import User, Blabber, Blab, Blabber, Comment
 from django.core import serializers
 from datetime import datetime
+from django.http import HttpResponse
 
 import sys, os
 
@@ -19,13 +20,13 @@ from .forms import UserForm, RegisterForm
 logger = logging.getLogger("__name__")
 
 sqlBlabsByMe = ("SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
-			    "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
-			    "WHERE blabs.blabber = %s GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
+                "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
+                "WHERE blabs.blabber = %s GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
 
 sqlBlabsForMe = ("SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
-			    "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
-			    "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = %s "
-			    "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
+                "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
+                "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = %s "
+                "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
 
 def feed(request):
     if request.method == "GET":
@@ -129,10 +130,10 @@ def morefeed(request):
     length = request.GET.get('len')
 
     template = ("<li><div>" + "\t<div class=\"commenterImage\">" + "\t\t<img src=\"resources/images/{username}.png\">" +
-				"\t</div>" + "\t<div class=\"commentText\">" + "\t\t<p>{content}</p>" +
-				"\t\t<span class=\"date sub-text\">by {blab_name} on {timestamp}</span><br>" +
-				"\t\t<span class=\"date sub-text\"><a href=\"blab?blabid={blabid}\">{count} Comments</a></span>" + "\t</div>" +
-				"</div></li>")
+                "\t</div>" + "\t<div class=\"commentText\">" + "\t\t<p>{content}</p>" +
+                "\t\t<span class=\"date sub-text\">by {blab_name} on {timestamp}</span><br>" +
+                "\t\t<span class=\"date sub-text\"><a href=\"blab?blabid={blabid}\">{count} Comments</a></span>" + "\t</div>" +
+                "</div></li>")
     
     try:
         cnt = int(count)
@@ -160,7 +161,7 @@ def morefeed(request):
 
         logger.error("Unexpected error:", sys.exc_info()[0])
 
-    return ret
+    return HttpResponse(ret)
 
 def blab(request):
     if request.method == "GET":
@@ -176,11 +177,11 @@ def blab(request):
         logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
         blabDetailsSql = ("SELECT blabs.content, users.blab_name "
-			    "FROM blabs INNER JOIN users ON blabs.blabber = users.username " + "WHERE blabs.blabid = %s;")
+                "FROM blabs INNER JOIN users ON blabs.blabber = users.username " + "WHERE blabs.blabid = %s;")
 
         blabCommentsSql = ("SELECT users.username, users.blab_name, comments.content, comments.timestamp "
-				"FROM comments INNER JOIN users ON comments.blabber = users.username "
-				"WHERE comments.blabid = %s ORDER BY comments.timestamp DESC;")
+                "FROM comments INNER JOIN users ON comments.blabber = users.username "
+                "WHERE comments.blabid = %s ORDER BY comments.timestamp DESC;")
         
         try :
             logger.info("Creating the Database connection")
@@ -230,7 +231,110 @@ def blab(request):
 
 
 def blabbers(request):
-    return render(request, 'app/blabbers.html', {})
+    if request.method == "GET":
+        sort = request.GET.get('sort')
+        if (sort is None or not sort):
+            sort = "blab_name ASC"
+        response = redirect('feed')
+        logger.info("Showing Blabbers")
+
+        username = request.session.get('username')
+        if not username:
+            logger.info("User is not Logged In - redirecting...")
+            return redirect("login?target=blabbers")
+        
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        blabbersSql = ("SELECT users.username," + " users.blab_name," + " users.created_at,"
+                    " SUM(if(listeners.listener=%s, 1, 0)) as listeners,"
+                    " SUM(if(listeners.status='Active',1,0)) as listening"
+                    " FROM users LEFT JOIN listeners ON users.username = listeners.blabber"
+                    " WHERE users.username NOT IN (\"admin\",%s)" + " GROUP BY users.username" + " ORDER BY " + sort + ";")
+
+        try:
+            logger.info("Creating database connection")
+            with connection.cursor() as cursor:
+
+                logger.info(blabbersSql)
+                logger.info("Executing query to see Blab details")
+                cursor.execute(blabbersSql, (username, username))
+                blabbersResults = cursor.fetchone()
+
+                blabbers = []
+                for b in blabbersResults:
+                    blabber = Blabber()
+                    blabber.setBlabName(b[1])
+                    blabber.setUsername(b[0])
+                    blabber.setCreatedDate(b[2])
+                    blabber.setNumberListeners(b[3])
+                    blabber.setNumberListening(b[4])
+
+                    blabbers.append(blabber)
+
+                request.blabbers = blabbers
+
+                response = render(request, 'app/blabbers.html', {})
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+        return response
+    
+    if request.method == "POST":
+        blabberUsername = request.POST.get('blabberUsername')
+        command = request.POST.get('command')
+
+        response = redirect('feed')
+        logger.info("Processing Blabbers")
+
+        username = request.session.get('username')
+        if not username:
+            logger.info("User is not Logged In - redirecting...")
+            return redirect("login?target=blabbers")
+        
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        if (command is None or not command):
+            logger.info("Empty command provided...")
+            response = redirect('login?target=blabbers')
+        logger.info("blabberUsername = " + blabberUsername)
+        logger.info("command = " + command)
+
+        try:
+            logger.info("Creating database connection")
+            with connection.cursor() as cursor:
+
+                logger.info(blabbersSql)
+                logger.info("Executing query to see Blab details")
+                cursor.execute(blabbersSql, (username, username))
+                blabbersResults = cursor.fetchone()
+
+                blabbers = []
+                for b in blabbersResults:
+                    blabber = Blabber()
+                    blabber.setBlabName(b[1])
+                    blabber.setUsername(b[0])
+                    blabber.setCreatedDate(b[2])
+                    blabber.setNumberListeners(b[3])
+                    blabber.setNumberListening(b[4])
+
+                    blabbers.append(blabber)
+
+                request.blabbers = blabbers
+
+                response = render(request, 'app/blabbers.html', {})
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+
+        return render(request, 'app/blabbers.html', {})
+        # return response instead of render when complete
+        # return response
 
 def profile(request):
     if(request.method == "GET"):
