@@ -57,10 +57,12 @@
 			<form method="post">
                 {% csrf_token %}
 				<label for="host">Host:</label> <input type="text" name="host"
-					value={{ request.META.HTTP_HOST }} ><input
+					value={{ host }} ><input
 					type="submit" value="Check" />
 			</form>
-			<pre>{{ request.ping }}</pre>
+			{% if result %}
+			<pre>{{ result }}</pre>
+			{% endif %}
 		</div>
 		<div>
             <h5>Show a UNIX fortune from one of the 2 supported dictionaries</h5>

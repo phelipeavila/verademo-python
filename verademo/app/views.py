@@ -451,12 +451,23 @@ def ping(host):
         output = stdout.decode() if stdout else ""
         print("Exit Code:", p.returncode)
     except subprocess.TimeoutExpired:
-        print("Ping request timed out")
+        print("Ping timed out")
     except Exception as e:
-        print("Error occurred:", e)
+        print("Error:", e)
     # TO FIX ERROR
     # return render(output, 'app/tools.html')
     return output
+
+def pingView(request):
+    host = request.GET.get('host')
+    result =""
+    if host:
+        result = ping(host)
+
+    print(f"Host: {host}")
+    print(f"Result: {result}")
+
+    return render(request, 'app/tools.html', {'result': result, 'host': host})
 
    
    
