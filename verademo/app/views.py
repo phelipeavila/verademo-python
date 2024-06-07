@@ -435,7 +435,8 @@ def processRegisterFinish(request):
                 logger.error(exceptSql);
             }
         '''
-    return render (request, 'app/feed.html')
+    return redirect('/login?username=' + username)
+    # return render (request, 'app/feed.html')
 
 def home(request):
     # Equivalent of HomeController.java
