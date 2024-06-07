@@ -386,11 +386,12 @@ def showTools(request):
 def processTools(request):
     host = request.POST.get('host')
     fortuneFile = request.POST.get('fortuneFile')
-    ping_result = ping(host) if host else ""
+    request.file = fortune(fortuneFile)
+    request.ping = ping(host) if host else ""
     
-    if not fortuneFile:
+    '''if not fortuneFile:
         fortuneFile = 'literature'
-        fortune(fortuneFile)
+        request.fortuneFile = fortune(fortuneFile)'''
 
     # Previous Logic
     '''logger.info("Processing tools")
@@ -410,20 +411,25 @@ def processTools(request):
 
     return render(request, 'app/tools.html')
 
-def fortune(fortuneFile):
-    cmd = "/bin/fortune" + fortuneFile
+def fortune(file):
+    cmd = f"/bin/fortune {file}"
     output = " "
 
     try: 
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for line in p.stdout.readlines():
-            b'output += line + "\n"'.decode("utf-8")
-            
-    except IOError as e:
-        print("Error occurred:", e)
-        logger.error(e)
-
-        return output
+        p = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            stdout, stderr = p.communicate(timeout=5)
+            output = stdout.decode() if stdout else ""
+        except subprocess.TimeoutExpired:
+            print("Fortune timed out")
+        except Exception as e:
+            print("Error:", e)
+        '''for line in p.stdout.readlines():
+            b'output += line + "\n"'.decode("utf-8")'''
+    except Exception as e:
+        print("Error:", e)
+        
+    return output
 
 
     '''while True:
@@ -458,18 +464,17 @@ def ping(host):
     # return render(output, 'app/tools.html')
     return output
 
+
 def pingView(request):
-    host = request.GET.get('host')
+    host = request.POST.get('host')
     result =""
     if host:
         try:
             result = ping(host)
         except Exception as e:
+            result = f"Error: {e}"
             print("Error:", e)
-            logger.error(e)
 
-    print(f"Host: {host}")
-    print(f"Result: {result}")
 
     return render(request, 'app/tools.html', {'result': result, 'host': host})
 

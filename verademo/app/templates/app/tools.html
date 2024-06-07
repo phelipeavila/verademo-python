@@ -54,14 +54,14 @@
 		</div>
 		<div>
 			<p>Check the uptime of a host here by pinging it. Example: 127.0.0.1</p>
-			<form method="post">
+			<form id="ping-form" method="post">
                 {% csrf_token %}
 				<label for="host">Host:</label> 
 				<input type="text" id="host-input" name="host"
 					value={{ host }} ><input
 					type="submit" value="Check" id="ping-btn" />
 			</form>
-			<pre id="ping-result">{{ result }}</pre>
+			<pre id="ping-result">{{ request.ping }}</pre>
 		</div>
 		<div>
             <h5>Show a UNIX fortune from one of the 2 supported dictionaries</h5>
@@ -82,5 +82,8 @@
 	<!-- Placed at the end of the document so the pages load faster -->
 	<script src="{% static 'js/jquery-1.11.2.min.js' %}"></script>
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+	<script>
+
 </body>
 </html>
