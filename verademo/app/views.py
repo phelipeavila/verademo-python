@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseForbidden, JsonResponse
-from django.db import connection
+from django.db import connection, transaction
 from django.core.files.storage import FileSystemStorage
 import sqlite3
 import logging
@@ -15,18 +15,20 @@ from datetime import datetime
 import sys, os
 
 from .forms import UserForm, RegisterForm
-
+'''
+General Note: '%s' should have surrounding quotes removed to prevent SQL injection.
+'''
 # Get logger
 logger = logging.getLogger("__name__")
 
 sqlBlabsByMe = ("SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
-			    "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
-			    "WHERE blabs.blabber = %s GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
+                "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
+                "WHERE blabs.blabber = '%s' GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
 
 sqlBlabsForMe = ("SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
-			    "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
-			    "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = %s "
-			    "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
+                "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
+                "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = '%s' "
+                "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
 
 def feed(request):
     if request.method == "GET":
@@ -109,7 +111,7 @@ def feed(request):
             with connection.cursor() as cursor:
 
                 logger.info("Creating query to add new Blab")
-                addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values (%s, %s, datetime('now'));"
+                addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values ('%s', '%s', datetime('now'));"
 
                 logger.info("Executing query to add new blab")
                 cursor.execute(addBlabSql, (username, blab))
@@ -130,10 +132,10 @@ def morefeed(request):
     length = request.GET.get('len')
 
     template = ("<li><div>" + "\t<div class=\"commenterImage\">" + "\t\t<img src=\"resources/images/{username}.png\">" +
-				"\t</div>" + "\t<div class=\"commentText\">" + "\t\t<p>{content}</p>" +
-				"\t\t<span class=\"date sub-text\">by {blab_name} on {timestamp}</span><br>" +
-				"\t\t<span class=\"date sub-text\"><a href=\"blab?blabid={blabid}\">{count} Comments</a></span>" + "\t</div>" +
-				"</div></li>")
+                "\t</div>" + "\t<div class=\"commentText\">" + "\t\t<p>{content}</p>" +
+                "\t\t<span class=\"date sub-text\">by {blab_name} on {timestamp}</span><br>" +
+                "\t\t<span class=\"date sub-text\"><a href=\"blab?blabid={blabid}\">{count} Comments</a></span>" + "\t</div>" +
+                "</div></li>")
     
     try:
         cnt = int(count)
@@ -177,11 +179,11 @@ def blab(request):
         logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
         blabDetailsSql = ("SELECT blabs.content, users.blab_name "
-			    "FROM blabs INNER JOIN users ON blabs.blabber = users.username " + "WHERE blabs.blabid = %s;")
+                "FROM blabs INNER JOIN users ON blabs.blabber = users.username " + "WHERE blabs.blabid = '%s';")
 
         blabCommentsSql = ("SELECT users.username, users.blab_name, comments.content, comments.timestamp "
-				"FROM comments INNER JOIN users ON comments.blabber = users.username "
-				"WHERE comments.blabid = %s ORDER BY comments.timestamp DESC;")
+                "FROM comments INNER JOIN users ON comments.blabber = users.username "
+                "WHERE comments.blabid = '%s' ORDER BY comments.timestamp DESC;")
         
         try :
             logger.info("Creating the Database connection")
@@ -317,20 +319,26 @@ def showProfile(request):
     return render(request, 'app/profile.html', {})
 
 '''TODO: Connect form to profile update
-TODO: Test sqlite3 error handling'''
+TODO: Test sqlite3 error handling
+NOTE: This saves images to the local images folder, but it would be much easier and more secure to
+store profile images in the database.
+'''
 def processProfile(request):
-    response = JsonResponse()
     realName = request.POST.get('realName')
     blabName = request.POST.get('blabName')
     username = request.POST.get('username')
     file = request.FILES.get('file')
+    #TODO: Experiment with safe=False on JsonResponse, send in non-dict objects for serialization
+    # Initial response only get returns if everything else succeeds.
+    msg = f"<script>alert('Successfully changed values!\\\\nusername:{username.lower()}\\\\nReal Name: {realName}\\\\nBlab Name: {blabName}');</script>"
+    response = JsonResponse({'values':{"username": {username.lower()}, "realName": {realName}, "blabName": {blabName}, 'message':msg}})
     logger.info("entering processProfile")
     sessionUsername = request.session.get('username')
 
     # Ensure user is logged in
     if not sessionUsername:
         logger.info("User is not Logged In = redirecting...")
-        response.write({'message':"<script>alert('Error - please login');</script>"})
+        response = JsonResponse({'message':"<script>alert('Error - please login');</script>"})
         response.status_code = 403
         return response
         #TODO: Resolve request/response status and ensure same funcitonality
@@ -342,10 +350,10 @@ def processProfile(request):
 
     try:
         logger.info("Getting Database connection")
-        # Get the Database Connectionß
+        # Get the Database Connection
         with connection.cursor() as cursor:
             logger.info("Preparing the update Prepared Statement")
-            update = "UPDATE users SET real_name=%s, blab_name=%s WHERE username=%s;"
+            update = "UPDATE users SET real_name='%s', blab_name='%s' WHERE username='%s';"
             logger.info("Executing the update Prepared Statement")
             cursor.execute(update, (realName,blabName,sessionUsername))
             updateResult = cursor.fetchone()
@@ -353,8 +361,9 @@ def processProfile(request):
             # If there is a record...
             if updateResult:
                 # failure
+                
+                response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"})
                 response.status_code = 500
-                response.write({'message':"<script>alert('An error occurred, please try again.');</script>"})
                 return response
             
     except sqlite3.Error as ex :
@@ -362,17 +371,19 @@ def processProfile(request):
 
     # Rename profile image if username changes
     if username != oldUsername :
-        '''
+        
         if usernameExists(username):
+            
+            response = JsonResponse({'message':"<script>alert('That username already exists. Please try another.');</script>"})
             response.status_code = 409
-            response.write({'message':"<script>alert('That username already exists. Please try another.');</script>"})
             return response
 
         if not updateUsername(oldUsername, username):
+            
+            response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"})
             response.status_code = 500
-            response.write({'message':"<script>alert('An error occurred, please try again.');</script>"})
             return response
-        '''
+        
         # Update all session and cookie logic
         request.session.username = username
         response.set_cookie('username',username)
@@ -389,7 +400,7 @@ def processProfile(request):
         # Update user profile image
     if file:
         
-        imageDir = os.path.realpath("./resources/images")
+        imageDir = os.path.realpath("./verademo/resources/images/")
         
 
         # Get old image name, if any, to delete
@@ -398,20 +409,22 @@ def processProfile(request):
             os.remove(os.path.join(imageDir,oldImage))
         
 
-        # TODO: check if file is png first
+        # TODO: check if file is png first //Done?
         try:
             #Potential VULN? ending with .png, having different file type
             extension = file.name.lower().endswith('.png')
             if extension:
-                path = imageDir + username + extension
+                path = imageDir + '/' + username + '.png'
             else:
                 response.status_code = 422
-                response.write({'message':"<script>alert('File must end in .png');</script>"})
+                response.content = {'message':"<script>alert('File must end in .png');</script>"}
                 return response
             logger.info("Saving new profile image: " + path)
 
-            os.rename(file.path, path)
-            file.save()
+            with open(path, 'wb') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+
         except Exception as ex :
             logger.error(ex)
         '''
@@ -420,7 +433,7 @@ def processProfile(request):
         '''
         response.status_code = 200
         msg = f"<script>alert('Successfully changed values!\\\\nusername:{username.lower()}\\\\nReal Name: {realName}\\\\nBlab Name: {blabName}');</script>"
-        response.write({"values": {"username": {username.lower()}, "realName": {realName}, "blabName": {blabName}, 'message':msg}})
+        response.content['values'] = {"username": {username.lower()}, "realName": {realName}, "blabName": {blabName}, 'message':msg}
         return response
 
 def register(request):
@@ -530,13 +543,13 @@ def processRegisterFinish(request):
                 if sqlStatement != None:
                     #sqlStatement.close();
                 
-            except SQLException as exceptSql
+            except sqlite3.Error as exceptSql
                 logger.error(exceptSql)
             try:
                 if (connect != null) {
                     connect.close();
                 }
-            } catch (SQLException exceptSql) {
+            } catch (sqlite3.Error exceptSql) {
                 logger.error(exceptSql);
             }
         '''
@@ -673,7 +686,7 @@ def updateInResponse(user, response):
 Takes a username and searches for the profile image for that user
 '''
 def getProfileImageNameFromUsername(username):
-    f = os.path.realpath("./resources/images")
+    f = os.path.realpath("./verademo/resources/images")
     matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
 
     if not matchingFiles:
@@ -793,3 +806,91 @@ def ping(host):
             logger.error(e)
 
         return output '''
+
+def usernameExists(username):
+    username = username.toLowerCase()
+    # Check is the username already exists
+    try:
+        # Get the Database Connection
+        logger.info("Getting Database connection")
+        with connection.cursor() as cursor:
+            logger.info("Preparing the duplicate username check Prepared Statement")
+            sqlStatement = "SELECT username FROM users WHERE username='%s'"
+            cursor.execute(sqlStatement,(username,))
+            result = cursor.fetchone()
+            if not result:
+                # username does not exist
+                return False
+            
+    except sqlite3.Error as er:
+            logger.error(er.sqlite_errorcode,er.sqlite_errorname)
+    except ModuleNotFoundError as ex:
+        logger.error(ex)
+    logger.info("Username: " + username + " already exists. Try again.")
+    return True
+
+def updateUsername(oldUsername, newUsername):
+    # Enforce all lowercase usernames
+    oldUsername = oldUsername.lower()
+    newUsername = newUsername.lower()
+
+    # Check is the username already exists
+    try:
+        logger.info("Getting Database connection")
+        # Get the Database Connection
+        with transaction.atomic():
+            with connection.cursor() as cursor:
+
+                # Update all references to this user
+                sqlStrQueries = [
+                    "UPDATE users SET username='%s' WHERE username='%s'",
+                    "UPDATE blabs SET blabber='%s' WHERE blabber='%s'",
+                    "UPDATE comments SET blabber='%s' WHERE blabber='%s'",
+                    "UPDATE listeners SET blabber='%s' WHERE blabber='%s'",
+                    "UPDATE listeners SET listener='%s' WHERE listener='%s'",
+                    "UPDATE users_history SET blabber='%s' WHERE blabber='%s'" ]
+        
+                # Execute updates as part of a batch transaction
+                # This will roll back all changes if one query fails
+                for query in sqlStrQueries:
+                    cursor.execute(query,(newUsername,oldUsername))
+
+
+        # Rename the user profile image to match new username
+        oldImage = getProfileImageNameFromUsername(oldUsername)
+        if oldImage:
+            extension = '.png'
+
+            logger.info("Renaming profile image from " + oldImage + " to " + newUsername + extension)
+            path = os.path.realpath("./verademo/resources/images")
+            oldPath = path + '/' + oldImage
+            newPath = path + '/' + newUsername + extension
+            os.rename(oldPath, newPath)
+        return True
+    except (sqlite3.Error, ModuleNotFoundError) as ex:
+        logger.error(ex)
+    '''
+    I Believe it transaction.atomic() rolls back without any other logic
+    finally {
+        try {
+            if (sqlUpdateQueries != null) {
+                for (PreparedStatement stmt : sqlUpdateQueries) {
+                    stmt.close();
+                }
+            }
+        } catch (sqlite3.Error e) {
+            logger.error(e);
+        }
+        try {
+            if (connect != null) {
+                logger.error("Transaction is being rolled back");
+                connect.rollback();
+                connect.close();
+            }
+        } catch (sqlite3.Error e) {
+            logger.error(e);
+        }
+    }
+    '''
+    # Error occurred
+    return False
