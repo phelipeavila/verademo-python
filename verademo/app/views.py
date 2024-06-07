@@ -385,40 +385,25 @@ def showTools(request):
 
 def processTools(request):
     host = request.POST.get('host')
-    fortuneFile = request.POST.get('fortuneFile')
-    request.file = fortune(fortuneFile)
+    fortunefile = request.POST.get('fortunefile')
+    request.file = fortune(fortunefile) if fortunefile else ""
     request.ping = ping(host) if host else ""
     
-    '''if not fortuneFile:
-        fortuneFile = 'literature'
-        request.fortuneFile = fortune(fortuneFile)'''
+    
 
-    # Previous Logic
-    '''logger.info("Processing tools")
-    toolMenu = request.POST.get('/tools')
-    host = request.POST.get('host')
-    form = RegisterForm(request.POST or None)
-    if form.is_valid():
-        cHost = form.cleaned_data.get('host')
-        if host is not None:
-            logger.info("Host: " + host)
-            ping(host) '''
-
-
-
-
-
-
-    return render(request, 'app/tools.html')
+    return render(request, 'app/tools.html', {"host" : host})
 
 def fortune(file):
-    cmd = f"/bin/fortune {file}"
-    output = " "
+    cmd = "/bin/fortune " + file
+    output = ""
 
     try: 
         p = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             stdout, stderr = p.communicate(timeout=5)
+            # Debug
+            print(stdout)
+            print(stderr)
             output = stdout.decode() if stdout else ""
         except subprocess.TimeoutExpired:
             print("Fortune timed out")
@@ -432,18 +417,22 @@ def fortune(file):
     return output
 
 
-    '''while True:
+def fortuneView(request):
+    file = request.POST.get('file')
+    result = ""
+    if file:
         try:
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            for line in p.stdout.readlines():
-                output += line
-                output += "\n"
-        except IOError as e:
-            logger.error(e)
-        else:
-            logger.error(e)
+            result = fortune(file)
+        except Exception as e:
+            result = f"Error: {e}"
+            print("Error:", e)
 
-        return output'''
+
+    return render(request, 'app/tools.html', {'result': result, 'file': file})
+
+
+
+    
     
 
 def ping(host):

@@ -58,7 +58,7 @@
                 {% csrf_token %}
 				<label for="host">Host:</label> 
 				<input type="text" id="host-input" name="host"
-					value={{ host }} ><input
+					value={{ request.ping }} ><input
 					type="submit" value="Check" id="ping-btn" />
 			</form>
 			<pre id="ping-result">{{ request.ping }}</pre>
@@ -67,13 +67,12 @@
             <h5>Show a UNIX fortune from one of the 2 supported dictionaries</h5>
             <form method="post">
                 {% csrf_token %}
-                <select name="fortunelife">
-                <option value={{ literature }}>literature</option>
-                    <option value={{ riddles }}>riddles</option>
+                <select name="fortunefile">
+                <option value="literature">literature</option>
+                    <option value="riddles">riddles</option>
                 </select> <input type="submit" value="Change"/>
             </form>
-            <pre>${{ request.fortune }}</pre>
-			
+            <pre id="fortune-result">{{ request.file }}</pre>
 		</div>
 	</div>
 
