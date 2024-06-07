@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseForbidden, JsonResponse
 from django.db import connection
+from django.core.files.storage import FileSystemStorage
 import sqlite3
 import logging
 import base64
@@ -322,7 +323,7 @@ def processProfile(request):
     realName = request.POST.get('realName')
     blabName = request.POST.get('blabName')
     username = request.POST.get('username')
-    file = request.POST.get('file')
+    file = request.FILES.get('file')
     logger.info("entering processProfile")
     sessionUsername = request.session.get('username')
 
@@ -387,6 +388,7 @@ def processProfile(request):
 
         # Update user profile image
         if file:
+            
             imageDir = os.path.realpath("./resources/images")
             
 
@@ -395,27 +397,30 @@ def processProfile(request):
             if oldImage:
                 os.remove(os.path.join(imageDir,oldImage))
             
-    '''
 
             # TODO: check if file is png first
-            try {
-                String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-                String path = imageDir + username + extension;
+            try:
+                #Potential VULN? ending with .png, having different file type
+                extension = file.name.lower().endswith('.png')
+                if extension:
+                    path = imageDir + username + extension
+                else:
+                    response.status_code = 422
+                    response.write({'message':"<script>alert('File must end in .png');</script>"})
+                    return response
+                logger.info("Saving new profile image: " + path)
 
-                logger.info("Saving new profile image: " + path);
+                os.rename(file.path, path)
+                file.save()
+            except IOException as ex :
+                logger.error(ex)
+            except IllegalStateException as e:
+                logger.error(e)
 
-                file.transferTo(new File(path)); // will delete any existing file first
-            } catch (IllegalStateException | IOException ex) {
-                logger.error(ex);
-            }
-        }
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String msg = "Successfully changed values!\\\\nusername: %1$s\\\\nReal Name: %2$s\\\\nBlab Name: %3$s";
-        String respTemplate = "{\"values\": {\"username\": \"%1$s\", \"realName\": \"%2$s\", \"blabName\": \"%3$s\"}, \"message\": \"<script>alert('"
-                + msg + "');</script>\"}";
-        return String.format(respTemplate, username.toLowerCase(), realName, blabName);
-'''
+        response.status_code = 200
+        msg = f"<script>alert('Successfully changed values!\\\\nusername:{username.lower()}\\\\nReal Name: {realName}\\\\nBlab Name: {blabName}');</script>"
+        response.write({"values": {"username": {username.lower()}, "realName": {realName}, "blabName": {blabName}, 'message':msg}})
+        return response
 
 def register(request):
     if(request.method == "GET"):
