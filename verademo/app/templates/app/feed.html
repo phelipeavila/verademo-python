@@ -81,11 +81,11 @@
                                     <div class ="commentText">
                                         <p class="">= post.getCommentContent() </p>
                                         <span class="date sub-text">
-                                            by {{" post.getCommentAuthor.getBlabName() "}} on = post.postDate() 
+                                            by {{" post.getCommentAuthor.getBlabName "}} on = post.postDate() 
                                         </span>
                                         <br/>
                                         <span class="date sub-text">
-                                            <a href="blab?blabid=<%= {{ "post.getId()" }} >">= {{ "post.getCommentCount()" }} Comments</a>
+                                            <a href="blab?blabid=<%= {{ "post.getId" }} >">= {{ "post.getCommentCount" }} Comments</a>
                                         </span>
                                     </div>
                                 </div>
@@ -93,7 +93,7 @@
                             {% endfor %}
                             {% endblock %}
                         </ul>
-                        <a href="#" onclick={{"getmore(this) return false"}}>Fetch more...</a>
+                        <a href="#" onclick="getmore(this); return false;">Fetch more...</a>
                     </div>
                 </div>
             </div>
@@ -147,7 +147,8 @@
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
 
     <!-- Fetch additional feed items  -->
-    <script type="text/javascript">
+    <!-- Fetch additional feed items -->
+	<script type="text/javascript">
 		function getmore(obj) {
 			var count = $("#feed li").length;
 			$.get("morefeed", {
