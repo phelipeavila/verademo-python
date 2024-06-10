@@ -12,7 +12,9 @@ from app.models import User, Blabber, Blab, Blabber, Comment
 from django.core import serializers
 from datetime import datetime
 from django.http import HttpResponse
-from app.commands import BlabberCommand
+from app.commands.BlabberCommand import BlabberCommand
+from app.commands.ListenCommand import ListenCommand
+from app.commands.IgnoreCommand import IgnoreCommand
 from django.views.decorators.csrf import csrf_exempt
 
 import sys, os
@@ -310,38 +312,18 @@ def blabbers(request):
         try:
             logger.info("Creating database connection")
             with connection.cursor() as cursor:
-                module = "app.commands." + command.capitalize() + "Command"
-                exec("from %s import %s as cmdClass" % (module, command.capitalize() + "Command"))
-                cmdObj = cmdClass()
-                # logger.info(blabbersSql)
-                # logger.info("Executing query to see Blab details")
-                # cursor.execute(blabbersSql, (username, username))
-                # blabbersResults = cursor.fetchall()
-
-                # blabbers = []
-                # for b in blabbersResults:
-                #     blabber = Blabber()
-                #     blabber.setBlabName(b[1])
-                #     blabber.setUsername(b[0])
-                #     blabber.setCreatedDate(b[2])
-                #     blabber.setNumberListeners(b[3])
-                #     blabber.setNumberListening(b[4])
-
-                #     blabbers.append(blabber)
-
-                # request.blabbers = blabbers
-
-                # response = render(request, 'app/blabbers.html', {})
+                module = command.capitalize()[:-1] + "Command"
+                cmdClass = eval(module)
+                cmdObj = cmdClass(cursor, username)
+                cmdObj.execute(blabberUsername)
+                return redirect('blabbers')
         except:
 
             # TODO: Implement exceptions
 
             logger.error("Unexpected error:", sys.exc_info()[0])
-
-
-        return render(request, 'app/blabbers.html', {})
-        # return response instead of render when complete
-        # return response
+        
+        return response
 
 def profile(request):
     if(request.method == "GET"):

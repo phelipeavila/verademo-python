@@ -1,9 +1,9 @@
-from app.commands import BlabberCommand
+from app.commands.BlabberCommand import BlabberCommand
 from typing import override
 import sys
 import logging
 
-class IgnoreCommand(BlabberCommand):
+class ListenCommand(BlabberCommand):
     logger = logging.getLogger("VeraDemo:IgnoreCommand")
 
     cursor = None

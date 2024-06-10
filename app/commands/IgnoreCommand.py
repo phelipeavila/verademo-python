@@ -1,4 +1,4 @@
-from app.commands import BlabberCommand
+from app.commands.BlabberCommand import BlabberCommand
 from typing import override
 import sys
 import logging
