@@ -231,11 +231,11 @@
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
 
 	<!-- Form submission -->
-    <!--
+   
 	<script type="text/javascript">
 		$('#updateprofile').submit(function(e) {
 			e.preventDefault();
-			
+
 			$.ajax({
 				type : e.target.method,
 				url : e.target.action,
@@ -249,7 +249,7 @@
 							$.each(data.values, function(key, val) {
 								$('input[name="' + key + '"]').val(val);
 								if (key === "username") {
-									$('#profileImage').attr('src', 'resources/images/' + val + '.png');
+									$('#profileImage').attr('src', './resources/images/' + val + '.png');
 								}
 							});
 						}
@@ -267,6 +267,5 @@
 			});
 		});
 	</script>
--->
 </body>
 </html>

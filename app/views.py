@@ -342,8 +342,10 @@ def blabbers(request):
 def profile(request):
     if(request.method == "GET"):
         return showProfile(request)
-    elif(request.method == "POST"):
+    elif(request.method == "POST" and is_ajax(request)):
         return processProfile(request)
+    else:
+        return JsonResponse({'No profile method satisfied.'})
     
 def showProfile(request):
     logger.info("Entering showProfile")
@@ -393,7 +395,8 @@ def showProfile(request):
             logger.info(sql)
             cursor.execute(sql)
             myInfoResults = cursor.fetchone()
-
+            if not myInfoResults:
+                return JsonResponse({'Error, no Inforesults found'})
             # Send these values to our View
             request.hecklers = hecklers
             request.events = events
@@ -418,16 +421,18 @@ def processProfile(request):
     file = request.FILES.get('file')
     #TODO: Experiment with safe=False on JsonResponse, send in non-dict objects for serialization
     # Initial response only get returns if everything else succeeds.
-    msg = f"<script>alert('Successfully changed values!\\\\nusername:{username.lower()}\\\\nReal Name: {realName}\\\\nBlab Name: {blabName}');</script>"
-    response = JsonResponse({'values':{"username": username.lower(), "realName": realName, "blabName": blabName, 'message':msg}})
+    # This must be here in order to use set_cookie later in the program
+    msg = f"<script>alert('Successfully changed values!\\nusername: {username.lower()}\\nReal Name: {realName}\\nBlab Name: {blabName}');</script>"
+    response = JsonResponse({'values':{"username": username.lower(), "realName": realName, "blabName": blabName}, 'message':msg},status=200)
+    
     logger.info("entering processProfile")
     sessionUsername = request.session.get('username')
 
     # Ensure user is logged in
     if not sessionUsername:
         logger.info("User is not Logged In = redirecting...")
-        response = JsonResponse({'message':"<script>alert('Error - please login');</script>"})
-        response.status_code = 403
+        response = JsonResponse({'message':"<script>alert('Error - please login');</script>"},status=403)
+        #response.status_code = 403
         return response
         #TODO: Resolve request/response status and ensure same funcitonality
         
@@ -451,8 +456,8 @@ def processProfile(request):
             if updateResult:
                 # failure
                 
-                response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"})
-                response.status_code = 500
+                response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
+                #response.status_code = 500
                 return response
             
     except sqlite3.Error as ex :
@@ -463,18 +468,18 @@ def processProfile(request):
         
         if usernameExists(username):
             
-            response = JsonResponse({'message':"<script>alert('That username already exists. Please try another.');</script>"})
-            response.status_code = 409
+            response = JsonResponse({'message':"<script>alert('That username already exists. Please try another.');</script>"},status=409)
+            #response.status_code = 409
             return response
 
         if not updateUsername(oldUsername, username):
             
-            response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"})
-            response.status_code = 500
+            response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
+            #response.status_code = 500
             return response
         
         # Update all session and cookie logic
-        request.session.username = username
+        request.session['username'] = username
         response.set_cookie('username',username)
         
 
@@ -489,7 +494,7 @@ def processProfile(request):
         # Update user profile image
     if file:
         
-        imageDir = os.path.realpath("./verademo/resources/images/")
+        imageDir = os.path.realpath("./resources/images/")
         
 
         # Get old image name, if any, to delete
@@ -505,8 +510,9 @@ def processProfile(request):
             if extension:
                 path = imageDir + '/' + username + '.png'
             else:
-                response.status_code = 422
-                response.content = {'message':"<script>alert('File must end in .png');</script>"}
+                
+                response = JsonResponse({'message':"<script>alert('File must end in .png');</script>"},status=422)
+                #response.status_code = 422
                 return response
             logger.info("Saving new profile image: " + path)
 
@@ -520,10 +526,8 @@ def processProfile(request):
         except IllegalStateException as e:
             logger.error(e)
         '''
-        response.status_code = 200
-        msg = f"<script>alert('Successfully changed values!\\\\nusername:{username.lower()}\\\\nReal Name: {realName}\\\\nBlab Name: {blabName}');</script>"
-        response.content['values'] = {"username": {username.lower()}, "realName": {realName}, "blabName": {blabName}, 'message':msg}
-        return response
+    
+    return response
 
 def register(request):
     if(request.method == "GET"):
@@ -897,7 +901,7 @@ def ping(host):
         return output '''
 
 def usernameExists(username):
-    username = username.toLowerCase()
+    username = username.lower()
     # Check is the username already exists
     try:
         # Get the Database Connection
@@ -905,7 +909,7 @@ def usernameExists(username):
         with connection.cursor() as cursor:
             logger.info("Preparing the duplicate username check Prepared Statement")
             sqlStatement = "SELECT username FROM users WHERE username='%s'"
-            cursor.execute(sqlStatement,(username,))
+            cursor.execute(sqlStatement % username)
             result = cursor.fetchone()
             if not result:
                 # username does not exist
@@ -942,7 +946,7 @@ def updateUsername(oldUsername, newUsername):
                 # Execute updates as part of a batch transaction
                 # This will roll back all changes if one query fails
                 for query in sqlStrQueries:
-                    cursor.execute(query,(newUsername,oldUsername))
+                    cursor.execute(query % (newUsername,oldUsername))
 
 
         # Rename the user profile image to match new username
@@ -951,35 +955,15 @@ def updateUsername(oldUsername, newUsername):
             extension = '.png'
 
             logger.info("Renaming profile image from " + oldImage + " to " + newUsername + extension)
-            path = os.path.realpath("./verademo/resources/images")
+            path = os.path.realpath("./resources/images")
             oldPath = path + '/' + oldImage
             newPath = path + '/' + newUsername + extension
             os.rename(oldPath, newPath)
         return True
     except (sqlite3.Error, ModuleNotFoundError) as ex:
         logger.error(ex)
-    '''
-    I Believe it transaction.atomic() rolls back without any other logic
-    finally {
-        try {
-            if (sqlUpdateQueries != null) {
-                for (PreparedStatement stmt : sqlUpdateQueries) {
-                    stmt.close();
-                }
-            }
-        } catch (sqlite3.Error e) {
-            logger.error(e);
-        }
-        try {
-            if (connect != null) {
-                logger.error("Transaction is being rolled back");
-                connect.rollback();
-                connect.close();
-            }
-        } catch (sqlite3.Error e) {
-            logger.error(e);
-        }
-    }
-    '''
     # Error occurred
     return False
+
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
