@@ -374,7 +374,7 @@ def showProfile(request):
             # END EXAMPLE VULNERABILITY 
 
             for result in userHistoryResult :
-                events.add(result[0])
+                events.append(result[0])
 
             # Get the users information
             sql = "SELECT username, real_name, blab_name FROM users WHERE username = '" + username + "'"
@@ -783,7 +783,8 @@ def getProfileImageNameFromUsername(username):
     return matchingFiles[0]
 
 def downloadImage(request):
-    pass
+    imageName = request.GET.get('image')
+    
 
 def notImplemented(request):
     return render(request, 'app/notImplemented.html')
