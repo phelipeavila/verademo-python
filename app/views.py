@@ -379,7 +379,7 @@ def showProfile(request):
             # END EXAMPLE VULNERABILITY 
 
             for result in userHistoryResult :
-                events.add(result[0])
+                events.append(result[0])
 
             # Get the users information
             sql = "SELECT username, real_name, blab_name FROM users WHERE username = '" + username + "'"
