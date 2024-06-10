@@ -310,9 +310,9 @@ def blabbers(request):
         try:
             logger.info("Creating database connection")
             with connection.cursor() as cursor:
-                module = "app.commands" + command.capitalize() + "Command"
-                
-                # cmdClass =  
+                module = "app.commands." + command.capitalize() + "Command"
+                exec("from %s import %s as cmdClass" % (module, command.capitalize() + "Command"))
+                cmdObj = cmdClass()
                 # logger.info(blabbersSql)
                 # logger.info("Executing query to see Blab details")
                 # cursor.execute(blabbersSql, (username, username))
@@ -497,8 +497,9 @@ def processProfile(request):
 
         # Update user profile image
     if file:
-        
-        imageDir = os.path.realpath("./resources/images/")
+        dir_path = os.path.dirname(__file__)
+        imageDir = os.path.join(dir_path, '../resources/images')
+        # imageDir = os.path.realpath("./resources/images/")
         
 
         # Get old image name, if any, to delete
@@ -785,7 +786,9 @@ def updateInResponse(user, response):
 Takes a username and searches for the profile image for that user
 '''
 def getProfileImageNameFromUsername(username):
-    f = os.path.realpath("./resources/images")
+    dir_path = os.path.dirname(__file__)
+    f = os.path.join(dir_path, '../resources/images')
+    # f = os.path.realpath("./resources/images")
     matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
 
     if not matchingFiles:
@@ -961,7 +964,9 @@ def updateUsername(oldUsername, newUsername):
             extension = '.png'
 
             logger.info("Renaming profile image from " + oldImage + " to " + newUsername + extension)
-            path = os.path.realpath("./resources/images")
+            dir_path = os.path.dirname(__file__)
+            path = os.path.join(dir_path, '../resources/images')
+            # path = os.path.realpath("./resources/images")
             oldPath = path + '/' + oldImage
             newPath = path + '/' + newUsername + extension
             os.rename(oldPath, newPath)
