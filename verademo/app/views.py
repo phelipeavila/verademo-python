@@ -11,6 +11,7 @@ from app.models import User, Blabber, Blab, Blabber, Comment
 from django.core import serializers
 from datetime import datetime
 from django.http import HttpResponse
+from app.commands import BlabberCommand
 
 import sys, os
 
@@ -246,8 +247,8 @@ def blabbers(request):
         logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
         blabbersSql = ("SELECT users.username," + " users.blab_name," + " users.created_at,"
-                    " SUM(if(listeners.listener=%s, 1, 0)) as listeners,"
-                    " SUM(if(listeners.status='Active',1,0)) as listening"
+                    " SUM(iif(listeners.listener=%s, 1, 0)) as listeners,"
+                    " SUM(iif(listeners.status='Active',1,0)) as listening"
                     " FROM users LEFT JOIN listeners ON users.username = listeners.blabber"
                     " WHERE users.username NOT IN (\"admin\",%s)" + " GROUP BY users.username" + " ORDER BY " + sort + ";")
 
@@ -258,7 +259,7 @@ def blabbers(request):
                 logger.info(blabbersSql)
                 logger.info("Executing query to see Blab details")
                 cursor.execute(blabbersSql, (username, username))
-                blabbersResults = cursor.fetchone()
+                blabbersResults = cursor.fetchall()
 
                 blabbers = []
                 for b in blabbersResults:
@@ -305,26 +306,28 @@ def blabbers(request):
         try:
             logger.info("Creating database connection")
             with connection.cursor() as cursor:
+                module = "app.commands" + command.capitalize() + "Command"
+                
+                # cmdClass =  
+                # logger.info(blabbersSql)
+                # logger.info("Executing query to see Blab details")
+                # cursor.execute(blabbersSql, (username, username))
+                # blabbersResults = cursor.fetchall()
 
-                logger.info(blabbersSql)
-                logger.info("Executing query to see Blab details")
-                cursor.execute(blabbersSql, (username, username))
-                blabbersResults = cursor.fetchone()
+                # blabbers = []
+                # for b in blabbersResults:
+                #     blabber = Blabber()
+                #     blabber.setBlabName(b[1])
+                #     blabber.setUsername(b[0])
+                #     blabber.setCreatedDate(b[2])
+                #     blabber.setNumberListeners(b[3])
+                #     blabber.setNumberListening(b[4])
 
-                blabbers = []
-                for b in blabbersResults:
-                    blabber = Blabber()
-                    blabber.setBlabName(b[1])
-                    blabber.setUsername(b[0])
-                    blabber.setCreatedDate(b[2])
-                    blabber.setNumberListeners(b[3])
-                    blabber.setNumberListening(b[4])
+                #     blabbers.append(blabber)
 
-                    blabbers.append(blabber)
+                # request.blabbers = blabbers
 
-                request.blabbers = blabbers
-
-                response = render(request, 'app/blabbers.html', {})
+                # response = render(request, 'app/blabbers.html', {})
         except:
 
             # TODO: Implement exceptions
