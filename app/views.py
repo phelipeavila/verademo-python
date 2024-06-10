@@ -12,6 +12,8 @@ from app.models import User, Blabber, Blab, Blabber, Comment
 from django.core import serializers
 from datetime import datetime
 from django.http import HttpResponse
+from app.commands import BlabberCommand
+from django.views.decorators.csrf import csrf_exempt
 
 import sys, os
 
@@ -24,11 +26,11 @@ logger = logging.getLogger("__name__")
 
 sqlBlabsByMe = ("SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
                 "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
-                "WHERE blabs.blabber = %s GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
+                "WHERE blabs.blabber = '%s' GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
 #NOTE: Tried adding quotes around %s, and it didn't work. Possible filtering in the blabsForMe format?
 sqlBlabsForMe = ("SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
                 "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
-                "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = %s "
+                "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = '%s' "
                 "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
 
 def feed(request):
@@ -45,7 +47,7 @@ def feed(request):
 
                 logger.info("Executing query to get all 'Blabs for me'")
                 blabsForMe = sqlBlabsForMe.format(10, 0)
-                cursor.execute(blabsForMe, (username,))
+                cursor.execute(blabsForMe % (username,))
                 blabsForMeResults = cursor.fetchall()
 
                 feedBlabs = []
@@ -69,7 +71,7 @@ def feed(request):
                 # Find the Blabs by this user
 
                 logger.info("Executing query to get all of user's Blabs")
-                cursor.execute(sqlBlabsByMe, (username,))
+                cursor.execute(sqlBlabsByMe % (username,))
                 blabsByMeResults = cursor.fetchall()
 
                 myBlabs = []
@@ -115,7 +117,7 @@ def feed(request):
                 addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values ('%s', '%s', datetime('now'));"
 
                 logger.info("Executing query to add new blab")
-                cursor.execute(addBlabSql, (username, blab))
+                cursor.execute(addBlabSql % (username, blab))
 
                 if not cursor.rowcount:
                     request.error = "Failed to add comment"
@@ -152,7 +154,7 @@ def morefeed(request):
 
             logger.info("Executing query to see more Blabs")
             blabsForMe = sqlBlabsForMe.format(len, cnt)
-            cursor.execute(blabsForMe, (username,))
+            cursor.execute(blabsForMe % (username,))
             results = cursor.fetchall()
             ret = ""
             for blab in results:
@@ -191,7 +193,7 @@ def blab(request):
             with connection.cursor() as cursor:
 
                 logger.info("Executing query to see Blab details")
-                cursor.execute(blabDetailsSql, (blabid,))
+                cursor.execute(blabDetailsSql % (blabid,))
                 blabDetailsResults = cursor.fetchone()
 
                 if (blabDetailsResults):
@@ -201,7 +203,7 @@ def blab(request):
 
                     # Get comments
                     logger.info("Executing query to get all comments")
-                    cursor.execute(blabCommentsSql, (blabid,))
+                    cursor.execute(blabCommentsSql % (blabid,))
                     blabCommentsResults = cursor.fetchall()
 
                     comments = []
@@ -232,7 +234,7 @@ def blab(request):
         comment = request.POST.get('comment')
         blabid = request.POST.get('blabid')
 
-
+@csrf_exempt
 def blabbers(request):
     if request.method == "GET":
         sort = request.GET.get('sort')
@@ -249,10 +251,10 @@ def blabbers(request):
         logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
         blabbersSql = ("SELECT users.username," + " users.blab_name," + " users.created_at,"
-                    " SUM(if(listeners.listener=%s, 1, 0)) as listeners,"
-                    " SUM(if(listeners.status='Active',1,0)) as listening"
+                    " SUM(iif(listeners.listener='%s', 1, 0)) as listeners,"
+                    " SUM(iif(listeners.status='Active',1,0)) as listening"
                     " FROM users LEFT JOIN listeners ON users.username = listeners.blabber"
-                    " WHERE users.username NOT IN (\"admin\",%s)" + " GROUP BY users.username" + " ORDER BY " + sort + ";")
+                    " WHERE users.username NOT IN (\"admin\",'%s')" + " GROUP BY users.username" + " ORDER BY " + sort + ";")
 
         try:
             logger.info("Creating database connection")
@@ -260,8 +262,8 @@ def blabbers(request):
 
                 logger.info(blabbersSql)
                 logger.info("Executing query to see Blab details")
-                cursor.execute(blabbersSql, (username, username))
-                blabbersResults = cursor.fetchone()
+                cursor.execute(blabbersSql % (username, username))
+                blabbersResults = cursor.fetchall()
 
                 blabbers = []
                 for b in blabbersResults:
@@ -308,26 +310,28 @@ def blabbers(request):
         try:
             logger.info("Creating database connection")
             with connection.cursor() as cursor:
+                module = "app.commands" + command.capitalize() + "Command"
+                
+                # cmdClass =  
+                # logger.info(blabbersSql)
+                # logger.info("Executing query to see Blab details")
+                # cursor.execute(blabbersSql, (username, username))
+                # blabbersResults = cursor.fetchall()
 
-                logger.info(blabbersSql)
-                logger.info("Executing query to see Blab details")
-                cursor.execute(blabbersSql, (username, username))
-                blabbersResults = cursor.fetchone()
+                # blabbers = []
+                # for b in blabbersResults:
+                #     blabber = Blabber()
+                #     blabber.setBlabName(b[1])
+                #     blabber.setUsername(b[0])
+                #     blabber.setCreatedDate(b[2])
+                #     blabber.setNumberListeners(b[3])
+                #     blabber.setNumberListening(b[4])
 
-                blabbers = []
-                for b in blabbersResults:
-                    blabber = Blabber()
-                    blabber.setBlabName(b[1])
-                    blabber.setUsername(b[0])
-                    blabber.setCreatedDate(b[2])
-                    blabber.setNumberListeners(b[3])
-                    blabber.setNumberListening(b[4])
+                #     blabbers.append(blabber)
 
-                    blabbers.append(blabber)
+                # request.blabbers = blabbers
 
-                request.blabbers = blabbers
-
-                response = render(request, 'app/blabbers.html', {})
+                # response = render(request, 'app/blabbers.html', {})
         except:
 
             # TODO: Implement exceptions
@@ -529,6 +533,7 @@ def processProfile(request):
     
     return response
 
+@csrf_exempt
 def register(request):
     if(request.method == "GET"):
         return showRegister(request)
@@ -568,6 +573,7 @@ def processRegister(request):
     
     return render(request, 'app/register.html')
 
+@csrf_exempt
 def registerFinish(request):
     if(request.method == "GET"):
         return showRegisterFinish(request)
@@ -909,7 +915,7 @@ def usernameExists(username):
         with connection.cursor() as cursor:
             logger.info("Preparing the duplicate username check Prepared Statement")
             sqlStatement = "SELECT username FROM users WHERE username='%s'"
-            cursor.execute(sqlStatement % username)
+            cursor.execute(sqlStatement % (username,))
             result = cursor.fetchone()
             if not result:
                 # username does not exist

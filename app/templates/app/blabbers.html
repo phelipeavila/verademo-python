@@ -85,7 +85,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								{% for blabber in  blabbers%}
+								{% for blabber in request.blabbers%}
 									<tr> 
 										<td class="commenterImage">
                                             <img src="{% static 'images/' %}{{ blabber.getUsername }}.png" />
@@ -105,11 +105,12 @@
                                                 <input type="hidden" name="blabberUsername"
                                                     value= {{ blabber.getUsername }} />
                                                 <input type="hidden" name="command"
-                                                    value= {{ blabber.getNumberListeners }}{% static "ignore : listen" %}/>
+                                                    value= {% if blabber.getNumberListeners == 1 %}ignore{% else %}listen{% endif %}/>
                                                 <input type="submit" class="btn btn-default pull-right" name="button"
-                                                    value= {{ blabber.getNumberListening }}{% static "ignore : listen" %} />
+                                                    value= {% if blabber.getNumberListeners == 1 %}Ignore{% else %}Listen{% endif %} />
                                             </form>
                                         </td>
+									</tr>
 								{% endfor %}
 							</tbody>
 						</table>

@@ -1,3 +1,3 @@
 class BlabberCommand:
-    def execute(blabberUsername):
+    def execute(self, blabberUsername):
         pass
