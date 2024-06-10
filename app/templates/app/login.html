@@ -69,7 +69,6 @@
 					</div>
 					<div class="panel-body">
 						<form method="POST" action="{{ request.path }}">
-							{% csrf_token %}
 							{{ form }}
 							<input type="hidden" name="target" value="{{ target }}">
 							<table class="table table-condensed">

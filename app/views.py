@@ -349,7 +349,7 @@ def profile(request):
     elif(request.method == "POST" and is_ajax(request)):
         return processProfile(request)
     else:
-        return JsonResponse({'No profile method satisfied.'})
+        return JsonResponse({'message':'No profile method satisfied.'})
     
 def showProfile(request):
     logger.info("Entering showProfile")
@@ -652,7 +652,12 @@ def processRegisterFinish(request):
                 logger.error(exceptSql);
             }
         '''
-    return redirect('/login?username=' + username)
+        return redirect('/login?username=' + username)
+    else:
+        logger.info("Form is invalid")
+        request.error = "Please fill out all fields"
+        return render(request, 'app/register.html')
+        
     # return render (request, 'app/feed.html')
 
 def home(request):

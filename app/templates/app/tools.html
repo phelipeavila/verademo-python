@@ -55,7 +55,6 @@
 		<div>
 			<p>Check the uptime of a host here by pinging it. Example: 127.0.0.1</p>
 			<form method="post">
-                {% csrf_token %}
 				<label for="host">Host:</label> <input type="text" name="host"
 					value={{ request.META.HTTP_HOST }} ><input
 					type="submit" value="Check" />
@@ -65,7 +64,6 @@
 		<div>
             <h5>Show a UNIX fortune from one of the 2 supported dictionaries</h5>
             <form method="post">
-                {% csrf_token %}
                 <select name="fortunelife">
                 <option value={{ literature }}>literature</option>
                     <option value={{ riddles }}>riddles</option>
