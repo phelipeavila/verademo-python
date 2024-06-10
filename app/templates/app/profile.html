@@ -248,7 +248,7 @@
 							$.each(data.values, function(key, val) {
 								$('input[name="' + key + '"]').val(val);
 								if (key === "username") {
-									$('#profileImage').attr('src', 'val+'.png');
+									$('#profileImage').attr('src', val + '.png');
 								}
 							});
 						}

@@ -15,6 +15,12 @@ class User(models.Model):
     real_name = models.CharField(max_length=100, null=True)
     blab_name = models.CharField(max_length=100, null=True)
     
+    def getUserName(self):
+        return self.username
+    
+    def getPassword(self):
+        return self.password
+
 class Blab(models.Model):
     class Meta:
         db_table='blabs'

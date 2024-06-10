@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.http import HttpResponse
 
 from . import views
+from . import view
 
 urlpatterns = [
     path('', views.home),
@@ -16,7 +17,7 @@ urlpatterns = [
     path('profile', views.profile, name='profile'),
     path('tools', views.tools, name='tools'),
     path('notImplemented', views.notImplemented, name='notImplemented'),
-    path('reset', views.reset, name='reset'),
+    path('reset', view.reset, name='reset'),
     path('downloadprofileimage', views.downloadImage, name='downloadProfileImage'),
     path('blab', views.blab, name='blab'),
     #path('hello/',views.say_hello),

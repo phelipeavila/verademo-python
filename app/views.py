@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseForbidden, JsonResponse
-from django.db import connection, transaction
+from django.db import connection, transaction, IntegrityError
 from django.core.files.storage import FileSystemStorage
 import sqlite3
 import logging
@@ -15,9 +15,9 @@ from django.http import HttpResponse
 from app.commands import BlabberCommand
 from django.views.decorators.csrf import csrf_exempt
 
-import sys, os
+import sys, os, moment
 
-from .forms import UserForm, RegisterForm
+from app.forms import UserForm, RegisterForm
 '''
 General Note: '%s' should have surrounding quotes removed to prevent SQL injection.
 '''
@@ -343,13 +343,18 @@ def blabbers(request):
         # return response instead of render when complete
         # return response
 
+
+    
+
+
+###########USER CONTROLLER################
 def profile(request):
     if(request.method == "GET"):
         return showProfile(request)
     elif(request.method == "POST" and is_ajax(request)):
         return processProfile(request)
     else:
-        return JsonResponse({'message':'No profile method satisfied.'})
+        return JsonResponse({'message':'Expected ajax request, got none'})
     
 def showProfile(request):
     logger.info("Entering showProfile")
@@ -636,22 +641,7 @@ def processRegisterFinish(request):
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         # except ClassNotFoundException as
-        '''
-        finally:
-            try:
-                if sqlStatement != None:
-                    #sqlStatement.close();
-                
-            except sqlite3.Error as exceptSql
-                logger.error(exceptSql)
-            try:
-                if (connect != null) {
-                    connect.close();
-                }
-            } catch (sqlite3.Error exceptSql) {
-                logger.error(exceptSql);
-            }
-        '''
+        
         return redirect('/login?username=' + username)
     else:
         logger.info("Form is invalid")
@@ -973,8 +963,16 @@ def updateUsername(oldUsername, newUsername):
         return True
     except (sqlite3.Error, ModuleNotFoundError) as ex:
         logger.error(ex)
+    except IntegrityError as er:
+        logger.error(er)
     # Error occurred
     return False
+
+def create(userName, blabName,realName):
+    password = userName
+    dateCreated = moment.now().format("YYYY-MM-DD hh:mm:ss")
+    lastLogin = None
+    return User(userName, password, dateCreated, lastLogin, blabName, realName)
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
