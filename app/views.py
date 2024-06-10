@@ -365,7 +365,7 @@ def showProfile(request):
                 heckler.setUsername(i[0])
                 heckler.setBlabName(i[1])
                 heckler.setCreatedDate(i[2])
-                hecklers.add(heckler)
+                hecklers.append(heckler)
             
 
             # Get the audit trail for this user
