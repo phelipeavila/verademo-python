@@ -116,7 +116,7 @@ def feed(request):
                 addBlabSql = "INSERT INTO blabs (blabber, content, timestamp) values ('%s', '%s', datetime('now'));"
 
                 logger.info("Executing query to add new blab")
-                cursor.execute(addBlabSql, (username, blab))
+                cursor.execute(addBlabSql % (username, blab))
 
                 if not cursor.rowcount:
                     request.error = "Failed to add comment"
