@@ -406,22 +406,6 @@ def showProfile(request):
             request.blabName = myInfoResults[2]
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
-    '''
-    finally:    
-        try:
-            if not myHecklers :
-                myHecklers.close()
-        
-        except sqlite3.Error as exceptSql :
-            logger.error(exceptSql.sqlite_errorcode, exceptSql.sqlite_errorname)
-        
-        try:
-            if (connect != null) {
-                connect.close();
-            }
-        except sqlite3.Error as exceptSql :
-            logger.error(exceptSql.sqlite_errorcode, exceptSql.sqlite_errorname)
-    ''' 
         
     return render(request, 'app/profile.html', {})
 
@@ -438,7 +422,7 @@ def processProfile(request):
     #TODO: Experiment with safe=False on JsonResponse, send in non-dict objects for serialization
     # Initial response only get returns if everything else succeeds.
     msg = f"<script>alert('Successfully changed values!\\\\nusername:{username.lower()}\\\\nReal Name: {realName}\\\\nBlab Name: {blabName}');</script>"
-    response = JsonResponse({'values':{"username": {username.lower()}, "realName": {realName}, "blabName": {blabName}, 'message':msg}})
+    response = JsonResponse({'values':{"username": username.lower(), "realName": realName, "blabName": blabName, 'message':msg}})
     logger.info("entering processProfile")
     sessionUsername = request.session.get('username')
 
@@ -458,11 +442,12 @@ def processProfile(request):
     try:
         logger.info("Getting Database connection")
         # Get the Database Connection
+        # TODO: Error in SQL execution
         with connection.cursor() as cursor:
             logger.info("Preparing the update Prepared Statement")
             update = "UPDATE users SET real_name='%s', blab_name='%s' WHERE username='%s';"
             logger.info("Executing the update Prepared Statement")
-            cursor.execute(update, (realName,blabName,sessionUsername))
+            cursor.execute(update % (realName,blabName,sessionUsername))
             updateResult = cursor.fetchone()
 
             # If there is a record...
