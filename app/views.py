@@ -774,7 +774,34 @@ def getProfileImageNameFromUsername(username):
 
 def downloadImage(request):
     imageName = request.GET.get('image')
-    
+    logger.info("Entering downloadImage")
+
+    username = request.session.get('username')
+    if not username:
+        logger.info("User is not Logged In - redirecting...")
+        return redirect('/login?target=profile')
+    logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+    dir_path = os.path.dirname(__file__)
+    f = os.path.join(dir_path, '../resources/images/')
+    path = f + imageName
+
+    logger.info("Fetching profile image: " + path)
+
+    try:
+        if os.path.exists(path):
+            with open(path, 'rb') as file:
+                response = HttpResponse(file.read(), content_type="application/octet-stream")
+                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(path)
+                return response
+
+    except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+    return render(request, "app/profile.html", {})
 
 def notImplemented(request):
     return render(request, 'app/notImplemented.html')
