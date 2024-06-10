@@ -12,7 +12,9 @@ from app.models import User, Blabber, Blab, Blabber, Comment
 from django.core import serializers
 from datetime import datetime
 from django.http import HttpResponse
-from app.commands import BlabberCommand
+from app.commands.BlabberCommand import BlabberCommand
+from app.commands.ListenCommand import ListenCommand
+from app.commands.IgnoreCommand import IgnoreCommand
 from django.views.decorators.csrf import csrf_exempt
 
 import sys, os, moment
@@ -310,38 +312,18 @@ def blabbers(request):
         try:
             logger.info("Creating database connection")
             with connection.cursor() as cursor:
-                module = "app.commands" + command.capitalize() + "Command"
-                
-                # cmdClass =  
-                # logger.info(blabbersSql)
-                # logger.info("Executing query to see Blab details")
-                # cursor.execute(blabbersSql, (username, username))
-                # blabbersResults = cursor.fetchall()
-
-                # blabbers = []
-                # for b in blabbersResults:
-                #     blabber = Blabber()
-                #     blabber.setBlabName(b[1])
-                #     blabber.setUsername(b[0])
-                #     blabber.setCreatedDate(b[2])
-                #     blabber.setNumberListeners(b[3])
-                #     blabber.setNumberListening(b[4])
-
-                #     blabbers.append(blabber)
-
-                # request.blabbers = blabbers
-
-                # response = render(request, 'app/blabbers.html', {})
+                module = command.capitalize()[:-1] + "Command"
+                cmdClass = eval(module)
+                cmdObj = cmdClass(cursor, username)
+                cmdObj.execute(blabberUsername)
+                return redirect('blabbers')
         except:
 
             # TODO: Implement exceptions
 
             logger.error("Unexpected error:", sys.exc_info()[0])
-
-
-        return render(request, 'app/blabbers.html', {})
-        # return response instead of render when complete
-        # return response
+        
+        return response
 
 
     
@@ -502,8 +484,9 @@ def processProfile(request):
 
         # Update user profile image
     if file:
-        
-        imageDir = os.path.realpath("./resources/images/")
+        dir_path = os.path.dirname(__file__)
+        imageDir = os.path.join(dir_path, '../resources/images')
+        # imageDir = os.path.realpath("./resources/images/")
         
 
         # Get old image name, if any, to delete
@@ -780,7 +763,9 @@ def updateInResponse(user, response):
 Takes a username and searches for the profile image for that user
 '''
 def getProfileImageNameFromUsername(username):
-    f = os.path.realpath("./resources/images")
+    dir_path = os.path.dirname(__file__)
+    f = os.path.join(dir_path, '../resources/images')
+    # f = os.path.realpath("./resources/images")
     matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
 
     if not matchingFiles:
@@ -956,7 +941,9 @@ def updateUsername(oldUsername, newUsername):
             extension = '.png'
 
             logger.info("Renaming profile image from " + oldImage + " to " + newUsername + extension)
-            path = os.path.realpath("./resources/images")
+            dir_path = os.path.dirname(__file__)
+            path = os.path.join(dir_path, '../resources/images')
+            # path = os.path.realpath("./resources/images")
             oldPath = path + '/' + oldImage
             newPath = path + '/' + newUsername + extension
             os.rename(oldPath, newPath)
