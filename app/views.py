@@ -13,6 +13,7 @@ from django.core import serializers
 from datetime import datetime
 from django.http import HttpResponse
 from app.commands import BlabberCommand
+from django.views.decorators.csrf import csrf_exempt
 
 import sys, os
 
@@ -233,7 +234,7 @@ def blab(request):
         comment = request.POST.get('comment')
         blabid = request.POST.get('blabid')
 
-
+@csrf_exempt
 def blabbers(request):
     if request.method == "GET":
         sort = request.GET.get('sort')
@@ -528,6 +529,7 @@ def processProfile(request):
         response.content['values'] = {"username": {username.lower()}, "realName": {realName}, "blabName": {blabName}, 'message':msg}
         return response
 
+@csrf_exempt
 def register(request):
     if(request.method == "GET"):
         return showRegister(request)
@@ -567,6 +569,7 @@ def processRegister(request):
     
     return render(request, 'app/register.html')
 
+@csrf_exempt
 def registerFinish(request):
     if(request.method == "GET"):
         return showRegisterFinish(request)
@@ -908,7 +911,7 @@ def usernameExists(username):
         with connection.cursor() as cursor:
             logger.info("Preparing the duplicate username check Prepared Statement")
             sqlStatement = "SELECT username FROM users WHERE username='%s'"
-            cursor.execute(sqlStatement,(username,))
+            cursor.execute(sqlStatement % (username,))
             result = cursor.fetchone()
             if not result:
                 # username does not exist
