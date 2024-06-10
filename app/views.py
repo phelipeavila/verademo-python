@@ -773,7 +773,8 @@ def getProfileImageNameFromUsername(username):
     return matchingFiles[0]
 
 def downloadImage(request):
-    pass
+    imageName = request.GET.get('image')
+    
 
 def notImplemented(request):
     return render(request, 'app/notImplemented.html')
