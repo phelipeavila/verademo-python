@@ -26,11 +26,11 @@ logger = logging.getLogger("__name__")
 
 sqlBlabsByMe = ("SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
                 "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
-                "WHERE blabs.blabber = %s GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
+                "WHERE blabs.blabber = '%s' GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
 #NOTE: Tried adding quotes around %s, and it didn't work. Possible filtering in the blabsForMe format?
 sqlBlabsForMe = ("SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
                 "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
-                "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = %s "
+                "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = '%s' "
                 "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
 
 def feed(request):
@@ -47,7 +47,7 @@ def feed(request):
 
                 logger.info("Executing query to get all 'Blabs for me'")
                 blabsForMe = sqlBlabsForMe.format(10, 0)
-                cursor.execute(blabsForMe, (username,))
+                cursor.execute(blabsForMe % (username,))
                 blabsForMeResults = cursor.fetchall()
 
                 feedBlabs = []
@@ -71,7 +71,7 @@ def feed(request):
                 # Find the Blabs by this user
 
                 logger.info("Executing query to get all of user's Blabs")
-                cursor.execute(sqlBlabsByMe, (username,))
+                cursor.execute(sqlBlabsByMe % (username,))
                 blabsByMeResults = cursor.fetchall()
 
                 myBlabs = []
@@ -154,7 +154,7 @@ def morefeed(request):
 
             logger.info("Executing query to see more Blabs")
             blabsForMe = sqlBlabsForMe.format(len, cnt)
-            cursor.execute(blabsForMe, (username,))
+            cursor.execute(blabsForMe % (username,))
             results = cursor.fetchall()
             ret = ""
             for blab in results:
@@ -193,7 +193,7 @@ def blab(request):
             with connection.cursor() as cursor:
 
                 logger.info("Executing query to see Blab details")
-                cursor.execute(blabDetailsSql, (blabid,))
+                cursor.execute(blabDetailsSql % (blabid,))
                 blabDetailsResults = cursor.fetchone()
 
                 if (blabDetailsResults):
@@ -203,7 +203,7 @@ def blab(request):
 
                     # Get comments
                     logger.info("Executing query to get all comments")
-                    cursor.execute(blabCommentsSql, (blabid,))
+                    cursor.execute(blabCommentsSql % (blabid,))
                     blabCommentsResults = cursor.fetchall()
 
                     comments = []
@@ -251,10 +251,10 @@ def blabbers(request):
         logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
         blabbersSql = ("SELECT users.username," + " users.blab_name," + " users.created_at,"
-                    " SUM(iif(listeners.listener=%s, 1, 0)) as listeners,"
+                    " SUM(iif(listeners.listener='%s', 1, 0)) as listeners,"
                     " SUM(iif(listeners.status='Active',1,0)) as listening"
                     " FROM users LEFT JOIN listeners ON users.username = listeners.blabber"
-                    " WHERE users.username NOT IN (\"admin\",%s)" + " GROUP BY users.username" + " ORDER BY " + sort + ";")
+                    " WHERE users.username NOT IN (\"admin\",'%s')" + " GROUP BY users.username" + " ORDER BY " + sort + ";")
 
         try:
             logger.info("Creating database connection")
@@ -262,7 +262,7 @@ def blabbers(request):
 
                 logger.info(blabbersSql)
                 logger.info("Executing query to see Blab details")
-                cursor.execute(blabbersSql, (username, username))
+                cursor.execute(blabbersSql % (username, username))
                 blabbersResults = cursor.fetchall()
 
                 blabbers = []
@@ -948,7 +948,7 @@ def updateUsername(oldUsername, newUsername):
                 # Execute updates as part of a batch transaction
                 # This will roll back all changes if one query fails
                 for query in sqlStrQueries:
-                    cursor.execute(query,(newUsername,oldUsername))
+                    cursor.execute(query % (newUsername,oldUsername))
 
 
         # Rename the user profile image to match new username
