@@ -6,6 +6,8 @@ import logging
 import base64
 import subprocess
 import hashlib
+import fortune
+import shutil
 from django.views.generic import TemplateView
 from app.models import User, Blabber
 from django.core import serializers
@@ -394,16 +396,17 @@ def processTools(request):
     return render(request, 'app/tools.html', {"host" : host})
 
 def fortune(file):
-    cmd = "/bin/fortune " + file
+    cmd = "fortune " + file
     output = ""
+
+    if shutil.which("fortune") is None:
+        print("After")
+        return "fortune not found"
 
     try: 
         p = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             stdout, stderr = p.communicate(timeout=5)
-            # Debug
-            print(stdout)
-            print(stderr)
             output = stdout.decode() if stdout else ""
         except subprocess.TimeoutExpired:
             print("Fortune timed out")
@@ -449,8 +452,7 @@ def ping(host):
         print("Ping timed out")
     except Exception as e:
         print("Error:", e)
-    # TO FIX ERROR
-    # return render(output, 'app/tools.html')
+
     return output
 
 
