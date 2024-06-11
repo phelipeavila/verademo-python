@@ -34,11 +34,11 @@ def ping(host):
         stdout, stderr = p.communicate(timeout=5)
     
         output = stdout.decode() if stdout else ""
-        print("Exit Code:", p.returncode)
+        logger.info("Exit Code:" + str(p.returncode))
     except subprocess.TimeoutExpired:
-        print("Ping request timed out")
+        logger.error("Ping request timed out")
     except Exception as e:
-        print("Error occurred:", e)
+        logger.error("Error occurred:", e)
     # TO FIX ERROR, CRASH ON PING
     # return render(output, 'app/tools.html')
     return output
