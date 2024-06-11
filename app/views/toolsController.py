@@ -4,7 +4,6 @@ import logging
 import subprocess
 import sys
 import shutil
-import fortune
 
 logger = logging.getLogger("VeraDemo:toolsController")
 

@@ -137,15 +137,17 @@ def showPasswordHint(request):
             if (row):
                 password = row[0]
                 formatString = "Username '" + username + "' has password: {}"
-                return formatString.format(password[:2] + "*" * (len(password) - 2))
+                hint = formatString.format(password[:2] + ("*" * (len(password) - 2)))
+                logger.info(hint)
+                return HttpResponse(hint)
             else:
-                return "No password found for " + username
+                return HttpResponse("No password found for " + username)
     except:
 
             # TODO: Implement exceptions
 
             logger.error("Unexpected error:", sys.exc_info()[0])
-    return "ERROR!"
+    return HttpResponse("ERROR!")
 
 
 def logout(request):
