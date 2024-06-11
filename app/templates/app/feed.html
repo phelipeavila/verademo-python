@@ -72,25 +72,27 @@
 					<div id="feed" class="actionBox">
 						<ul class="commentList">
                             {% block comment %}
+                            {% with feedBlabs=request.blabsByOthers %}
                             {% for post in feedBlabs %}
                             <li>
                                 <div>
                                     <div class="commenterImage">
-                                        <img src="{% static 'images/' %}{{ post.getAuthor.user }}.png" />
+                                        <img src="{% static 'images/' %}{{ post.getAuthor.getUsername }}.png" />
                                     </div>
                                     <div class ="commentText">
-                                        <p class="">= post.getCommentContent() </p>
+                                        <p class="">{{post.getContent}} </p>
                                         <span class="date sub-text">
-                                            by {{" post.getCommentAuthor.getBlabName "}} on = post.postDate() 
+                                            by {{post.getAuthor.getBlabName}} on {{post.postDateString}}
                                         </span>
                                         <br/>
                                         <span class="date sub-text">
-                                            <a href="blab?blabid=<%= {{ "post.getId" }} >">= {{ "post.getCommentCount" }} Comments</a>
+                                            <a href="blab?blabid=<%= {{ "post.getId" }} >"> {{post.getCommentCount}} Comments</a>
                                         </span>
                                     </div>
                                 </div>
                             </li>
                             {% endfor %}
+                            {% endwith %}
                             {% endblock %}
                         </ul>
                         <a href="#" onclick="getmore(this); return false;">Fetch more...</a>
