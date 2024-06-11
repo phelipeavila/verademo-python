@@ -33,7 +33,7 @@
             <nav>
                 <ul class="nav nav-pills pull-right">
                     <li role="presentation" class="active">
-                        <a href="reset">Home</a>
+                        <a href="reset">Reset</a>
                     </li>
                     <li role="presentation">
                         <a href="login">Login</a>
@@ -50,6 +50,13 @@
             <div class="page-header">
                 <h3>Reset Blab Data</h3>
             </div>
+
+            {% if request.error %}
+    	    <div class="alert alert-danger" role="alert">
+        	    {{ request.error }}
+    	    </div>
+    	    {% endif %}
+
             <div class="row">
                 <div class="col-md-12">
 

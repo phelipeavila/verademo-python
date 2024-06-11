@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'verademo.urls'
+ROOT_URLCONF = 'verademo-python.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'verademo.wsgi.application'
+WSGI_APPLICATION = 'verademo-python.wsgi.application'
 
 
 # Database

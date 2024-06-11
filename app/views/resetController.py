@@ -3,6 +3,7 @@ from django.db import connection, transaction, IntegrityError
 
 from app.models import create
 
+import subprocess
 import sqlite3
 import logging
 import random as rand
@@ -30,6 +31,7 @@ users = [
 			create("christraut", "Chris Trautwein", "Chris Trautwein"),
 			create("christyson", "Chris Tyson", "Chris Tyson"),
 			create("clint", "Clint", "Clint Pollock"),
+            create("clyde", "Clyde", "Clyde Shtino"),
 			create("cody", "Cody", "Cody Bertram"),
 			create("derek", "Derek", "Derek Chowaniec"),
 			create("glenn", "Glenn", "Glenn Whittemore"),
@@ -39,7 +41,9 @@ users = [
 			create("jeremy", "Jeremy", "Jeremy Anderson"),
 			create("johnny", "Johnny", "Johnny Wong"),
 			create("kevin", "Kevin", "Kevin Rise"),
+            create("kevinliu", "Kevin", "Kevin Liu"),
 			create("scottrum", "Scott Rumrill", "Scott Rumrill"),
+            create("stuart", "Stuart", "Stuart Sessions"),
 			create("scottsim", "Scott Simpson", "Scott Simpson")]
 
 def reset(request):
@@ -53,18 +57,22 @@ def showReset(request):
     return render(request, 'app/reset.html',{})
 
 def processReset(request):
-    confirm = ''
+    confirm = request.POST.get('confirm')
     primary = ''
+    # START VULN. CODE (Shell Injection)
+    # https://docs.python.org/2/library/subprocess.html#frequently-used-arguments
+    if not confirm:
+        request.error = "Make sure to press confirm"
+        return render(request, 'app/reset.html')
     logger.info("Entering processReset")
-    
-    usersStatement = None
-    listenersStatement = None
-    blabsStatement = None
-    commentsStatement = None
+
     now = moment.now().format("YYYY-MM-DD")
 
+    
     # Drop existing tables and recreate from schema file
     #recreateDatabaseSchema()
+    #currently implemented in subprocess.run line
+    sp= subprocess.run(["django-admin","flush","--noinput","--database","users"],shell=True)
 
     try:
         logger.info("Getting Database connection")
@@ -76,7 +84,7 @@ def processReset(request):
                 usersStatement = "INSERT INTO users (username, password, password_hint, created_at, last_login, real_name, blab_name) values ('%s', '%s', '%s', '%s', '%s', '%s', '%s');"
                 for user in users:
                     logger.info("Adding user " + user.username)
-                    cursor.execute(usersStatement % (user.username, user.password, user.password_hint,
+                    cursor.execute(usersStatement % (user.username, user.password, user.password_hint, user.created_at,
                                                      user.last_login, user.real_name, user.blab_name))
 
             # Add the listeners
@@ -138,7 +146,7 @@ def processReset(request):
                         logger.info("Adding a comment from " + username + " on blab ID " + str(i))
 
                         cursor.execute(commentsStatement % (i,username,comment,moment.now().sub(seconds=(vary*1000)).format("YYYY-MM-DD hh:mm:ss")))      
-    except IntegrityError as er:
+    except sqlite3.IntegrityError as er:
          logger.error(er)
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
@@ -146,100 +154,11 @@ def processReset(request):
     return redirect("reset")
 
 
-
-#Drop and recreate the entire database schema
-
-def recreateDatabaseSchema():
-    pass
-'''
-        # Fetch database schema
-        logger.info("Reading database schema from file")
-        String[] schemaSql = loadFile("blab_schema.sql", new String[] { "--", "/*" }, ";");
-
-        Connection connect = None;
-        Statement stmt = None;
-        try {
-            // Get the Database Connection
-            logger.info("Getting Database connection");
-            Class.forName("com.mysql.jdbc.Driver");
-            connect = DriverManager.getConnection(Constants.create().getJdbcConnectionString());
-
-            stmt = connect.createStatement();
-
-            for (String sql : schemaSql) {
-                sql = sql.trim(); // Remove any remaining whitespace
-                if (!sql.isEmpty()) {
-                    logger.info("Executing: " + sql);
-                    System.out.println("Executing: " + sql);
-                    stmt.executeUpdate(sql);
-                }
-            }
-        } catch (ClassNotFoundException | SQLException ex) {
-            logger.error(ex);
-        } finally {
-            try {
-                if (stmt != None) {
-                    stmt.close();
-                }
-            } catch (SQLException ex) {
-                logger.error(ex);
-            }
-            try {
-                if (connect != None) {
-                    connect.close();
-                }
-            } catch (SQLException ex) {
-                logger.error(ex);
-            }
-        }
-    }
-'''
-
-def loadFile(filename, skipCharacters='', delimiter=''):
-    pass
-'''
-		path = "/app/src/main/resources" + File.separator + filename;
-
-		regex = ""
-		if len(skipCharacters) > 0 :
-			skipString = String.join("|", skipCharacters);
-			skipString = skipString.replaceAll("(?=[]\\[+&!(){}^\"~*?:\\\\])", "\\\\");
-			regex = "^(" + skipString + ").*?";
-		}
-
-		String[] lines = null;
-		StringBuffer sb = new StringBuffer();
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(path));
-
-			String line = br.readLine();
-			while (line != null) {
-				if (line.matches(regex)) {
-					line = br.readLine();
-					continue;
-				}
-
-				sb.append(line);
-				sb.append(System.lineSeparator());
-
-				line = br.readLine();
-			}
-
-			// Break content by delimiter
-			lines = sb.toString().split(delimiter);
-		} catch (IOException ex) {
-			logger.error(ex);
-		} finally {
-			try {
-				if (br != null) {
-					br.close();
-				}
-			} catch (IOException ex) {
-				logger.error(ex);
-			}
-		}
-
-		return lines;
-	}
-    '''
+def loadFile(filename):
+    path = "/app/views/resources/" + filename
+    lines = None
+    with open(path,'r') as file:
+        lines = file.readlines()
+        for line in lines:
+            line.strip()
+    return lines
