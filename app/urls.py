@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.http import HttpResponse
 
 from . import views
+from . import toolsController
 
 urlpatterns = [
     path('', views.home),
@@ -15,7 +16,7 @@ urlpatterns = [
     path('morefeed', views.morefeed, name='morefeed'),
     path('blabbers', views.blabbers, name='blabbers'),
     path('profile', views.profile, name='profile'),
-    path('tools', views.tools, name='tools'),
+    path('tools', toolsController.tools, name='tools'),
     #path('notImplemented', view.notImplemented, name='notImplemented'),
     path('reset', views.reset, name='reset'),
     path('downloadprofileimage', views.downloadImage, name='downloadProfileImage'),
