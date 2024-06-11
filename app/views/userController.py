@@ -448,7 +448,7 @@ def downloadImage(request):
     logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
     f = image_dir
-    path = f + "/" + imageName
+    path = f + imageName
 
     logger.info("Fetching profile image: " + path)
 
