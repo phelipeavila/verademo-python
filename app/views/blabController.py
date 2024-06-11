@@ -222,6 +222,31 @@ def blab(request):
         comment = request.POST.get('comment')
         blabid = request.POST.get('blabid')
 
+        response = redirect('feed')
+        logger.info("Processing Blab")
+
+        username = request.session.get('username')
+        if not username:
+            logger.info("User is not Logged In - redirecting...")
+            return redirect("login?target=feed")
+        
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        addCommentSql = "INSERT INTO comments (blabid, blabber, content, timestamp) values (%s, %s, %s, %s);"
+
+        try :
+            logger.info("Creating the Database connection")
+            with connection.cursor() as cursor:
+
+                now = moment.now().format("YYYY-MM-DD hh:mm:ss")
+                logger.info("Preparing the addComment Prepared Statement")
+
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
 @csrf_exempt
 def blabbers(request):
     if request.method == "GET":
