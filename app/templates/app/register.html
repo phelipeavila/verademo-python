@@ -68,7 +68,6 @@
 					<div class="panel-body">
 						<!-- TODO: Link form post method to User model-->
 						<form method="POST" action="register">
-							{% csrf_token %}
 							{{ form }}
 							<input type="hidden" name="returnPath" value="">
 							<table class="table table-condensed">

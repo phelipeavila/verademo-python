@@ -23,6 +23,7 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+	
 </head>
 
 <body role="document">
@@ -51,9 +52,9 @@
 		<div class="page-header">
 			<h4>Profile</h4>
 		</div>
-        {% if error %}
+        {% if request.error %}
     	<div class="alert alert-danger" role="alert">
-        	{{ error }}
+        	{{ request.error }}
     	</div>
     	{% endif %}
 
@@ -65,13 +66,14 @@
 						<label>Your Profile</label>
 					</div>
 					<div class="actionBox">
-						<form method="post" action="profile" id="updateprofile" enctype="multipart/form-data">
+						<form method="POST" action="profile" id="updateprofile" enctype="multipart/form-data">
+						
 							<input type="hidden" name="returnPath" value="">
 							<table class="table table-condensed">
 								<tbody>
 									<tr>
 										<td class="commenterImage">
-											<img id="profileImage" src="images/ {{ request.image }}" />
+											<img id="profileImage" src="{% static 'images/' %}{{ request.image }}" />
 										</td>
 										<td>
 											<div class="form-group">
@@ -228,12 +230,16 @@
 	<script src="{% static 'js/jquery-1.11.2.min.js' %}"></script>
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
 
+	<script> 
+		var image_path = "{% static 'images/' %}"; 
+	</script>
+
 	<!-- Form submission -->
-    <!--
 	<script type="text/javascript">
+		
 		$('#updateprofile').submit(function(e) {
 			e.preventDefault();
-			
+
 			$.ajax({
 				type : e.target.method,
 				url : e.target.action,
@@ -247,7 +253,8 @@
 							$.each(data.values, function(key, val) {
 								$('input[name="' + key + '"]').val(val);
 								if (key === "username") {
-									$('#profileImage').attr('src', 'resources/images/' + val + '.png');
+									
+									$('#profileImage').attr('src', image_path + val + '.png');
 								}
 							});
 						}
@@ -265,6 +272,5 @@
 			});
 		});
 	</script>
--->
 </body>
 </html>

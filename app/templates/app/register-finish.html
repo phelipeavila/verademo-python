@@ -1,4 +1,3 @@
-
 {% load static %}
 
 <!DOCTYPE html>
@@ -10,10 +9,10 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<title>Login to Blab</title>
+<title>Register for Blab</title>
 
 <!-- Bootstrap core CSS -->
-<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" >
 <!-- Bootstrap theme -->
 <link href="{% static 'css/bootstrap-theme.min.css' %}" rel="stylesheet">
 
@@ -35,8 +34,8 @@
 			<nav>
 				<ul class="nav nav-pills pull-right">
 					<!-- <li role="presentation"><a href="reset">Reset</a></li> -->
-					<li role="presentation" class="active"><a href="login">Login</a></li>
-					<li role="presentation"><a href="register">Register</a></li>
+					<li role="presentation"><a href="login">Login</a></li>
+					<li role="presentation" class="active"><a href="register">Register</a></li>
 				</ul>
 			</nav>
 			<img src="{% static 'images/Tokyoship_Talk_icon.svg' %}" height="100"
@@ -49,53 +48,71 @@
 	<div class="container theme-showcase" role="main">
 
 		<div class="page-header">
-			<h3>Login</h3>
+			<h3>Register</h3>
 		</div>
 
-		{% if request.error %}
+		<!-- <%
+			String error = (String) request.getAttribute("error");
+			if (null != error) {
+		%>
 		<div class="alert alert-danger" role="alert">
-			{{ request.error }}
+			<%=error%>
 		</div>
-		{% endif %}
 
+		<%
+			}
+		%> -->
 
 		<div class="row">
 			<div class="col-md-12">
 
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h3 class="panel-title">Please provide your username and
-							password to login to Blab</h3>
+						<h3 class="panel-title">Please provide your user information
+							to register for Blab</h3>
 					</div>
 					<div class="panel-body">
-						<form method="POST" action="{{ request.path }}">
-							{% csrf_token %}
-							{{ form }}
-							<input type="hidden" name="target" value="{{ target }}">
+						<form method="POST" action="register-finish">
+							<input type="hidden" name="returnPath" value="">
 							<table class="table table-condensed">
 								<tbody>
-									<tr>
+																		<tr>
 										<td>Username</td>
 										<td><div class="form-group">
-												<input type="text" class="form-control" name="user"
-													value="{{ username }}">
-											</div><a href="javascript:hint()">Hint</a></td>
+												{{ request.session.username }}
+											</div></td>
 									</tr>
 									<tr>
 										<td>Password</td>
 										<td><div class="form-group">
-												<input type="text" class="form-control" name="password"
+												<input id = "password" maxlength='100' type="password" class="form-control" name="password"
 													value="">
 											</div></td>
 									</tr>
 									<tr>
-										<td></td>
-										<td><input type="checkbox" name="remember" value="1" />
-										<label for="remember">Remember me</label>
+										<td>Confirm Password</td>
+										<td><div class="form-group">
+												<input id = "cpassword" type="password" maxlength='100' class="form-control" name="cpassword"
+													value="">
+											</div></td>
+									</tr>
+									<tr>
+										<td>Real Name</td>
+										<td><div class="form-group">
+												<input id="realName" type="text" maxlength='100' class="form-control" name="realName"
+													value="">
+											</div></td>
+									</tr>
+									<tr>
+										<td>Blab Name</td>
+										<td><div class="form-group">
+												<input id="blabName" type="text" maxlength='100' class="form-control" name="blabName"
+													value="">
+											</div></td>
 									</tr>
 									<tr>
 										<td><button type="submit" class="btn btn-primary"
-												id="login" name="Login" value="Login">Login</button></td>
+												id="login" name="Register" value="Register">Register</button></td>
 										<td></td>
 									</tr>
 								</tbody>
@@ -113,18 +130,5 @@
 	<!-- Placed at the end of the document so the pages load faster -->
 	<script src="{% static 'js/jquery-1.11.2.min.js' %}"></script>
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
-	<script>
-	function hint() {
-		
-		function alerter () {
-			window.alert(this.responseText);
-		}
-
-		var oReq = new XMLHttpRequest();
-		oReq.addEventListener("load", alerter);
-		oReq.open("GET", "/password-hint?username=" + document.forms[0].user.value);
-		oReq.send();
-	}
-	</script>
 </body>
 </html>
