@@ -3,7 +3,6 @@ from django.urls import path, include
 from django.http import HttpResponse
 
 from . import views
-from . import view
 
 urlpatterns = [
     path('', views.home),
@@ -16,10 +15,8 @@ urlpatterns = [
     path('blabbers', views.blabbers, name='blabbers'),
     path('profile', views.profile, name='profile'),
     path('tools', views.tools, name='tools'),
-    path('notImplemented', views.notImplemented, name='notImplemented'),
-    path('reset', view.reset, name='reset'),
+    #path('notImplemented', view.notImplemented, name='notImplemented'),
+    path('reset', views.reset, name='reset'),
     path('downloadprofileimage', views.downloadImage, name='downloadProfileImage'),
     path('blab', views.blab, name='blab'),
-    #path('hello/',views.say_hello),
-    # path('register/', views.register),
 ]

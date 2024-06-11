@@ -1,5 +1,5 @@
 from django.db import models
-import datetime
+import moment
 
 # Create your models here
 class User(models.Model):
@@ -20,6 +20,12 @@ class User(models.Model):
     
     def getPassword(self):
         return self.password
+    
+def create(userName, blabName,realName):
+    password = userName
+    dateCreated = moment.now().format("YYYY-MM-DD hh:mm:ss")
+    lastLogin = None
+    return User(userName, password, dateCreated, lastLogin, blabName, realName)
 
 class Blab(models.Model):
     class Meta:
