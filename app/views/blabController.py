@@ -2,7 +2,10 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.db import connection, transaction, IntegrityError
 from django.views.decorators.csrf import csrf_exempt
-
+from app.commands.BlabberCommand import BlabberCommand
+from app.commands.ListenCommand import ListenCommand
+from app.commands.IgnoreCommand import IgnoreCommand
+import moment
 
 import logging, sys
 
@@ -108,7 +111,7 @@ def feed(request):
                 cursor.execute(addBlabSql % (username, blab))
 
                 if not cursor.rowcount:
-                    request.error = "Failed to add comment"
+                    request.error = "Failed to add blab"
 
         except:
 
@@ -221,6 +224,38 @@ def blab(request):
     if request.method == "POST":
         comment = request.POST.get('comment')
         blabid = request.POST.get('blabid')
+
+        response = redirect('feed')
+        logger.info("Processing Blab")
+
+        username = request.session.get('username')
+        if not username:
+            logger.info("User is not Logged In - redirecting...")
+            return redirect("login?target=feed")
+        
+        logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
+
+        addCommentSql = "INSERT INTO comments (blabid, blabber, content, timestamp) values ('%s', '%s', '%s', '%s');"
+
+        try :
+            logger.info("Creating the Database connection")
+            with connection.cursor() as cursor:
+
+                logger.info("Executing addComment")
+                cursor.execute(addCommentSql % (blabid, username, comment, moment.now().format("YYYY-MM-DD hh:mm:ss")))
+                
+                if not cursor.rowcount:
+                    request.error = "Failed to add comment"
+
+                response = redirect("/blab?blabid=" + blabid)
+
+        except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+
+        return response
 
 @csrf_exempt
 def blabbers(request):
