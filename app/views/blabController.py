@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.db import connection, transaction, IntegrityError
 from django.views.decorators.csrf import csrf_exempt
-
+import moment
 
 import logging, sys
 
@@ -108,7 +108,7 @@ def feed(request):
                 cursor.execute(addBlabSql % (username, blab))
 
                 if not cursor.rowcount:
-                    request.error = "Failed to add comment"
+                    request.error = "Failed to add blab"
 
         except:
 
@@ -232,20 +232,27 @@ def blab(request):
         
         logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
-        addCommentSql = "INSERT INTO comments (blabid, blabber, content, timestamp) values (%s, %s, %s, %s);"
+        addCommentSql = "INSERT INTO comments (blabid, blabber, content, timestamp) values ('%s', '%s', '%s', '%s');"
 
         try :
             logger.info("Creating the Database connection")
             with connection.cursor() as cursor:
 
-                now = moment.now().format("YYYY-MM-DD hh:mm:ss")
-                logger.info("Preparing the addComment Prepared Statement")
+                logger.info("Executing addComment")
+                cursor.execute(addCommentSql % (blabid, username, comment, moment.now().format("YYYY-MM-DD hh:mm:ss")))
+                
+                if not cursor.rowcount:
+                    request.error = "Failed to add comment"
+
+                response = redirect("/blab?blabid=" + blabid)
 
         except:
 
             # TODO: Implement exceptions
 
             logger.error("Unexpected error:", sys.exc_info()[0])
+
+        return response
 
 @csrf_exempt
 def blabbers(request):

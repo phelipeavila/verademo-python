@@ -74,11 +74,11 @@
                                             <button class="btn btn-default">Add</button>
                                         </div>
                                         <input type="hidden" name="blabid"
-                                            value="{{ blabid }}">
+                                            value="{{ request.blabid }}">
                                     </form>
                                 </div>
                                 <ul class="commentList">
-                                {% for post in request.blabsByMe %}
+                                {% for comment in request.comments %}
                                 <li>
                                     <div>
                                         <div class="commenterImage">
