@@ -64,12 +64,12 @@
 		<div>
             <h5>Show a UNIX fortune from one of the 2 supported dictionaries</h5>
             <form method="post">
-                <select name="fortunelife">
-                <option value={{ literature }}>literature</option>
-                    <option value={{ riddles }}>riddles</option>
-                </select> <input type="submit" value="Change"/>
-            </form>
-            <pre>${{ request.fortune }}</pre>
+                <select name="fortunefile">
+					<option value="literature">literature</option>
+						<option value="riddles">riddles</option>
+					</select> <input type="submit" value="Change"/>
+				</form>
+				<pre id="fortune-result">{{ request.file }}</pre>
 			
 		</div>
 	</div>
