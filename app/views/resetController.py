@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import redirect, render
 from django.db import connection, transaction, IntegrityError
 
@@ -59,8 +60,7 @@ def showReset(request):
 def processReset(request):
     confirm = request.POST.get('confirm')
     primary = ''
-    # START VULN. CODE (Shell Injection)
-    # https://docs.python.org/2/library/subprocess.html#frequently-used-arguments
+
     if not confirm:
         request.error = "Make sure to press confirm"
         return render(request, 'app/reset.html')
@@ -70,9 +70,9 @@ def processReset(request):
 
     
     # Drop existing tables and recreate from schema file
-    #recreateDatabaseSchema()
-    #currently implemented in subprocess.run line
-    sp= subprocess.run(["django-admin","flush","--noinput","--database","users"],shell=True)
+    # Implement Vulnerability (Shell Injection)
+    # https://docs.python.org/2/library/subprocess.html#frequently-used-arguments
+    sp= subprocess.run(["python3","manage.py","flush","--noinput"])
 
     try:
         logger.info("Getting Database connection")
@@ -107,17 +107,17 @@ def processReset(request):
 
                 # Add the blabs
                 logger.info("Preparing the Statement for adding blabs")
-                blabsStatement = "INSERT INTO blabs (blabber, content, timestamp) values ('%s', '%s', '%s');"
+                blabsStatement = "INSERT INTO blabs (blabber, content, timestamp) values ('%s', '%s', datetime('now'));"
                 for blabContent in blabsContent:
                     # Get the array offset for a random user
-                    randomUserOffset = rand.randint(len(users) - 1)
+                    randomUserOffset = rand.randint(0,len(users) - 1)
 
                     # get the number or seconds until some time in the last 30 days.
                     vary = rand.randint(0,(30 * 24 * 3600)+1)
 
                     username = users[randomUserOffset].username
                     logger.info("Adding a blab for " + username)
-                    cursor.execute(blabsStatement % (username, blabContent, moment.now().sub(seconds=(vary*1000)).format("YYYY-MM-DD hh:mm:ss")))
+                    cursor.execute(blabsStatement % (username, blabContent))
 
             # Fetch pre-loaded Comments
             logger.info("Reading comments from file")
@@ -126,7 +126,7 @@ def processReset(request):
             # Add the comments
             with transaction.atomic():
                 logger.info("Preparing the Statement for adding comments")
-                commentsStatement = "INSERT INTO comments (blabid, blabber, content, timestamp) values ('%s', '%s', '%s', '%s');"
+                commentsStatement = "INSERT INTO comments (blabid, blabber, content, timestamp) values ('%s', '%s', '%s', datetime('now'));"
                 for i in range(len(blabsContent)):
                     # Add a random number of comment
                     count = rand.randint(0,5) # between 0 and 6
@@ -145,7 +145,7 @@ def processReset(request):
 
                         logger.info("Adding a comment from " + username + " on blab ID " + str(i))
 
-                        cursor.execute(commentsStatement % (i,username,comment,moment.now().sub(seconds=(vary*1000)).format("YYYY-MM-DD hh:mm:ss")))      
+                        cursor.execute(commentsStatement % (i,username,comment))      
     except sqlite3.IntegrityError as er:
          logger.error(er)
     except sqlite3.Error as ex :
@@ -155,7 +155,8 @@ def processReset(request):
 
 
 def loadFile(filename):
-    path = "/app/views/resources/" + filename
+    file_dir = os.path.join(os.path.dirname(__file__), '../../resources/files')
+    path = file_dir  + '/' + filename
     lines = None
     with open(path,'r') as file:
         lines = file.readlines()
