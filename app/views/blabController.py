@@ -2,6 +2,9 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.db import connection, transaction, IntegrityError
 from django.views.decorators.csrf import csrf_exempt
+from app.commands.BlabberCommand import BlabberCommand
+from app.commands.ListenCommand import ListenCommand
+from app.commands.IgnoreCommand import IgnoreCommand
 import moment
 
 import logging, sys
