@@ -1,8 +1,7 @@
 from django.shortcuts import redirect, render
 from django.db import connection, transaction, IntegrityError
 
-from app.models import User
-from app.views import create
+from app.models import create
 
 import sqlite3
 import logging
@@ -12,10 +11,10 @@ import moment
 # END
 
 ##################RESET CONTROLLER#####################
-logger = logging.getLogger("__name__")
+logger = logging.getLogger("VeraDemo:resetController")
 # Did not include admin in users list due to pre-existing admin functionality with DJango
 users = [
-			create("john", "John", "John Smith"),
+		create("john", "John", "John Smith"),
 			create("paul", "Paul", "Paul Farrington"),
 			create("chrisc", "Chris", "Chris Campbell"),
 			create("laurie", "Laurie", "Laurie Mercer"),
@@ -196,7 +195,7 @@ def recreateDatabaseSchema():
     }
 '''
 
-def loadFile(filename, skipCharacters='', delimiter='/'):
+def loadFile(filename, skipCharacters='', delimiter=''):
     pass
 '''
 		path = "/app/src/main/resources" + File.separator + filename;
