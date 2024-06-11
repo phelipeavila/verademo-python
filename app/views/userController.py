@@ -12,7 +12,7 @@ from app.forms import RegisterForm
 
 # Get logger
 logger = logging.getLogger("VeraDemo:userController")
-
+image_dir = os.path.join(os.path.dirname(__file__), '../../resources/images')
 
 ###LOGIN###
 def login(request):
@@ -395,8 +395,7 @@ def processProfile(request):
 
         # Update user profile image
     if file:
-        dir_path = os.path.dirname(__file__)
-        imageDir = os.path.join(dir_path, '../resources/images')
+        imageDir = image_dir
         # imageDir = os.path.realpath("./resources/images/")
         
 
@@ -448,8 +447,7 @@ def downloadImage(request):
         return redirect('/login?target=profile')
     logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
-    dir_path = os.path.dirname(__file__)
-    f = os.path.join(dir_path, '../resources/images/')
+    f = image_dir
     path = f + imageName
 
     logger.info("Fetching profile image: " + path)
@@ -524,8 +522,7 @@ def updateUsername(oldUsername, newUsername):
             extension = '.png'
 
             logger.info("Renaming profile image from " + oldImage + " to " + newUsername + extension)
-            dir_path = os.path.dirname(__file__)
-            path = os.path.join(dir_path, '../resources/images')
+            path = image_dir
             # path = os.path.realpath("./resources/images")
             oldPath = path + '/' + oldImage
             newPath = path + '/' + newUsername + extension
@@ -542,8 +539,7 @@ def updateUsername(oldUsername, newUsername):
 Takes a username and searches for the profile image for that user
 '''
 def getProfileImageNameFromUsername(username):
-    dir_path = os.path.dirname(__file__)
-    f = os.path.join(dir_path, '../resources/images')
+    f = image_dir
     # f = os.path.realpath("./resources/images")
     matchingFiles = [file for file in os.listdir(f) if file.startswith(username + ".")]
 
