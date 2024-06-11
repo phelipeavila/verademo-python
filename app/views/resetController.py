@@ -108,17 +108,17 @@ def processReset(request):
 
                 # Add the blabs
                 logger.info("Preparing the Statement for adding blabs")
-                blabsStatement = "INSERT INTO blabs (blabber, content, timestamp) values ('%s', '%s', datetime('now'));"
+                blabsStatement = "INSERT INTO blabs (blabber, content, timestamp) values (%s, %s, datetime('now'));"
                 for blabContent in blabsContent:
                     # Get the array offset for a random user
                     randomUserOffset = rand.randint(0,len(users) - 1)
 
                     # get the number or seconds until some time in the last 30 days.
-                    vary = rand.randint(0,(30 * 24 * 3600)+1)
+                    #vary = rand.randint(0,(30 * 24 * 3600)+1)
 
                     username = users[randomUserOffset].username
                     logger.info("Adding a blab for " + username)
-                    cursor.execute(blabsStatement % (username, blabContent))
+                    cursor.execute(blabsStatement, (username, blabContent))
 
             # Fetch pre-loaded Comments
             logger.info("Reading comments from file")
@@ -127,14 +127,14 @@ def processReset(request):
             # Add the comments
             with transaction.atomic():
                 logger.info("Preparing the Statement for adding comments")
-                commentsStatement = "INSERT INTO comments (blabid, blabber, content, timestamp) values ('%s', '%s', '%s', datetime('now'));"
+                commentsStatement = "INSERT INTO comments (blabid, blabber, content, timestamp) values (%s, %s, %s, datetime('now'));"
                 for i in range(len(blabsContent)):
                     # Add a random number of comment
                     count = rand.randint(0,5) # between 0 and 6
 
-                    for j in range(len(count)) :
+                    for j in range(count) :
                         # Get the array offset for a random user
-                        randomUserOffset = rand.randint(0,users.length-1) #removed +1 cause no admin,  removed -2 because no admin and inclusive.
+                        randomUserOffset = rand.randint(0,len(users)-1) #removed +1 cause no admin,  removed -2 because no admin and inclusive.
                         username = users[randomUserOffset].username
 
                         # Pick a random comment to add
@@ -146,7 +146,8 @@ def processReset(request):
 
                         logger.info("Adding a comment from " + username + " on blab ID " + str(i))
 
-                        cursor.execute(commentsStatement % (i,username,comment))      
+                        cursor.execute(commentsStatement, (i,username,comment))
+        logger.info("Database Reset... Great Success!")   
     except sqlite3.IntegrityError as er:
          logger.error(er)
     except sqlite3.Error as ex :
