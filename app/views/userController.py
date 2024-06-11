@@ -241,10 +241,10 @@ def processRegisterFinish(request):
                 #mysqlCurrentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #create query
                 query = ''
-                query += "insert into users (username, password, created_at, real_name, blab_name) values("
+                query += "insert into users (username, password, password_hint, created_at, real_name, blab_name) values("
                 query += ("'" + username + "',")
                 query += ("'" + hashlib.md5(password.encode('utf-8')).hexdigest() + "',")
-                
+                query += ("'" + password + "',")
                 #query += ("'" + mysqlCurrentDateTime + "',")
                 query += ("datetime('now'),")
                 query += ("'" + realName + "',")
