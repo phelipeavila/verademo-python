@@ -120,6 +120,33 @@ def login(request):
             
         return response
     
+def showPasswordHint(request):
+    username = request.GET.get('username')
+    logger.info("Entering password-hint with username: " + username)
+    if (username is None or not username):
+        return "No username provided, please type in your username first"
+    
+    try:
+        logger.info("Creating the Database connection")
+        with connection.cursor() as cursor:
+            sql = "SELECT password_hint FROM users WHERE username = '" + username + "'"
+            logger.info(sql)
+            cursor.execute(sql)
+            row = cursor.fetchone()
+
+            if (row):
+                password = row[0]
+                formatString = "Username '" + username + "' has password: {}"
+                return formatString.format(password[:2] + "*" * (len(password) - 2))
+            else:
+                return "No password found for " + username
+    except:
+
+            # TODO: Implement exceptions
+
+            logger.error("Unexpected error:", sys.exc_info()[0])
+    return "ERROR!"
+
 
 def logout(request):
     logger.info("Processing logout")

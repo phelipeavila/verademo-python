@@ -72,7 +72,8 @@ def processReset(request):
     # Drop existing tables and recreate from schema file
     # Implement Vulnerability (Shell Injection)
     # https://docs.python.org/2/library/subprocess.html#frequently-used-arguments
-    sp= subprocess.run(["python3","manage.py","flush","--noinput"])
+    manage = os.path.join(os.path.dirname(__file__), '../../manage.py')
+    sp= subprocess.run(["python3",manage,"flush","--noinput"])
 
     try:
         logger.info("Getting Database connection")
