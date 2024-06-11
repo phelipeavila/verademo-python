@@ -396,29 +396,39 @@ def processTools(request):
     return render(request, 'app/tools.html', {"host" : host})
 
 def fortune(file):
-    cmd = "fortune " + file
+    cmd = f"/usr/games/fortune {file}"
     output = ""
+    logger.info(output)
+    logger.info("fortune:\n")
+    sys.stdout.flush()
 
     if shutil.which("fortune") is None:
-        print("After")
+        logger.info("After")
+        sys.stdout.flush()
         return "fortune not found"
 
     try: 
         p = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        logger.info("fortune after try1:\n")
+        sys.stdout.flush()
         try:
             stdout, stderr = p.communicate(timeout=5)
             output = stdout.decode() if stdout else ""
+            logger.info("fortune output:\n")
+            sys.stdout.flush()
         except subprocess.TimeoutExpired:
-            print("Fortune timed out")
+            logger.info("Fortune timed out")
+            sys.stdout.flush()
         except Exception as e:
-            print("Error:", e)
+            logger.info("Error:", e)
+            sys.stdout.flush()
         '''for line in p.stdout.readlines():
             b'output += line + "\n"'.decode("utf-8")'''
     except Exception as e:
-        print("Error:", e)
+        logger.info("Error:", e)
+        sys.stdout.flush()
         
     return output
-
 
 def fortuneView(request):
     file = request.POST.get('file')
