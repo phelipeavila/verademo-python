@@ -1,5 +1,5 @@
 from django.db import models
-import moment
+import moment, hashlib
 
 # Create your models here
 class User(models.Model):
@@ -22,10 +22,10 @@ class User(models.Model):
         return self.password
     
 def create(userName, blabName,realName):
-    password = userName
+    password = hashlib.md5(userName.encode('utf-8')).hexdigest()
     dateCreated = moment.now().format("YYYY-MM-DD hh:mm:ss")
     lastLogin = None
-    return User(userName, password, dateCreated, lastLogin, blabName, realName)
+    return User(userName, password, userName, dateCreated, lastLogin, blabName, realName)
 
 class Blab(models.Model):
     class Meta:
