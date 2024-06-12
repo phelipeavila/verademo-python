@@ -79,8 +79,9 @@
 																		<tr>
 										<td>Username</td>
 										<td><div class="form-group">
-												{{ request.session.username }}
-											</div></td>
+												{{ request.username }}
+											</div>
+											<input type="hidden" name="username" value="{{ request.username }}"></td>
 									</tr>
 									<tr>
 										<td>Password</td>

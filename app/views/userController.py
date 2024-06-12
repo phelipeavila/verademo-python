@@ -5,6 +5,9 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import logging, sys, os
 import sqlite3, hashlib
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 from app.models import User, Blabber, Blabber
 from app.forms import RegisterForm
@@ -176,7 +179,7 @@ def showRegister(request):
 def processRegister(request):
     logger.info('Entering processRegister')
     username = request.POST.get('username')
-    request.session['username'] = username
+    request.username = username
 
     # Get the Database Connection
     logger.info("Creating the Database connection")
@@ -216,7 +219,7 @@ Interprets POST request from register form, adds user to database
 def processRegisterFinish(request):
     logger.info("Entering processRegisterFinish")
     #create variables
-    username = request.session.get('username')
+    username = request.POST.get('username')
     cpassword = request.POST.get('cpassword')
     #fill in required username field
     form = RegisterForm(request.POST or None)
@@ -261,7 +264,8 @@ def processRegisterFinish(request):
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         # except ClassNotFoundException as
-        
+        request.session['username'] = username
+        emailUser(username)
         return redirect('/login?username=' + username)
     else:
         logger.info("Form is invalid")
@@ -269,6 +273,26 @@ def processRegisterFinish(request):
         return render(request, 'app/register.html')
         
     # return render (request, 'app/feed.html')
+
+def emailUser(username):
+    try:
+        message = MIMEMultipart()
+        message["Subject"] = "New user registered:" + " " + username
+        message["From"] = "verademo@veracode.com"
+        message["To"] = "admin@example.com"
+        message.set_payload("A new VeraDemo user registered: " + username)
+        logger.info("Sending email to admin")
+
+        # Using localhost and port 1025 to test emails with MailHog
+        with smtplib.SMTP("localhost", 1025) as server:
+            server.send_message(message)
+
+    except:
+
+        # TODO: Implement exceptions
+
+        logger.error("Unexpected error:", sys.exc_info()[0])
+
 
 def profile(request):
     if(request.method == "GET"):
