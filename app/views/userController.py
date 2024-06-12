@@ -5,12 +5,13 @@ import os
 import sqlite3
 import hashlib
 import smtplib
+import pickle, base64
 
 from email.mime.multipart import MIMEMultipart
 
 from django.shortcuts import redirect, render
 from django.http import JsonResponse, HttpResponse
-from django.db import connection, transaction, IntegrityError
+from django.db import connection, transaction, IntegrityError, DatabaseError
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -57,11 +58,12 @@ def login(request):
 
         else:
             logger.info("User details were remembered")
-            unencodedUserDetails = next(serializers.deserialize('xml', userDetailsCookie))
+            decoded = base64.b64decode(userDetailsCookie)
+            unencodedUserDetails = pickle.loads(decoded)
 
-            logger.info("User details were retrieved for user: " + unencodedUserDetails.object.username)
+            logger.info("User details were retrieved for user: " + unencodedUserDetails.username)
             
-            request.session['username'] = unencodedUserDetails.object.username
+            request.session['username'] = unencodedUserDetails.username
 
             if (target != None) and (target) and (not target == "null"):
                 return redirect(target)
@@ -119,12 +121,12 @@ def login(request):
 
                     nextView = 'login'
                     response = render(request, 'app/' + nextView + '.html', {})
-        except:
-
-            # TODO: Implement exceptions
-
+        except DatabaseError as db_err:
+            logger.error("Database error: " + db_err)
+            nextView = 'login'
+            response = render(request, 'app/' + nextView + '.html', {})   
+        except Exception as e:
             logger.error("Unexpected error:", sys.exc_info()[0])
-
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
 
@@ -155,11 +157,12 @@ def showPasswordHint(request):
                 return HttpResponse(hint)
             else:
                 return HttpResponse("No password found for " + username)
-    except:
-
-            # TODO: Implement exceptions
-
+    except DatabaseError as db_err:
+            logger.error("Database error: " + db_err)
+            return HttpResponse("ERROR!") 
+    except Exception as e:
             logger.error("Unexpected error:", sys.exc_info()[0])
+        
     return HttpResponse("ERROR!")
 
 # funcitonality called by logout button
@@ -191,6 +194,10 @@ def processRegister(request):
     username = request.POST.get('username')
     request.username = username
 
+    if username is None:
+        return "No username provided, please type in your username first"
+
+
     # Get the Database Connection
     logger.info("Creating the Database connection")
     try:
@@ -206,8 +213,6 @@ def processRegister(request):
                 return render(request, 'app/register-finish.html')
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
-    
-    
     
     return render(request, 'app/register.html')
 
@@ -269,7 +274,14 @@ def processRegisterFinish(request):
                 sqlStatement = cursor.fetchone() #<- variable for response
                 logger.info(query)
                 # END EXAMPLE VULNERABILITY
-        #TODO: Implement exceptions and final statement
+        except IntegrityError as e:
+            logger.error(e)
+            request.error = "Username '" + username + "' already exists!"
+            return render(request, 'app/register.html')
+        except ValueError as e:
+            logger.error(e)
+            request.error = "Please fill out all fields"
+            return render(request, 'app/register.html')
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         # except ClassNotFoundException as
@@ -454,9 +466,11 @@ def processProfile(request):
         # Update remember me functionality
         userDetailsCookie = request.COOKIES.get('user')
         if userDetailsCookie is not None:
-            unencodedUserDetails = next(serializers.deserialize('xml', userDetailsCookie))
-            unencodedUserDetails.object.username = username
-            response = updateInResponse(unencodedUserDetails.object, response)
+            decoded = base64.b64decode(userDetailsCookie)
+            unencodedUserDetails = pickle.loads(decoded)
+            # unencodedUserDetails = pickle.loads(base64.b64decode(userDetailsCookie))
+            unencodedUserDetails.username = username
+            response = updateInResponse(unencodedUserDetails, response)
         
 
         # Update user profile image
@@ -496,7 +510,10 @@ def processProfile(request):
 
 # updates the user cookies
 def updateInResponse(user, response):
-    cookie = serializers.serialize('xml', [user,])
+    # encoded = base64.b64encode(user)
+    # cookie = pickle.dumps(encoded.decode())
+    pickled = pickle.dumps(user)
+    cookie = base64.b64encode(pickled).decode('ASCII')
     response.set_cookie('user', cookie)
     return response
 
