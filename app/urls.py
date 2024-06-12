@@ -1,6 +1,5 @@
-from django.contrib import admin
-from django.urls import path, include
-from django.http import HttpResponse
+#urls.py creates a request to functions defined in the vairous controllers within 'views' folder
+from django.urls import path
 
 from .views import userController,homeController,blabController,resetController,toolsController
 

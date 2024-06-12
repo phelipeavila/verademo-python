@@ -1,16 +1,18 @@
+# resetController.py deals with resetting the database
 import os
-from django.shortcuts import redirect, render
-from django.db import connection, transaction, IntegrityError
-
-from app.models import create
-
 import subprocess
 import sqlite3
 import logging
 import random as rand
-# START 3rd PARTY PACKAGE
+# START VULN PACKAGE
 import moment
 # END
+from django.shortcuts import redirect, render
+from django.db import connection, transaction
+from app.models import create
+
+
+
 
 ##################RESET CONTROLLER#####################
 logger = logging.getLogger("VeraDemo:resetController")
@@ -48,33 +50,34 @@ users = [
             create("stuart", "Stuart", "Stuart Sessions"),
 			create("scottsim", "Scott Simpson", "Scott Simpson")]
 
+# Transfers the request depeneding on request type.
 def reset(request):
     if(request.method == "GET"):
         return showReset(request)
     elif(request.method == "POST"):
         return processReset(request)
-    
+
+# Loads the reset webpage
 def showReset(request):
     logger.info("Entering showReset")
     return render(request, 'app/reset.html',{})
 
+# Resets database users
 def processReset(request):
     confirm = request.POST.get('confirm')
-    primary = ''
 
     if not confirm:
         request.error = "Make sure to press confirm"
         return render(request, 'app/reset.html')
     logger.info("Entering processReset")
 
-    now = moment.now().format("YYYY-MM-DD")
 
     
     # Drop existing tables and recreate from schema file
-    # Implement Vulnerability (Shell Injection)
+    # TODO: Implement Vulnerability (Shell Injection)
     # https://docs.python.org/2/library/subprocess.html#frequently-used-arguments
     manage = os.path.join(os.path.dirname(__file__), '../../manage.py')
-    sp= subprocess.run(["python3",manage,"flush","--noinput"])
+    subprocess.run(["python3",manage,"flush","--noinput"], check=True)
 
     try:
         logger.info("Getting Database connection")
@@ -156,7 +159,7 @@ def processReset(request):
 
     return redirect("reset")
 
-
+# reads data from a .txt file and returns it
 def loadFile(filename):
     file_dir = os.path.join(os.path.dirname(__file__), '../../resources/files')
     path = file_dir  + '/' + filename
