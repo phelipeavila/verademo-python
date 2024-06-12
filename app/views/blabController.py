@@ -269,7 +269,7 @@ def blabbers(request):
         username = request.session.get('username')
         if not username:
             logger.info("User is not Logged In - redirecting...")
-            return redirect("login?target=blabbers")
+            return redirect("/login?target=blabbers")
         
         logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
