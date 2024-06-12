@@ -147,12 +147,14 @@ def showPasswordHint(request):
                 return HttpResponse(hint)
             else:
                 return HttpResponse("No password found for " + username)
-    except:
-
-            # TODO: Implement exceptions
-
+    except DatabaseError as db_err:
+            logger.error("Database error: " + db_err)
+            return HttpResponse("ERROR!") 
+    except Exception as e:
             logger.error("Unexpected error:", sys.exc_info()[0])
+        
     return HttpResponse("ERROR!")
+
 
 def logout(request):
     logger.info("Processing logout")
