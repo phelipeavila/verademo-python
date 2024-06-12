@@ -21,8 +21,7 @@ class User(models.Model):
 
 # Creates a new user from just username, blabname, and realname
 def create(userName, blabName,realName):
-    password = "PASSWORD"
-    print(password)
+    password = userName
     dateCreated = moment.now().format("YYYY-MM-DD hh:mm:ss")
     lastLogin = None
     return User(userName, hashlib.md5(password.encode('utf-8')).hexdigest(), userName, dateCreated, lastLogin, blabName, realName)
