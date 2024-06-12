@@ -70,14 +70,14 @@
 					<div class="panel-body">
 						<form method="POST" action="{{ request.path }}">
 							{{ form }}
-							<input type="hidden" name="target" value="{{ target }}">
+							<input type="hidden" name="target" value="{{ request.target }}">
 							<table class="table table-condensed">
 								<tbody>
 									<tr>
 										<td>Username</td>
 										<td><div class="form-group">
 												<input type="text" class="form-control" name="user"
-													value="{{ username }}">
+													value="{{ request.username }}">
 											</div><a href="javascript:hint()">Hint</a></td>
 									</tr>
 									<tr>
