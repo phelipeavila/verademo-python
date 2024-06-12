@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from django.http import JsonResponse, HttpResponse
-from django.db import connection, transaction, IntegrityError
+from django.db import connection, transaction, IntegrityError, DatabaseError
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import logging, sys, os
@@ -107,12 +107,12 @@ def login(request):
 
                     nextView = 'login'
                     response = render(request, 'app/' + nextView + '.html', {})
-        except:
-
-            # TODO: Implement exceptions
-
+        except DatabaseError as db_err:
+            logger.error("Database error: " + db_err)
+            nextView = 'login'
+            response = render(request, 'app/' + nextView + '.html', {})   
+        except Exception as e:
             logger.error("Unexpected error:", sys.exc_info()[0])
-
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
 
