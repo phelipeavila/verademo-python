@@ -5,13 +5,13 @@ import os
 import sqlite3
 import hashlib
 import smtplib
+import pickle, base64
 
 from email.mime.multipart import MIMEMultipart
 
 from django.shortcuts import redirect, render
 from django.http import JsonResponse, HttpResponse
 from django.db import connection, transaction, IntegrityError
-from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_exempt
 import mimetypes
@@ -57,11 +57,12 @@ def login(request):
 
         else:
             logger.info("User details were remembered")
-            unencodedUserDetails = next(serializers.deserialize('xml', userDetailsCookie))
+            decoded = base64.b64decode(userDetailsCookie)
+            unencodedUserDetails = pickle.loads(decoded)
 
-            logger.info("User details were retrieved for user: " + unencodedUserDetails.object.username)
+            logger.info("User details were retrieved for user: " + unencodedUserDetails.username)
             
-            request.session['username'] = unencodedUserDetails.object.username
+            request.session['username'] = unencodedUserDetails.username
 
             if (target != None) and (target) and (not target == "null"):
                 return redirect(target)
@@ -454,9 +455,11 @@ def processProfile(request):
         # Update remember me functionality
         userDetailsCookie = request.COOKIES.get('user')
         if userDetailsCookie is not None:
-            unencodedUserDetails = next(serializers.deserialize('xml', userDetailsCookie))
-            unencodedUserDetails.object.username = username
-            response = updateInResponse(unencodedUserDetails.object, response)
+            decoded = base64.b64decode(userDetailsCookie)
+            unencodedUserDetails = pickle.loads(decoded)
+            # unencodedUserDetails = pickle.loads(base64.b64decode(userDetailsCookie))
+            unencodedUserDetails.username = username
+            response = updateInResponse(unencodedUserDetails, response)
         
 
         # Update user profile image
@@ -496,7 +499,10 @@ def processProfile(request):
 
 # updates the user cookies
 def updateInResponse(user, response):
-    cookie = serializers.serialize('xml', [user,])
+    # encoded = base64.b64encode(user)
+    # cookie = pickle.dumps(encoded.decode())
+    pickled = pickle.dumps(user)
+    cookie = base64.b64encode(pickled).decode('ASCII')
     response.set_cookie('user', cookie)
     return response
 
