@@ -192,6 +192,10 @@ def processRegister(request):
     username = request.POST.get('username')
     request.username = username
 
+    if username is None:
+        return "No username provided, please type in your username first"
+
+
     # Get the Database Connection
     logger.info("Creating the Database connection")
     try:
@@ -207,8 +211,6 @@ def processRegister(request):
                 return render(request, 'app/register-finish.html')
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
-    
-    
     
     return render(request, 'app/register.html')
 
@@ -270,7 +272,14 @@ def processRegisterFinish(request):
                 sqlStatement = cursor.fetchone() #<- variable for response
                 logger.info(query)
                 # END EXAMPLE VULNERABILITY
-        #TODO: Implement exceptions and final statement
+        except IntegrityError as e:
+            logger.error(e)
+            request.error = "Username '" + username + "' already exists!"
+            return render(request, 'app/register.html')
+        except ValueError as e:
+            logger.error(e)
+            request.error = "Please fill out all fields"
+            return render(request, 'app/register.html')
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         # except ClassNotFoundException as
