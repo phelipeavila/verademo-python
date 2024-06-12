@@ -41,7 +41,7 @@ class LoginViewTests(TestCase):
 
             self.assertEqual(response.status_code, 200) 
             self.assertContains(response, 'Login failed')
-
+    # TEST FAILS 302 != 200
     def testLogin(self):
         # Mock the successful login case
         with patch('app.views.userController') as mock_cursor:
@@ -51,8 +51,8 @@ class LoginViewTests(TestCase):
             )
 
             response = self.client.post(self.login_url, {
-                'user': 'testuser',
-                'password': 'testpass',
+                'user': 'clyde',
+                'password': 'clyde',
                 'target': 'feed'
             })
             self.assertRedirects(response, 'feed')
@@ -265,7 +265,23 @@ class ProcessRegisterFinishTests(TestCase):
             self.assertIn('Invalid Data', response.context['request'].error)
 
     def testSQLite(self):
-        
+        data = {
+            'username': 'testuser',
+            'password': '123',
+            'cpassword': '123',
+           'realName': 'Test User',
+            'blabName': 'testblab'
+        }
+
+        connection.close()
+
+        response = self.client.post(self.register_finish_url, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response,'app/register-finish.html')
+
+        with self.assertLogs(self.logger, level='ERROR') as cm:
+            self.assertIn('Database error', cm.output[0])
         
     
 
