@@ -1,15 +1,17 @@
-from django.shortcuts import redirect, render
-from django.http import HttpResponse
-from django.db import connection, transaction, IntegrityError
-from django.views.decorators.csrf import csrf_exempt
-from app.commands.BlabberCommand import BlabberCommand
-from app.commands.ListenCommand import ListenCommand
-from app.commands.IgnoreCommand import IgnoreCommand
+'''
+blabController interacts with blabs, and loads relevent pages such as 'Feed' and 'Blabbers'
+'''
+
+import logging
+import sys
 import moment
 
-import logging, sys
+from django.shortcuts import redirect, render
+from django.http import HttpResponse
+from django.db import connection
+from django.views.decorators.csrf import csrf_exempt
 
-from app.models import User, Blabber, Blab, Blabber, Comment
+from app.models import Blab, Blabber, Comment
 
 # Get logger
 
@@ -24,6 +26,9 @@ sqlBlabsForMe = ("SELECT users.username, users.blab_name, blabs.content, blabs.t
                 "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = '%s' "
                 "GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC LIMIT {} OFFSET {};")
 
+#
+# handles the getting and updating of information from feed page
+#
 def feed(request):
     if request.method == "GET":
         username = request.session.get('username')
@@ -120,7 +125,9 @@ def feed(request):
             logger.error("Unexpected error:", sys.exc_info()[0])
 
         return response
-    
+
+
+# Called when the 'fetch more' button is pressed, and writes more blabs onto the HTML
 def morefeed(request):
     count = request.GET.get('count')
     length = request.GET.get('len')
@@ -158,7 +165,8 @@ def morefeed(request):
         logger.error("Unexpected error:", sys.exc_info()[0])
 
     return HttpResponse(ret)
-
+    
+# Brings up the page to view a blab, or to write a blab
 def blab(request):
     if request.method == "GET":
         blabid = request.GET.get('blabid')
@@ -256,7 +264,9 @@ def blab(request):
             logger.error("Unexpected error:", sys.exc_info()[0])
 
         return response
-
+#
+# csrf_exempt tag prevents this funciton from checking csrf_tag from form
+# deals with loading and updating the "Blabbers" page
 @csrf_exempt
 def blabbers(request):
     if request.method == "GET":

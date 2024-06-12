@@ -1,21 +1,27 @@
-from django.shortcuts import render
-
+# toolsController.py deals with the 'Tools' page and calls the tool functions used in the page
 import logging
 import subprocess
 import sys
 import shutil
 
+from django.shortcuts import render
+
+
+
 logger = logging.getLogger("VeraDemo:toolsController")
 
+# Redirects request based on type
 def tools(request):
     if(request.method == "GET"):
         return showTools(request)
     elif(request.method == "POST"):
         return processTools(request)
-    
+
+# Loads the tool webpage    
 def showTools(request):
     return render(request, 'app/tools.html', {})
 
+# Performs the actions on the tool page, updating output accordingly
 def processTools(request):
     host = request.POST.get('host')
     fortunefile = request.POST.get('fortunefile')
@@ -26,6 +32,7 @@ def processTools(request):
 
     return render(request, 'app/tools.html', {"host" : host})
 
+# pings selected host and outputs the result
 def ping(host):
     output = ""
     
@@ -43,7 +50,7 @@ def ping(host):
 
     return output
 
-
+'''
 def pingView(request):
     host = request.POST.get('host')
     result =""
@@ -56,8 +63,9 @@ def pingView(request):
 
 
     return render(request, 'app/tools.html', {'result': result, 'host': host})
+'''
 
-
+# Produces a fortune based on the submitted selection
 def fortune(file):
     cmd = f"/usr/games/fortune {file}"
     output = ""
@@ -91,6 +99,7 @@ def fortune(file):
         
     return output
 
+'''
 def fortuneView(request):
     file = request.POST.get('file')
     result = ""
@@ -102,7 +111,7 @@ def fortuneView(request):
             print("Error:", e)
 
     return render(request, 'app/tools.html', {'result': result, 'file': file})
-
+'''
 
 
 

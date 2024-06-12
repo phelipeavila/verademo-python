@@ -1,16 +1,22 @@
+# userController handles user logic, including user login, registration, and profile updating.
+import logging
+import sys
+import os
+import sqlite3
+import hashlib
+import smtplib
+
+from email.mime.multipart import MIMEMultipart
+
 from django.shortcuts import redirect, render
 from django.http import JsonResponse, HttpResponse
 from django.db import connection, transaction, IntegrityError, DatabaseError
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_exempt
-import logging, sys, os
-import sqlite3, hashlib
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import mimetypes
 
-from app.models import User, Blabber, Blabber
+from app.models import User, Blabber
 from app.forms import RegisterForm
 
 
@@ -18,7 +24,8 @@ from app.forms import RegisterForm
 logger = logging.getLogger("VeraDemo:userController")
 image_dir = os.path.join(os.path.dirname(__file__), '../../resources/images')
 
-###LOGIN###
+# xframe_options_exempt makes this function unprotected from clickjacking
+# login checks an inputted username and password against the database, and logs them in
 @xframe_options_exempt
 def login(request):
     if request.method == "GET":
@@ -125,6 +132,7 @@ def login(request):
             
         return response
 
+# shows the password hint on login screen
 def showPasswordHint(request):
     username = request.GET.get('username')
     logger.info("Entering password-hint with username: " + username)
@@ -155,7 +163,7 @@ def showPasswordHint(request):
         
     return HttpResponse("ERROR!")
 
-
+# funcitonality called by logout button
 def logout(request):
     logger.info("Processing logout")
     request.session['username'] = None
@@ -164,6 +172,8 @@ def logout(request):
     logger.info("Redirecting to login...")
     return response
 
+# csrf_exempt prevents form from requiring csrf token on submission
+# transfers register request to appropriate handler
 @csrf_exempt
 def register(request):
     if(request.method == "GET"):
@@ -171,16 +181,12 @@ def register(request):
     elif(request.method == "POST"):
         return processRegister(request)
 
-'''
-renders the register.html file, called by a path in urls
-'''
-
+# renders the register.html file, called by a path in urls
 def showRegister(request):
     logger.info("Entering showRegister")
     return render(request, 'app/register.html', {})
 
-''' Sends username into register-finish page'''
-
+#sends username into register-finish page
 def processRegister(request):
     logger.info('Entering processRegister')
     username = request.POST.get('username')
@@ -206,6 +212,7 @@ def processRegister(request):
     
     return render(request, 'app/register.html')
 
+# called by register, sends request to appropriate handling destination
 @csrf_exempt
 def registerFinish(request):
     if(request.method == "GET"):
@@ -213,14 +220,13 @@ def registerFinish(request):
     elif(request.method == "POST"):
         return processRegisterFinish(request)
 
-'''TODO: This shouldn't pass'''
+# loads register-finish page
 def showRegisterFinish(request):
     logger.info("Entering showRegisterFinish")
-    return render(request, 'app/register-finish', {})
+    return render(request, 'app/register', {})
 
-'''
-Interprets POST request from register form, adds user to database
-'''
+
+# Interprets POST request from register form, adds user to database
 def processRegisterFinish(request):
     logger.info("Entering processRegisterFinish")
     #create variables
@@ -237,7 +243,6 @@ def processRegisterFinish(request):
             logger.info("Password and Confirm Password do not match")
             request.error = "The Password and Confirm Password values do not match. Please try again."
             return render(request, 'app/register.html')
-        sqlStatement = None
         try:
             # Get the Database Connection
             logger.info("Creating the Database connection")
@@ -279,6 +284,7 @@ def processRegisterFinish(request):
         
     # return render (request, 'app/feed.html')
 
+# emails a user
 def emailUser(username):
     try:
         message = MIMEMultipart()
@@ -298,7 +304,7 @@ def emailUser(username):
 
         logger.error("Unexpected error:", sys.exc_info()[0])
 
-
+# handles redirect for profile requests
 def profile(request):
     if(request.method == "GET"):
         return showProfile(request)
@@ -306,13 +312,14 @@ def profile(request):
         return processProfile(request)
     else:
         return JsonResponse({'message':'Expected ajax request, got none'})
-    
+
+# populates the profile page
 def showProfile(request):
     logger.info("Entering showProfile")
     username = request.session.get('username')
     if not username:
         logger.info("User is not Logged In - redirecting...")
-        return redirect("login?target=profile")
+        return redirect("/login?target=profile")
     myHecklers = None
     myInfo = None
     sqlMyHecklers = ''
@@ -370,11 +377,12 @@ def showProfile(request):
         
     return render(request, 'app/profile.html', {})
 
-'''TODO: Connect form to profile update
+'''
 TODO: Test sqlite3 error handling
 NOTE: This saves images to the local images folder, but it would be much easier and more secure to
 store profile images in the database.
 '''
+# updates profile, called by jQuery and returns results without updating the active webpage
 def processProfile(request):
     realName = request.POST.get('realName')
     blabName = request.POST.get('blabName')
@@ -463,8 +471,6 @@ def processProfile(request):
         if oldImage:
             os.remove(os.path.join(imageDir,oldImage))
         
-
-        # TODO: check if file is png first //Done?
         try:
             #Potential VULN? ending with .png, having different file type
             extension = file.name.lower().endswith('.png')
@@ -473,7 +479,6 @@ def processProfile(request):
             else:
                 
                 response = JsonResponse({'message':"<script>alert('File must end in .png');</script>"},status=422)
-                #response.status_code = 422
                 return response
             logger.info("Saving new profile image: " + path)
 
@@ -490,12 +495,13 @@ def processProfile(request):
     
     return response
 
-
+# updates the user cookies
 def updateInResponse(user, response):
     cookie = serializers.serialize('xml', [user,])
     response.set_cookie('user', cookie)
     return response
 
+# logic to download uploaded profile image
 def downloadImage(request):
     imageName = request.GET.get('image')
     logger.info("Entering downloadImage")
@@ -507,15 +513,19 @@ def downloadImage(request):
     logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
     f = image_dir
-    path = f + imageName
+    path = f + "/" + imageName
 
     logger.info("Fetching profile image: " + path)
 
     try:
         if os.path.exists(path):
             with open(path, 'rb') as file:
-                response = HttpResponse(file.read(), content_type="application/octet-stream")
-                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(path)
+                mime_type = mimetypes.guess_type(path)[0]
+                if mime_type is None:
+                    mime_type = "application/octet-stream"
+                logger.info("MIME type: " + mime_type)
+                response = HttpResponse(file.read(), content_type=mime_type)
+                response.headers['Content-Disposition'] = 'attachment; filename=' + imageName
                 return response
 
     except:
@@ -526,6 +536,7 @@ def downloadImage(request):
 
     return render(request, "app/profile.html", {})
 
+# Check if a username is already in database
 def usernameExists(username):
     username = username.lower()
     # Check is the username already exists
@@ -548,6 +559,7 @@ def usernameExists(username):
     logger.info("Username: " + username + " already exists. Try again.")
     return True
 
+# updates a username and all it's dependants to a new username
 def updateUsername(oldUsername, newUsername):
     # Enforce all lowercase usernames
     oldUsername = oldUsername.lower()
@@ -594,9 +606,8 @@ def updateUsername(oldUsername, newUsername):
     # Error occurred
     return False
 
-'''
-Takes a username and searches for the profile image for that user
-'''
+
+# Takes a username and searches for the profile image for that user
 def getProfileImageNameFromUsername(username):
     f = image_dir
     # f = os.path.realpath("./resources/images")
@@ -606,5 +617,6 @@ def getProfileImageNameFromUsername(username):
         return None
     return matchingFiles[0]
 
+# checks if a request was made using a JQuery ajax request
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'

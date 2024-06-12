@@ -1,7 +1,11 @@
-from django.db import models
-import moment, hashlib
+# models.py defines database tables that get created, in addition to blabbers class
+import hashlib
+import moment
 
-# Create your models here
+from django.db import models
+
+
+# User model stores user information
 class User(models.Model):
     
     class Meta:
@@ -14,19 +18,15 @@ class User(models.Model):
     last_login = models.DateTimeField(null=True)
     real_name = models.CharField(max_length=100, null=True)
     blab_name = models.CharField(max_length=100, null=True)
-    
-    def getUserName(self):
-        return self.username
-    
-    def getPassword(self):
-        return self.password
-    
+
+# Creates a new user from just username, blabname, and realname
 def create(userName, blabName,realName):
     password = hashlib.md5(userName.encode('utf-8')).hexdigest()
     dateCreated = moment.now().format("YYYY-MM-DD hh:mm:ss")
     lastLogin = None
     return User(userName, password, userName, dateCreated, lastLogin, blabName, realName)
 
+# Table for a blab, which is a message on the website
 class Blab(models.Model):
     class Meta:
         db_table='blabs'
@@ -40,6 +40,7 @@ class Blab(models.Model):
     commentCount = 0
     author = None
     
+    ######Getters and setters######
     def getId(self):
         return self.blabid
 
@@ -72,7 +73,8 @@ class Blab(models.Model):
 
     def setCommentCount(self, count):
         self.commentCount = count
-     
+
+# Blabber object, similar to a user but not needed in database    
 class Blabber():
 
     id = None
@@ -84,12 +86,12 @@ class Blabber():
     numberListening = None
 
     date_format = "%b %d %Y"
-
+    ######Getters and Setters######
     def getId(self):
         return self.id
     
-    def setId(self, id):
-        self.id = id
+    def setId(self, newID):
+        self.id = newID
     
     def getUsername(self):
         return self.username
@@ -129,7 +131,8 @@ class Blabber():
     
     def setNumberListening(self, numberListening):
         self.numberListening = numberListening
-    
+
+# Table layout for a comment
 class Comment(models.Model):
 
     commentid = models.IntegerField(primary_key=True,null=False)
@@ -140,9 +143,11 @@ class Comment(models.Model):
 
     date_format = "%b %d %Y"
 
+    # Renames the table in database
     class Meta:
         db_table = 'comments'
 
+    ######Getters and setters######
     def getId(self):
         return self.commentid
 
@@ -170,16 +175,18 @@ class Comment(models.Model):
     def setAuthor(self, blabber):
         self.blabber = blabber
 
-
+# Table of Listeners
 class Listener(models.Model):
     blabber = models.TextField(max_length=100,null=False)
     listener = models.TextField(max_length=100,null=False)
     status = models.TextField(max_length=20,null=True)
-
+    #Renames table
     class Meta:
         db_table = 'listeners'
 
+# Creates table of user history
 class User_History(models.Model):
+    #Renames table
     class Meta:
         db_table = 'users_history'
 
