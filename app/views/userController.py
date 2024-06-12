@@ -3,8 +3,12 @@ from django.http import JsonResponse, HttpResponse
 from django.db import connection, transaction, IntegrityError, DatabaseError
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.clickjacking import xframe_options_exempt
 import logging, sys, os
 import sqlite3, hashlib
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 from app.models import User, Blabber, Blabber
 from app.forms import RegisterForm
@@ -15,6 +19,7 @@ logger = logging.getLogger("VeraDemo:userController")
 image_dir = os.path.join(os.path.dirname(__file__), '../../resources/images')
 
 ###LOGIN###
+@xframe_options_exempt
 def login(request):
     if request.method == "GET":
 
@@ -119,7 +124,7 @@ def login(request):
         logger.info("Redirecting to view: " + nextView)
             
         return response
-    
+
 def showPasswordHint(request):
     username = request.GET.get('username')
     logger.info("Entering password-hint with username: " + username)
@@ -149,7 +154,6 @@ def showPasswordHint(request):
             logger.error("Unexpected error:", sys.exc_info()[0])
     return HttpResponse("ERROR!")
 
-
 def logout(request):
     logger.info("Processing logout")
     request.session['username'] = None
@@ -168,15 +172,17 @@ def register(request):
 '''
 renders the register.html file, called by a path in urls
 '''
+
 def showRegister(request):
     logger.info("Entering showRegister")
     return render(request, 'app/register.html', {})
 
 ''' Sends username into register-finish page'''
+
 def processRegister(request):
     logger.info('Entering processRegister')
     username = request.POST.get('username')
-    request.session['username'] = username
+    request.username = username
 
     # Get the Database Connection
     logger.info("Creating the Database connection")
@@ -216,7 +222,7 @@ Interprets POST request from register form, adds user to database
 def processRegisterFinish(request):
     logger.info("Entering processRegisterFinish")
     #create variables
-    username = request.session.get('username')
+    username = request.POST.get('username')
     cpassword = request.POST.get('cpassword')
     #fill in required username field
     form = RegisterForm(request.POST or None)
@@ -261,7 +267,8 @@ def processRegisterFinish(request):
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         # except ClassNotFoundException as
-        
+        request.session['username'] = username
+        emailUser(username)
         return redirect('/login?username=' + username)
     else:
         logger.info("Form is invalid")
@@ -269,6 +276,26 @@ def processRegisterFinish(request):
         return render(request, 'app/register.html')
         
     # return render (request, 'app/feed.html')
+
+def emailUser(username):
+    try:
+        message = MIMEMultipart()
+        message["Subject"] = "New user registered:" + " " + username
+        message["From"] = "verademo@veracode.com"
+        message["To"] = "admin@example.com"
+        message.set_payload("A new VeraDemo user registered: " + username)
+        logger.info("Sending email to admin")
+
+        # Using localhost and port 1025 to test emails with MailHog
+        with smtplib.SMTP("localhost", 1025) as server:
+            server.send_message(message)
+
+    except:
+
+        # TODO: Implement exceptions
+
+        logger.error("Unexpected error:", sys.exc_info()[0])
+
 
 def profile(request):
     if(request.method == "GET"):
@@ -305,6 +332,7 @@ def showProfile(request):
                 heckler.setUsername(i[0])
                 heckler.setBlabName(i[1])
                 heckler.setCreatedDate(i[2])
+                heckler.image = getProfileImageNameFromUsername(heckler.username)
                 hecklers.append(heckler)
             
 

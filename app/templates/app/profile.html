@@ -133,50 +133,26 @@
 					</div>
 					<div class="actionBox">
 						<ul class="commentList">
-                            <!--
-							<%
-								@SuppressWarnings("unchecked")
-								List<Blabber> hecklers = (List<Blabber>) request.getAttribute("hecklers");
-								
-								@SuppressWarnings("unchecked")
-								ArrayList<String> hecklerIds = (ArrayList<String>) request.getAttribute("hecklerUsernames");
-								@SuppressWarnings("unchecked")
-								ArrayList<String> hecklerNames = (ArrayList<String>) request.getAttribute("hecklerNames");
-								@SuppressWarnings("unchecked")
-								ArrayList<String> createdTimes = (ArrayList<String>) request.getAttribute("created");
-								
-								if (hecklers != null && !hecklers.isEmpty()) {
-									for (Blabber heckler : hecklers) {
-							%>
-                            
+						{% if request.hecklers|length > 0 %}
+							{% for heckler in request.hecklers %}
 							<li>
 								<div class="clear">
 									<div class="commenterImage">
-										<img src="<% static'images/<% heckler.getUsername() %>.png' %>" />
+										<img src="{% static 'images/' %}{{ heckler.image }}" />
 									</div>
 									<div class="commentText">
-										<p> <% heckler.getBlabName() %></p>
-										<span class="date sub-text">member since <% heckler.getCreatedDateString() %></span>
+										<p> {{ heckler.blabName }}</p>
+										<span class="date sub-text">member since {{ heckler.createdDate }}</span>
 										<br/>
 									</div>
 								</div>
 							</li>
-                            -->
-                            <!--
-							<%
-									}
-								}
-								else {
-							%>
-                                -->
+							{% endfor %}
+						{% else %}
 							<li>
 								<p class="">You have no hecklers</p>
 							</li>
-                            <!--
-							<%
-								}
-							%>
-                            -->
+                        {% endif %}
 						</ul>
 					</div>
 				</div>
@@ -189,31 +165,17 @@
 					</div>
 					<div class="actionBox">
 						<ul class="commentList">
-                            <!--
-							<%
-								@SuppressWarnings("unchecked")
-								ArrayList<String> events = (ArrayList<String>) request.getAttribute("events");
-								
-								if (events != null && !events.isEmpty()) {
-									for (int i = 0; i < events.size(); i++) {
-							%>
-							<li>
-								<p class=""><%=events.get(i)%></p>
-							</li>
-							<%
-									}
-								}
-								else {
-							%>
-                            -->
-							<li>
-								<p class="">You haven't done anything yet!</p>
-							</li>
-                            <!--
-							<%
-								}
-							%>
-                            -->
+							{% if request.events|length > 0 %}
+								{% for event in request.events %}
+								<li>
+									<p class="">{{event}}</p>
+								</li>
+								{% endfor %}
+							{% else %}
+								<li>
+									<p class="">You haven't done anything yet!</p>
+								</li>
+							{% endif %}
 						</ul>
 					</div>
 				</div>

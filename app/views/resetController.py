@@ -35,6 +35,7 @@ users = [
             create("clyde", "Clyde", "Clyde Shtino"),
 			create("cody", "Cody", "Cody Bertram"),
 			create("derek", "Derek", "Derek Chowaniec"),
+            create("eric", "Eric", "Eric Ghilani"),
 			create("glenn", "Glenn", "Glenn Whittemore"),
 			create("grant", "Grant", "Grant Robinson"),
 			create("gregory", "Gregory", "Gregory Wolford"),
