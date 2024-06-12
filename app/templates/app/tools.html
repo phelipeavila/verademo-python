@@ -56,7 +56,7 @@
 			<p>Check the uptime of a host here by pinging it. Example: 127.0.0.1</p>
 			<form method="post">
 				<label for="host">Host:</label> <input type="text" name="host"
-					value={{ request.META.HTTP_HOST }} ><input
+					value={{ request.META.SERVER_NAME }} /><input
 					type="submit" value="Check" />
 			</form>
 			<pre>{{ request.ping }}</pre>
