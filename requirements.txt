@@ -1,5 +1,5 @@
 asgiref==3.8.1
-certifi==2024.6.2
+certifi==2022.9.14
 distlib==0.3.8
 Django==4.2.13
 filelock==3.14.0

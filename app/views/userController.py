@@ -9,6 +9,7 @@ import sqlite3, hashlib
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import mimetypes
 
 from app.models import User, Blabber, Blabber
 from app.forms import RegisterForm
@@ -505,15 +506,19 @@ def downloadImage(request):
     logger.info("User is Logged In - continuing... UA=" + request.headers["User-Agent"] + " U=" + username)
 
     f = image_dir
-    path = f + imageName
+    path = f + "/" + imageName
 
     logger.info("Fetching profile image: " + path)
 
     try:
         if os.path.exists(path):
             with open(path, 'rb') as file:
-                response = HttpResponse(file.read(), content_type="application/octet-stream")
-                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(path)
+                mime_type = mimetypes.guess_type(path)[0]
+                if mime_type is None:
+                    mime_type = "application/octet-stream"
+                logger.info("MIME type: " + mime_type)
+                response = HttpResponse(file.read(), content_type=mime_type)
+                response.headers['Content-Disposition'] = 'attachment; filename=' + imageName
                 return response
 
     except:
