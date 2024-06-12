@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.db import connection, transaction, IntegrityError
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.clickjacking import xframe_options_exempt
 import logging, sys, os
 import sqlite3, hashlib
 
@@ -15,6 +16,7 @@ logger = logging.getLogger("VeraDemo:userController")
 image_dir = os.path.join(os.path.dirname(__file__), '../../resources/images')
 
 ###LOGIN###
+@xframe_options_exempt
 def login(request):
     if request.method == "GET":
 
@@ -119,7 +121,7 @@ def login(request):
         logger.info("Redirecting to view: " + nextView)
             
         return response
-    
+
 def showPasswordHint(request):
     username = request.GET.get('username')
     logger.info("Entering password-hint with username: " + username)
@@ -149,7 +151,6 @@ def showPasswordHint(request):
             logger.error("Unexpected error:", sys.exc_info()[0])
     return HttpResponse("ERROR!")
 
-
 def logout(request):
     logger.info("Processing logout")
     request.session['username'] = None
@@ -168,11 +169,13 @@ def register(request):
 '''
 renders the register.html file, called by a path in urls
 '''
+
 def showRegister(request):
     logger.info("Entering showRegister")
     return render(request, 'app/register.html', {})
 
 ''' Sends username into register-finish page'''
+
 def processRegister(request):
     logger.info('Entering processRegister')
     username = request.POST.get('username')
@@ -305,6 +308,7 @@ def showProfile(request):
                 heckler.setUsername(i[0])
                 heckler.setBlabName(i[1])
                 heckler.setCreatedDate(i[2])
+                heckler.image = getProfileImageNameFromUsername(heckler.username)
                 hecklers.append(heckler)
             
 

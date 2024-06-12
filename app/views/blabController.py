@@ -125,7 +125,7 @@ def morefeed(request):
     count = request.GET.get('count')
     length = request.GET.get('len')
 
-    template = ("<li><div>" + "\t<div class=\"commenterImage\">" + "\t\t<img src=\"resources/images/{username}.png\">" +
+    template = ("<li><div>" + "\t<div class=\"commenterImage\">" + "\t\t<img src=\"/static/images/{username}.png\">" +
                 "\t</div>" + "\t<div class=\"commentText\">" + "\t\t<p>{content}</p>" +
                 "\t\t<span class=\"date sub-text\">by {blab_name} on {timestamp}</span><br>" +
                 "\t\t<span class=\"date sub-text\"><a href=\"blab?blabid={blabid}\">{count} Comments</a></span>" + "\t</div>" +
@@ -150,7 +150,7 @@ def morefeed(request):
             ret = ""
             for blab in results:
                 ret += template.format(username = blab[0], content = blab[2], blab_name = blab[1],
-                                       timestamp = blab[3], blabid = blab[5], count = blab[4])
+                                       timestamp = blab[3].strftime("%b %d %Y"), blabid = blab[5], count = blab[4])
     except:
 
         # TODO: Implement exceptions
