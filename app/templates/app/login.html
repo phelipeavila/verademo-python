@@ -51,13 +51,25 @@
 		<div class="page-header">
 			<h3>Login</h3>
 		</div>
-
+<!-- START VULNERABLE CODE -->
 		{% if request.error %}
 		<div class="alert alert-danger" role="alert">
-			{{ request.error }}
+			{% autoescape off %}
+				{{ request.error }}
+			{% endautoescape %}
+		</div>
+		{% endif %}
+<!-- END VULNERABLE CODE -->
+<!-- START SAFE CODE
+{% if request.error %}
+		<div class="alert alert-danger" role="alert">
+			{% autoescape off %}
+				{{ request.error }}
+			{% endautoescape %}
 		</div>
 		{% endif %}
 
+ END SAFE CODE -->
 
 		<div class="row">
 			<div class="col-md-12">

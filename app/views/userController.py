@@ -54,7 +54,7 @@ def login(request):
             request.username = username
             request.target = target
 
-            return render(request, 'app/login.html')
+            return render(request, 'app/login.html',{})
 
         else:
             logger.info("User details were remembered")
@@ -116,7 +116,11 @@ def login(request):
                 else:
                     logger.info("User not found")
 
-                    request.error = "Login failed. Please try again."
+                    # START VULN CODE
+                    request.error = "Login failed for " + username + ". Please try again."
+                    # END VULN CODE
+                    #SAFE:
+                    #request.error = "Login failed. Please try again."
                     request.target = target
 
                     nextView = 'login'
