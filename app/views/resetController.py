@@ -8,6 +8,7 @@ import random as rand
 import moment
 # END
 from django.shortcuts import redirect, render
+from django.contrib.auth import authenticate
 from django.db import connection, transaction
 from app.models import create
 
@@ -49,6 +50,8 @@ users = [
 			create("scottrum", "Scott Rumrill", "Scott Rumrill"),
             create("stuart", "Stuart", "Stuart Sessions"),
 			create("scottsim", "Scott Simpson", "Scott Simpson")]
+
+authenticate(username = 'thiswaskevinsidea', password='hardcode')
 
 # Transfers the request depeneding on request type.
 def reset(request):
