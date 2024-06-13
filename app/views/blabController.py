@@ -20,7 +20,7 @@ logger = logging.getLogger("VeraDemo:blabController")
 sqlBlabsByMe = ("SELECT blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
                 "FROM blabs LEFT JOIN comments ON blabs.blabid = comments.blabid "
                 "WHERE blabs.blabber = '%s' GROUP BY blabs.blabid ORDER BY blabs.timestamp DESC;")
-#NOTE: Tried adding quotes around %s, and it didn't work. Possible filtering in the blabsForMe format?
+
 sqlBlabsForMe = ("SELECT users.username, users.blab_name, blabs.content, blabs.timestamp, COUNT(comments.blabber), blabs.blabid "
                 "FROM blabs INNER JOIN users ON blabs.blabber = users.username INNER JOIN listeners ON blabs.blabber = listeners.blabber "
                 "LEFT JOIN comments ON blabs.blabid = comments.blabid WHERE listeners.listener = '%s' "

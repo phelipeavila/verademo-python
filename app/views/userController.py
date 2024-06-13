@@ -49,12 +49,16 @@ def login(request):
                 username = ''
             if target is None:
                 target = ''
+
+            # BAD CODE:
             logger.info("Entering login with username " + username + " and target " + target)
+            # GOOD CODE:
+            # logger.debug("Entering login.")
             
             request.username = username
             request.target = target
 
-            return render(request, 'app/login.html')
+            return render(request, 'app/login.html',{})
 
         else:
             logger.info("User details were remembered")
@@ -119,7 +123,11 @@ def login(request):
                 else:
                     logger.info("User not found")
 
-                    request.error = "Login failed. Please try again."
+                    # START VULN CODE
+                    request.error = "Login failed for " + username + ". Please try again."
+                    # END VULN CODE
+                    #SAFE:
+                    #request.error = "Login failed. Please try again."
                     request.target = target
 
                     nextView = 'login'
@@ -204,7 +212,6 @@ def processRegister(request):
     # Get the Database Connection
     logger.info("Creating the Database connection")
     try:
-        
         with connection.cursor() as cursor:
             sqlQuery = "SELECT username FROM users WHERE username = '" + username + "'"
             cursor.execute(sqlQuery)
