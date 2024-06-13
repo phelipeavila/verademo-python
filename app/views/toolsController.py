@@ -35,7 +35,7 @@ def processTools(request):
 # pings selected host and outputs the result
 def ping(host):
     output = ""
-    
+    print("Pinging", host)
     try:
         p = subprocess.Popen(['ping', '-c', '1', host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
