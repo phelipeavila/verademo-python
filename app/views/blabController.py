@@ -3,7 +3,6 @@ blabController interacts with blabs, and loads relevent pages such as 'Feed' and
 '''
 
 import logging
-import sys
 import moment
 
 from django.shortcuts import redirect, render
@@ -81,13 +80,12 @@ def feed(request):
                     myBlabs.append(post)
                     
                 request.blabsByMe = myBlabs
-
-        except:
-
-            # TODO: Implement exceptions
-
-            logger.error("Unexpected error:", sys.exc_info()[0])
-
+        except ConnectionError as ce:
+            logger.error("Unexpected connection error:", ce.exc_info()[0])
+            nextView = 'login'
+            response = render(request, 'app/' + nextView + '.html', {})
+        except Exception as e:
+            logger.error("Unexpected error:", e.exc_info()[0])
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
             
@@ -118,11 +116,14 @@ def feed(request):
                 if not cursor.rowcount:
                     request.error = "Failed to add blab"
 
-        except:
-
-            # TODO: Implement exceptions
-
-            logger.error("Unexpected error:", sys.exc_info()[0])
+        except ConnectionError as ce:
+            logger.error("Unexpected connection error:", ce.exc_info()[0])
+            nextView = 'login'
+            response = render(request, 'app/' + nextView + '.html', {})
+        except Exception as e:
+            logger.error("Unexpected error:", e.exc_info()[0])
+            nextView = 'login'
+            response = render(request, 'app/' + nextView + '.html', {})
 
         return response
 
@@ -157,12 +158,11 @@ def morefeed(request):
             ret = ""
             for blab in results:
                 ret += template.format(username = blab[0], content = blab[2], blab_name = blab[1],
-                                       timestamp = blab[3].strftime("%b %d %Y"), blabid = blab[5], count = blab[4])
-    except:
-
-        # TODO: Implement exceptions
-
-        logger.error("Unexpected error:", sys.exc_info()[0])
+                                       timestamp = blab[3].strftime("%b %d %Y"), blabid = blab[5], count = blab[4])    
+    except ConnectionError as ce:
+        logger.error("Unexpected connection error:", ce.exc_info()[0])
+    except Exception as e:
+        logger.error("Unexpected error:", e.exc_info()[0])
 
     return HttpResponse(ret)
     
@@ -220,12 +220,10 @@ def blab(request):
                     request.comments = comments
 
                     response = render(request, 'app/blab.html', {})
-
-        except:
-
-            # TODO: Implement exceptions
-
-            logger.error("Unexpected error:", sys.exc_info()[0])
+        except ConnectionError as ce:
+            logger.error("Unexpected error:", ce.exc_info()[0])
+        except Exception as e:
+            logger.error("Unexpected error:", e.exc_info()[0])
 
         return response
     
@@ -256,14 +254,12 @@ def blab(request):
                     request.error = "Failed to add comment"
 
                 response = redirect("/blab?blabid=" + blabid)
+        except ConnectionError as ce:
+            logger.error("Unexpected error:", ce.exc_info()[0])
+        except Exception as e:
+            logger.error("Unexpected error:", e.exc_info()[0])
 
-        except:
-
-            # TODO: Implement exceptions
-
-            logger.error("Unexpected error:", sys.exc_info()[0])
-
-        return response
+    return response
 #
 # csrf_exempt tag prevents this funciton from checking csrf_tag from form
 # deals with loading and updating the "Blabbers" page
@@ -312,11 +308,10 @@ def blabbers(request):
                 request.blabbers = blabbers
 
                 response = render(request, 'app/blabbers.html', {})
-        except:
-
-            # TODO: Implement exceptions
-
-            logger.error("Unexpected error:", sys.exc_info()[0])
+        except ConnectionError as ce:
+            logger.error("Unexpected connection error:", ce.exc_info()[0])
+        except Exception as e:
+            logger.error("Unexpected error:", e.exc_info()[0])
 
         return response
     
@@ -347,11 +342,10 @@ def blabbers(request):
                 cmdClass = eval(module)
                 cmdObj = cmdClass(cursor, username)
                 cmdObj.execute(blabberUsername)
-                return redirect('blabbers')
-        except:
-
-            # TODO: Implement exceptions
-
-            logger.error("Unexpected error:", sys.exc_info()[0])
+                return redirect('blabbers')       
+        except ConnectionError as ce:
+            logger.error("Unexpected connection error:", ce.exc_info()[0])   
+        except Exception as e:
+            logger.error("Unexpected error:", e.exc_info()[0])
         
         return response

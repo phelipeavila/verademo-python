@@ -137,7 +137,7 @@ def login(request):
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})   
         except Exception as e:
-            logger.error("Unexpected error:", sys.exc_info()[0])
+            logger.error("Unexpected error:", e.exc_info()[0])
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
 
@@ -172,7 +172,7 @@ def showPasswordHint(request):
             logger.error("Database error: " + db_err)
             return HttpResponse("ERROR!") 
     except Exception as e:
-            logger.error("Unexpected error:", sys.exc_info()[0])
+            logger.error("Unexpected error:", e.exc_info()[0])
         
     return HttpResponse("ERROR!")
 
@@ -221,13 +221,13 @@ def processRegister(request):
                 return render(request, 'app/register.html')
             else:
                 return render(request, 'app/register-finish.html')
+            
     except sqlite3.IntegrityError as ie:
         logger.error(ie.sqlite_errorcode, ie.sqlite_errorname)
-
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-        logger.error("Unexpected error:", sys.exc_info()[0])
+        logger.error("Unexpected error:", e.exc_info()[0])
     
     return render(request, 'app/register.html')
 
@@ -289,19 +289,16 @@ def processRegisterFinish(request):
                 sqlStatement = cursor.fetchone() #<- variable for response
                 logger.info(query)
                 # END EXAMPLE VULNERABILITY
-        except IntegrityError as e:
-            logger.error(e)
-            request.error = "Username '" + username + "' already exists!"
+        except IntegrityError as ie:
+            logger.error("Integrity error: " + ie)
             return render(request, 'app/register.html')
-        except ValueError as e:
-            logger.error(e)
-            request.error = "Please fill out all fields"
+        except ValueError as ve:
+            logger.error("Value error: " + ve)
             return render(request, 'app/register.html')
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         except Exception as e:
-            logger.error("Unexpected error:", sys.exc_info()[0])
-            request.error = "Error occured try again later!"
+            logger.error("Unexpected error:", e.exc_info()[0])
         # except ClassNotFoundException as
         request.session['username'] = username
         emailUser(username)
@@ -403,6 +400,8 @@ def showProfile(request):
             request.blabName = myInfoResults[2]
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
+    except Exception as e:
+        logger.error("Unexpected error:", e.exc_info()[0])
         
     return render(request, 'app/profile.html', {})
 
@@ -530,6 +529,7 @@ def processProfile(request):
             response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
             #response.status_code = 500
             return response
+        
         except Exception as ex :
             logger.error(ex)
         '''
