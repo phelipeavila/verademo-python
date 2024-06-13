@@ -16,6 +16,15 @@ class LoginViewTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.login_url = reverse('login')
+        self.register_url = reverse('registerFinish')
+        self.client.post(self.register_url, {
+            'username': 'clyde',
+            'password': 'clyde',
+            'cpassword': 'clyde',
+            'realName': 'clyde',
+            'blabName': 'clyde',
+        })
+
 
     def testDatabase(self):
         # Simulate a DatabaseError during login
@@ -48,19 +57,17 @@ class LoginViewTests(TestCase):
     def testLogin(self):
         # Mock the successful login case
         # with patch('app.views.userController') as mock_cursor:
-            # '''mock_cursor.return_value.__enter__.return_value.fetchone.return_value = (
-            #     'clyde', hashlib.md5('clyde'.encode('utf-8')).hexdigest(),
-            #     'hint', '2022-01-01', '2022-01-01', 'Real Name', 'Blab Name'
-            # '''
-    
+        #     mock_cursor.return_value.__enter__.return_value.fetchone.return_value = (
+        #         'testuser', hashlib.md5('testpass'.encode('utf-8')).hexdigest(),
+        #         'hint', '2022-01-01', '2022-01-01', 'Real Name', 'Blab Name'
+        #     )
+
         response = self.client.post(self.login_url, {
             'user': 'clyde',
             'password': 'clyde',
             'target': 'feed'
-        })
-        
-        self.assertRedirects(response, 'feed')
-        
+        }, HTTP_USER_AGENT='UA=Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0 U=clyde')
+        self.assertRedirects(response, '/feed')
 
     def testLoginInvalid(self):
         # Mock the case where no user is found
