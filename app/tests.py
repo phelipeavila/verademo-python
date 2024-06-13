@@ -8,6 +8,9 @@ from app.views.userController import login, showPasswordHint, processRegister, p
 import hashlib
 import logging
 
+
+logger = logging.getLogger("VeraDemo:Tests")
+
 # Testing Login
 class LoginViewTests(TestCase):
     def setUp(self):
