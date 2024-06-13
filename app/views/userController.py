@@ -79,6 +79,8 @@ def login(request):
         remember = request.POST.get('remember')
         target = request.POST.get('target')
 
+        logger.info("Attempting login with username: " + username + " and target: " + target)
+
         if (target != None) and (target) and (not target == "null"):
             nextView = target
             response = redirect(nextView)
@@ -95,6 +97,7 @@ def login(request):
                             real_name, blab_name from users where username='" + username + "' \
                             and password='" + hashlib.md5(password.encode('utf-8')).hexdigest() + "';"
 
+                logger.info(sqlQuery)
                 cursor.execute(sqlQuery)
                 row = cursor.fetchone()
 
