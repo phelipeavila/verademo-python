@@ -221,8 +221,13 @@ def processRegister(request):
                 return render(request, 'app/register.html')
             else:
                 return render(request, 'app/register-finish.html')
+    except sqlite3.IntegrityError as ie:
+        logger.error(ie.sqlite_errorcode, ie.sqlite_errorname)
+
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
+    except Exception as e:
+        logger.error("Unexpected error:", sys.exc_info()[0])
     
     return render(request, 'app/register.html')
 
@@ -294,6 +299,9 @@ def processRegisterFinish(request):
             return render(request, 'app/register.html')
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
+        except Exception as e:
+            logger.error("Unexpected error:", sys.exc_info()[0])
+            request.error = "Error occured try again later!"
         # except ClassNotFoundException as
         request.session['username'] = username
         emailUser(username)
@@ -318,11 +326,11 @@ def emailUser(username):
         # Using localhost and port 1025 to test emails with MailHog
         with smtplib.SMTP("localhost", 1025) as server:
             server.send_message(message)
-
-    except:
-
-        # TODO: Implement exceptions
-
+    except smtplib.SMTPException as smtp_err:
+        logger.error("SMTP error: " + str(smtp_err))
+    except ConnectionRefusedError as conn_err:
+        logger.error("Connection refused: " + str(conn_err))
+    except Exception as e:
         logger.error("Unexpected error:", sys.exc_info()[0])
 
 # handles redirect for profile requests
@@ -449,9 +457,18 @@ def processProfile(request):
                 response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
                 #response.status_code = 500
                 return response
-            
+    except sqlite3.IntegrityError as e:
+        logger.error(e.sqlite_errorcode, e.sqlite_errorname)
+        response = JsonResponse({'message':"<script>alert('An Database error occurred, please try again.');</script>"},status=500)
+        #response.status_code = 500
+        return response
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
+    except Exception as e:
+        logger.error("Unexpected error:", sys.exc_info()[0])
+        response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
+        #response.status_code = 500
+        return response
 
     # Rename profile image if username changes
     if username != oldUsername :
@@ -508,7 +525,11 @@ def processProfile(request):
             with open(path, 'wb') as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
-
+        except IOError as e:
+            logger.error("Error occured saving image", e)
+            response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
+            #response.status_code = 500
+            return response
         except Exception as ex :
             logger.error(ex)
         '''
@@ -553,12 +574,16 @@ def downloadImage(request):
                 response = HttpResponse(file.read(), content_type=mime_type)
                 response.headers['Content-Disposition'] = 'attachment; filename=' + imageName
                 return response
-
-    except:
-
-            # TODO: Implement exceptions
-
+    except ValueError as ve:
+            logger.error("Security Error: " + str(ve))
+            return render(request, "app/profile.html", {"error" : ve})
+    except FileNotFoundError as fnfe:
+            logger.error("File Error: " + str(fnfe))
+            return render(request, "app/profile.html", {"error" : fnfe})
+    except Exception as e:
             logger.error("Unexpected error:", sys.exc_info()[0])
+            return render(request, "app/profile.html", {"error" : e})
+
 
     return render(request, "app/profile.html", {})
 
@@ -579,9 +604,10 @@ def usernameExists(username):
                 return False
             
     except sqlite3.Error as er:
-            logger.error(er.sqlite_errorcode,er.sqlite_errorname)
+        logger.error(er.sqlite_errorcode,er.sqlite_errorname)
     except ModuleNotFoundError as ex:
         logger.error(ex)
+
     logger.info("Username: " + username + " already exists. Try again.")
     return True
 

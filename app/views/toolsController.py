@@ -51,20 +51,6 @@ def ping(host):
 
     return output
 
-'''
-def pingView(request):
-    host = request.POST.get('host')
-    result =""
-    if host:
-        try:
-            result = ping(host)
-        except Exception as e:
-            result = f"Error: {e}"
-            print("Error:", e)
-
-
-    return render(request, 'app/tools.html', {'result': result, 'host': host})
-'''
 
 # Produces a fortune based on the submitted selection
 def fortune(file):
@@ -100,19 +86,6 @@ def fortune(file):
         
     return output
 
-'''
-def fortuneView(request):
-    file = request.POST.get('file')
-    result = ""
-    if file:
-        try:
-            result = fortune(file)
-        except Exception as e:
-            result = f"Error: {e}"
-            print("Error:", e)
-
-    return render(request, 'app/tools.html', {'result': result, 'file': file})
-'''
 
 
 

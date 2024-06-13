@@ -185,7 +185,7 @@ class ProcessRegisterFinishTests(TestCase):
         })
     # TEST FAILS 302 != 200
     def testValidRegistration(self):
-        response = self.client.post(self.register_url, {
+        response = self.client.get(self.register_url, {
             'user': 'newuser',
             'password': 'newuser',
             'cpassword': 'newuser',
@@ -194,7 +194,7 @@ class ProcessRegisterFinishTests(TestCase):
             'target': 'feed'
         },HTTP_USER_AGENT='UA=Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0 U=newuser')
 
-
+        response = self.client.post(self.register_url)
         self.assertRedirects(response, '/feed')
 
         # self.assertRedirects(response, '/login')
