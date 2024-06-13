@@ -8,6 +8,9 @@ from app.views.userController import login, showPasswordHint, processRegister, p
 import hashlib
 import logging
 
+
+logger = logging.getLogger("VeraDemo:Tests")
+
 # Testing Login
 class LoginViewTests(TestCase):
     def setUp(self):
@@ -44,18 +47,20 @@ class LoginViewTests(TestCase):
     # TEST FAILS 302 != 200
     def testLogin(self):
         # Mock the successful login case
-        with patch('app.views.userController') as mock_cursor:
-            mock_cursor.return_value.__enter__.return_value.fetchone.return_value = (
-                'testuser', hashlib.md5('testpass'.encode('utf-8')).hexdigest(),
-                'hint', '2022-01-01', '2022-01-01', 'Real Name', 'Blab Name'
-            )
-
-            response = self.client.post(self.login_url, {
-                'user': 'clyde',
-                'password': 'clyde',
-                'target': 'feed'
-            })
-            self.assertRedirects(response, 'feed')
+        # with patch('app.views.userController') as mock_cursor:
+            # '''mock_cursor.return_value.__enter__.return_value.fetchone.return_value = (
+            #     'clyde', hashlib.md5('clyde'.encode('utf-8')).hexdigest(),
+            #     'hint', '2022-01-01', '2022-01-01', 'Real Name', 'Blab Name'
+            # '''
+    
+        response = self.client.post(self.login_url, {
+            'user': 'clyde',
+            'password': 'clyde',
+            'target': 'feed'
+        })
+        
+        self.assertRedirects(response, 'feed')
+        
 
     def testLoginInvalid(self):
         # Mock the case where no user is found
