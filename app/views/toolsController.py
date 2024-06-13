@@ -19,7 +19,8 @@ def tools(request):
 
 # Loads the tool webpage    
 def showTools(request):
-    return render(request, 'app/tools.html', {})
+    host = request.META['SERVER_NAME']
+    return render(request, 'app/tools.html', { 'host' : host })
 
 # Performs the actions on the tool page, updating output accordingly
 def processTools(request):

@@ -49,7 +49,11 @@ def login(request):
                 username = ''
             if target is None:
                 target = ''
+
+            # BAD CODE:
             logger.info("Entering login with username " + username + " and target " + target)
+            # GOOD CODE:
+            # logger.debug("Entering login.")
             
             request.username = username
             request.target = target
@@ -204,7 +208,6 @@ def processRegister(request):
     # Get the Database Connection
     logger.info("Creating the Database connection")
     try:
-        
         with connection.cursor() as cursor:
             sqlQuery = "SELECT username FROM users WHERE username = '" + username + "'"
             cursor.execute(sqlQuery)
