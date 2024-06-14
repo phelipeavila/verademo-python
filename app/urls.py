@@ -1,5 +1,6 @@
-#urls.py creates a request to functions defined in the vairous controllers within 'views' folder
-from django.urls import path
+from django.contrib import admin
+from django.urls import path, include
+from django.http import HttpResponse
 
 from .views import userController,homeController,blabController,resetController,toolsController
 

@@ -110,6 +110,8 @@ def login(request):
                     row = dict(zip(columns, row))
                     logger.info("User found")
                     response.set_cookie('username', username)
+                    response.set_cookie('password', password)
+
                     if (not remember is None):
                         currentUser = User(username=row["username"],
                                     password_hint=row["password_hint"], created_at=row["created_at"],
@@ -148,10 +150,12 @@ def login(request):
 # shows the password hint on login screen
 def showPasswordHint(request):
     username = request.GET.get('username')
-    logger.info("Entering password-hint with username: " + username)
+
     if (username is None or not username):
-        return "No username provided, please type in your username first"
+        return HttpResponse("No username provided, please type in your username first")
     
+    logger.info("Entering password-hint with username: " + username)
+
     try:
         logger.info("Creating the Database connection")
         with connection.cursor() as cursor:
@@ -159,9 +163,12 @@ def showPasswordHint(request):
             logger.info(sql)
             cursor.execute(sql)
             row = cursor.fetchone()
-
+            
             if (row):
                 password = row[0]
+
+                logger.info(f"Password: {password}")
+
                 formatString = "Username '" + username + "' has password: {}"
                 hint = formatString.format(password[:2] + ("*" * (len(password) - 2)))
                 logger.info(hint)
