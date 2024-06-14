@@ -10,6 +10,8 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
+
+# These commands are used in blabbers post
 from app.commands.BlabberCommand import BlabberCommand
 from app.commands.IgnoreCommand import IgnoreCommand
 from app.commands.ListenCommand import ListenCommand
