@@ -81,11 +81,11 @@ def feed(request):
                     
                 request.blabsByMe = myBlabs
         except ConnectionError as ce:
-            logger.error("Unexpected connection error:", ce.exc_info()[0])
+            logger.error("Unexpected connection error:")
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error:")
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
             
@@ -117,11 +117,11 @@ def feed(request):
                     request.error = "Failed to add blab"
 
         except ConnectionError as ce:
-            logger.error("Unexpected connection error:", ce.exc_info()[0])
+            logger.error("Unexpected connection error:", ce)
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error:", e)
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
 
@@ -160,9 +160,9 @@ def morefeed(request):
                 ret += template.format(username = blab[0], content = blab[2], blab_name = blab[1],
                                        timestamp = blab[3].strftime("%b %d %Y"), blabid = blab[5], count = blab[4])    
     except ConnectionError as ce:
-        logger.error("Unexpected connection error:", ce.exc_info()[0])
+        logger.error("Unexpected connection error:", ce)
     except Exception as e:
-        logger.error("Unexpected error:", e.exc_info()[0])
+        logger.error("Unexpected error:", e)
 
     return HttpResponse(ret)
     
@@ -221,9 +221,9 @@ def blab(request):
 
                     response = render(request, 'app/blab.html', {})
         except ConnectionError as ce:
-            logger.error("Unexpected error:", ce.exc_info()[0])
+            logger.error("Unexpected error:", ce)
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error:", e)
 
         return response
     
@@ -255,9 +255,9 @@ def blab(request):
 
                 response = redirect("/blab?blabid=" + blabid)
         except ConnectionError as ce:
-            logger.error("Unexpected error:", ce.exc_info()[0])
+            logger.error("Unexpected error:", ce)
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error:", e)
 
     return response
 #
@@ -309,9 +309,9 @@ def blabbers(request):
 
                 response = render(request, 'app/blabbers.html', {})
         except ConnectionError as ce:
-            logger.error("Unexpected connection error:", ce.exc_info()[0])
+            logger.error("Unexpected connection error:", ce)
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error:", e)
 
         return response
     
@@ -344,8 +344,8 @@ def blabbers(request):
                 cmdObj.execute(blabberUsername)
                 return redirect('blabbers')       
         except ConnectionError as ce:
-            logger.error("Unexpected connection error:", ce.exc_info()[0])   
+            logger.error("Unexpected connection error:", ce)   
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error:", e)
         
         return response
