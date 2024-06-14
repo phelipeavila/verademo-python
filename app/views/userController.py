@@ -12,7 +12,6 @@ from email.mime.multipart import MIMEMultipart
 from django.shortcuts import redirect, render
 from django.http import JsonResponse, HttpResponse
 from django.db import connection, transaction, IntegrityError, DatabaseError
-from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_exempt
 import mimetypes
@@ -135,11 +134,11 @@ def login(request):
                     nextView = 'login'
                     response = render(request, 'app/' + nextView + '.html', {})
         except DatabaseError as db_err:
-            logger.error("Database error: " + db_err)
+            logger.error("Database error: " + str(db_err))
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})   
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error:", e)
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
 
@@ -234,7 +233,7 @@ def processRegister(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-        logger.error("Unexpected error:", e.exc_info()[0])
+        logger.error("Unexpected error:", e)
     
     return render(request, 'app/register.html')
 
@@ -305,7 +304,7 @@ def processRegisterFinish(request):
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error:", e)
         # except ClassNotFoundException as
         request.session['username'] = username
         emailUser(username)
@@ -335,7 +334,7 @@ def emailUser(username):
     except ConnectionRefusedError as conn_err:
         logger.error("Connection refused: " + str(conn_err))
     except Exception as e:
-        logger.error("Unexpected error:", sys.exc_info()[0])
+        logger.error("Unexpected error:", e)
 
 # handles redirect for profile requests
 def profile(request):
@@ -408,7 +407,7 @@ def showProfile(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-        logger.error("Unexpected error:", e.exc_info()[0])
+        logger.error("Unexpected error:", e)
         
     return render(request, 'app/profile.html', {})
 
@@ -471,7 +470,7 @@ def processProfile(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-        logger.error("Unexpected error:", sys.exc_info()[0])
+        logger.error("Unexpected error:", e)
         response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
         #response.status_code = 500
         return response
