@@ -8,10 +8,9 @@ Also see the `docs/flaws` folder for in-depth explanations of the various exploi
 
 Build the app:
 
-	cd app
-	mvn clean package
+	zip -r verademo-python.zip app verademo-python *.py requirements.txt
 
-The `app/target/verademo.war` file is the built app.  This is the file to be used for scanning.  Either upload this file to the Veracode platform for a Policy/Sandbox scan, or use it with the Veracode Pipeline scan.
+The verademo-python.zip file is the file to upload for scanning. Either upload this file to the Veracode platform for a Policy/Sandbox scan, or use it with the Veracode Pipeline scan.
 
 ## SCA scanning
 
