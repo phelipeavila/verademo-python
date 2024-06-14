@@ -400,7 +400,7 @@ def showProfile(request):
             cursor.execute(sql)
             myInfoResults = cursor.fetchone()
             if not myInfoResults:
-                return JsonResponse({'Error, no Inforesults found'})
+                return JsonResponse({'message':'Error, no Inforesults found'})
             # Send these values to our View
             request.hecklers = hecklers
             request.events = events
