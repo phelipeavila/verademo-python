@@ -135,7 +135,7 @@ def login(request):
                     nextView = 'login'
                     response = render(request, 'app/' + nextView + '.html', {})
         except DatabaseError as db_err:
-            logger.error("Database error: " + db_err)
+            logger.error("Database error: " + str(db_err))
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})   
         except Exception as e:
