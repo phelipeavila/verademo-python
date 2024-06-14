@@ -152,11 +152,7 @@ def showPasswordHint(request):
     username = request.GET.get('username')
 
     if (username is None or not username):
-<<<<<<< HEAD
         return HttpResponse("No username provided, please type in your username first")
-=======
-        return HttpResponse ("No username provided, please type in your username first")
->>>>>>> 7d95f7b7c344bf57c85d7a0bebb9e99768d43879
     
     logger.info("Entering password-hint with username: " + username)
 
