@@ -46,7 +46,7 @@ Also see the `docs` folder for in-depth explanations of the various exploits exp
 
 To build the container run this:
 
-    docker pull cshtino/verademo
+    docker pull cshtino/verademo;
     docker build --no-cache -t verademo-python .
 
 To run the container for local development run this:
