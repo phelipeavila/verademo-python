@@ -4,6 +4,7 @@ blabController interacts with blabs, and loads relevent pages such as 'Feed' and
 
 import logging
 import moment
+import sys
 
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
@@ -81,11 +82,11 @@ def feed(request):
                     
                 request.blabsByMe = myBlabs
         except ConnectionError as ce:
-            logger.error("Unexpected connection error:")
+            logger.error("Unexpected connection error:", ce)
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
         except Exception as e:
-            logger.error("Unexpected error:")
+            logger.error("Unexpected error:", e)
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
             
