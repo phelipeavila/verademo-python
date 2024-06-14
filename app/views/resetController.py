@@ -4,9 +4,8 @@ import subprocess
 import sqlite3
 import logging
 import random as rand
-# START VULN PACKAGE
-import moment
-# END
+import httplib2
+
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate
 from django.db import connection, transaction
@@ -52,14 +51,18 @@ users = [
         create("stuart", "Stuart", "Stuart Sessions"),
         create("scottsim", "Scott Simpson", "Scott Simpson")]
 
-authenticate(username = 'thiswaskevinsidea', password='hardcode')
 
 # Transfers the request depeneding on request type.
 def reset(request):
-    if(request.method == "GET"):
+    if(request.method == "GET"): 
         return showReset(request)
     elif(request.method == "POST"):
         return processReset(request)
+    else:
+        h = httplib2.Http(".cache", disable_ssl_certificate_validation=True) #CWE-295
+        h.add_credentials('thiswaskevinsidea','hardcode') #CWE-798
+        data=h.request("http://localhost/",method='GET')
+        return data
 
 # Loads the reset webpage
 def showReset(request):

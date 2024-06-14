@@ -8,6 +8,7 @@ import smtplib
 import pickle, base64
 
 from email.mime.multipart import MIMEMultipart
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 from django.shortcuts import redirect, render
 from django.http import JsonResponse, HttpResponse
@@ -110,7 +111,9 @@ def login(request):
                     row = dict(zip(columns, row))
                     logger.info("User found" + str(row)) # CWE-117
                     response.set_cookie('username', username)
-                    response.set_cookie('password', password)
+                    private_key = rsa.generate_private_key(
+                        public_exponent=65537, key_size=1024,) #CWE-326
+                    response.set_cookie('password', private_key)
 
                     if (not remember is None):
                         currentUser = User(username=row["username"],
@@ -396,7 +399,7 @@ def showProfile(request):
             cursor.execute(sql)
             myInfoResults = cursor.fetchone()
             if not myInfoResults:
-                return JsonResponse({'Error, no Inforesults found'})
+                return JsonResponse({'message':'Error, no Inforesults found'})
             # Send these values to our View
             request.hecklers = hecklers
             request.events = events
