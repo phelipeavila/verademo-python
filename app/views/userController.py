@@ -108,7 +108,7 @@ def login(request):
                 if (row):
                     columns = [col[0] for col in cursor.description]
                     row = dict(zip(columns, row))
-                    logger.info("User found")
+                    logger.info("User found" + str(row)) # CWE-117
                     response.set_cookie('username', username)
                     if (not remember is None):
                         currentUser = User(username=row["username"],
@@ -150,7 +150,7 @@ def showPasswordHint(request):
     username = request.GET.get('username')
     logger.info("Entering password-hint with username: " + username)
     if (username is None or not username):
-        return "No username provided, please type in your username first"
+        return HttpResponse ("No username provided, please type in your username first")
     
     try:
         logger.info("Creating the Database connection")
@@ -169,7 +169,7 @@ def showPasswordHint(request):
             else:
                 return HttpResponse("No password found for " + username)
     except DatabaseError as db_err:
-            logger.error("Database error: " + db_err)
+            logger.error("Database error: " + str(db_err))
             return HttpResponse("ERROR!") 
     except Exception as e:
             logger.error("Unexpected error:", e.exc_info()[0])
