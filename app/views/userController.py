@@ -135,11 +135,11 @@ def login(request):
                     nextView = 'login'
                     response = render(request, 'app/' + nextView + '.html', {})
         except DatabaseError as db_err:
-            logger.error("Database error: " + str(db_err))
+            logger.error("Database error", db_err)
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})   
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error", e)
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})
 
@@ -176,10 +176,10 @@ def showPasswordHint(request):
             else:
                 return HttpResponse("No password found for " + username)
     except DatabaseError as db_err:
-            logger.error("Database error: " + str(db_err))
+            logger.error("Database error", db_err)
             return HttpResponse("ERROR!") 
     except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
+            logger.error("Unexpected error", e)
         
     return HttpResponse("ERROR!")
 
@@ -234,7 +234,7 @@ def processRegister(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-        logger.error("Unexpected error:", e.exc_info()[0])
+        logger.error("Unexpected error", e)
     
     return render(request, 'app/register.html')
 
@@ -297,16 +297,15 @@ def processRegisterFinish(request):
                 logger.info(query)
                 # END EXAMPLE VULNERABILITY
         except IntegrityError as ie:
-            logger.error("Integrity error: " + ie)
+            logger.error("Integrity error", ie)
             return render(request, 'app/register.html')
         except ValueError as ve:
-            logger.error("Value error: " + ve)
+            logger.error("Value error", ve)
             return render(request, 'app/register.html')
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         except Exception as e:
-            logger.error("Unexpected error:", e.exc_info()[0])
-        # except ClassNotFoundException as
+            logger.error("Unexpected error", e)
         request.session['username'] = username
         emailUser(username)
         return redirect('/login?username=' + username)
@@ -331,11 +330,11 @@ def emailUser(username):
         with smtplib.SMTP("localhost", 1025) as server:
             server.send_message(message)
     except smtplib.SMTPException as smtp_err:
-        logger.error("SMTP error: " + str(smtp_err))
+        logger.error("SMTP error", smtp_err)
     except ConnectionRefusedError as conn_err:
-        logger.error("Connection refused: " + str(conn_err))
+        logger.error("Connection refused", conn_err)
     except Exception as e:
-        logger.error("Unexpected error:", sys.exc_info()[0])
+        logger.error("Unexpected error", e)
 
 # handles redirect for profile requests
 def profile(request):
@@ -408,7 +407,7 @@ def showProfile(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-        logger.error("Unexpected error:", e.exc_info()[0])
+        logger.error("Unexpected error", e)
         
     return render(request, 'app/profile.html', {})
 
@@ -471,7 +470,7 @@ def processProfile(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-        logger.error("Unexpected error:", sys.exc_info()[0])
+        logger.error("Unexpected error", e)
         response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
         #response.status_code = 500
         return response
@@ -539,10 +538,6 @@ def processProfile(request):
         
         except Exception as ex :
             logger.error(ex)
-        '''
-        except IllegalStateException as e:
-            logger.error(e)
-        '''
     
     return response
 
@@ -582,13 +577,13 @@ def downloadImage(request):
                 response.headers['Content-Disposition'] = 'attachment; filename=' + imageName
                 return response
     except ValueError as ve:
-            logger.error("Security Error: " + str(ve))
+            logger.error("Security Error", ve)
             return render(request, "app/profile.html", {"error" : ve})
     except FileNotFoundError as fnfe:
-            logger.error("File Error: " + str(fnfe))
+            logger.error("File Error", fnfe)
             return render(request, "app/profile.html", {"error" : fnfe})
     except Exception as e:
-            logger.error("Unexpected error:", sys.exc_info()[0])
+            logger.error("Unexpected error", e)
             return render(request, "app/profile.html", {"error" : e})
 
 
@@ -614,6 +609,8 @@ def usernameExists(username):
         logger.error(er.sqlite_errorcode,er.sqlite_errorname)
     except ModuleNotFoundError as ex:
         logger.error(ex)
+    except Exception as e:
+        logger.error("Unexpected error", e)
 
     logger.info("Username: " + username + " already exists. Try again.")
     return True
@@ -662,6 +659,9 @@ def updateUsername(oldUsername, newUsername):
         logger.error(ex)
     except IntegrityError as er:
         logger.error(er)
+    except Exception as e:
+        logger.error("Unexpected error", e)
+
     # Error occurred
     return False
 

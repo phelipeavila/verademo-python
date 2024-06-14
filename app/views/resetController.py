@@ -162,6 +162,8 @@ def processReset(request):
          logger.error(er)
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
+    except Exception as e:
+        logger.error("Unexpected error", e)
 
     return redirect("reset")
 

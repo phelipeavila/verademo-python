@@ -3,6 +3,7 @@ import logging
 import subprocess
 import sys
 import shutil
+import socket
 
 from django.shortcuts import render
 
@@ -19,14 +20,15 @@ def tools(request):
 
 # Loads the tool webpage    
 def showTools(request):
-    host = request.META['SERVER_NAME']
-    return render(request, 'app/tools.html', { 'host' : host })
+    request.host = ""
+    return render(request, 'app/tools.html', {})
 
 # Performs the actions on the tool page, updating output accordingly
 def processTools(request):
     host = request.POST.get('host')
     fortunefile = request.POST.get('fortunefile')
     request.file = fortune(fortunefile) if fortunefile else ""
+    request.host = host
     request.ping = ping(host) if host else ""
     
     
@@ -36,18 +38,21 @@ def processTools(request):
 # pings selected host and outputs the result
 def ping(host):
     output = ""
-    print("Pinging", host)
+    logger.info("Pinging " + host)
     try:
         p = subprocess.Popen(['ping', '-c', '1', host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         stdout, stderr = p.communicate(timeout=5)
     
         output = stdout.decode() if stdout else ""
-        print("Exit Code:", p.returncode)
+        logger.info(output)
+        logger.info("Exit Code:", p.returncode)
     except subprocess.TimeoutExpired:
-        print("Ping timed out")
-    except Exception as e:
-        print("Error:", e)
+        logger.error("Ping timed out")
+        output = "ping: unknown host " + host
+    except Exception as e:  
+        logger.error("Error", e)
+        output = "ping: unknown host " + host
 
     return output
 
@@ -56,33 +61,24 @@ def ping(host):
 def fortune(file):
     cmd = f"/usr/games/fortune {file}"
     output = ""
-    logger.info(output)
-    logger.info("fortune:\n")
+    logger.info("Entering fortune")
     sys.stdout.flush()
 
     if shutil.which("fortune") is None:
-        logger.info("After")
         sys.stdout.flush()
         return "fortune not found"
 
     try: 
         p = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        logger.info("fortune after try1:\n")
-        sys.stdout.flush()
         try:
             stdout, stderr = p.communicate(timeout=5)
             output = stdout.decode() if stdout else ""
-            logger.info("fortune output:\n")
-            sys.stdout.flush()
         except subprocess.TimeoutExpired:
-            logger.info("Fortune timed out")
-            sys.stdout.flush()
+            logger.error("Fortune timed out")
         except Exception as e:
-            logger.info("Error:", e)
-            sys.stdout.flush()
+            logger.error("Error", e)
     except Exception as e:
-        logger.info("Error:", e)
-        sys.stdout.flush()
+        logger.error("Error", e)
         
     return output
 
