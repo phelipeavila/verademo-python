@@ -5,7 +5,7 @@ The purpose of this page is to give the user functionality to check the uptime o
 
 
 # Mitigate 
-* Validate both ping and fortune functions
+* Validate both ping and fortune functions (for validation for input)
 
 # Remediate
 * Create validation for host and use a whitelist for fortune files.
