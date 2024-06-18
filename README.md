@@ -43,7 +43,7 @@ Then register as a new user and add some feeds
 
 To run the program locally without using docker run this:
 
-    pip install requirements.txt
+    pip install -r requirements.txt
     python manage.py runserver
 
 To be able to use the fortune feature in tools (UNIX exclusive), run this:
