@@ -39,7 +39,7 @@ Navigate to: `http://127.0.0.1:8080`.
 
 Then register as a new user and add some feeds
 
-## Run locally without Docker (UNIX/Mac only)
+## Run locally without Docker (Linux/Mac only)
 
 To run the program locally without using docker run this:
 
@@ -48,7 +48,7 @@ To run the program locally without using docker run this:
     pip install -r requirements.txt
     python manage.py runserver
 
-To be able to use the fortune feature in tools (UNIX exclusive), run this:
+To be able to use the fortune feature in tools (Linux exclusive), run this before running server:
     apt-get install -y fortune-mod
 
 Navigate to: `http://127.0.0.1:8000`
