@@ -48,7 +48,8 @@ To run the program locally without using docker run this:
     pip install -r requirements.txt
     python manage.py runserver
 
-To be able to use the fortune feature in tools (Linux exclusive), run this before running server:
+To be able to use the fortune feature in tools (Linux exclusive), run this before running the server:
+
     apt-get install -y fortune-mod
 
 Navigate to: `http://127.0.0.1:8000`
