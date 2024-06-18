@@ -43,6 +43,8 @@ Then register as a new user and add some feeds
 
 To run the program locally without using docker run this:
 
+    python3 -m venv env
+    source env/bin/activate
     pip install -r requirements.txt
     python manage.py runserver
 
