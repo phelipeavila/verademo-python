@@ -39,6 +39,18 @@ Navigate to: `http://127.0.0.1:8080`.
 
 Then register as a new user and add some feeds
 
+## Run locally without Docker
+
+To run the program locally without using docker run this:
+
+    pip install requirements.txt
+    python manage.py runserver
+
+To be able to use the fortune feature in tools (UNIX exclusive), run this:
+    apt-get install -y fortune-mod
+
+Navigate to: `http://127.0.0.1:8000`
+
 ## Exploitation Demos
 
 See the [DEMO_NOTES](DEMO_NOTES.md) file for information on using this application with the various Veracode scan types.
