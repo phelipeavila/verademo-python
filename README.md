@@ -39,7 +39,7 @@ Navigate to: `http://127.0.0.1:8080`.
 
 Then register as a new user and add some feeds
 
-## Run locally without Docker (UNIX/Max only)
+## Run locally without Docker (UNIX/Mac only)
 
 To run the program locally without using docker run this:
 
