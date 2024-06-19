@@ -26,9 +26,33 @@ Blab-a-Gag is a fairly simple forum type application which allows:
 
 If you don't already have Docker this is a prerequisite.
 
-    docker run -p 8080:8080 veracode/vulnerable-verademo-java
+To build the container run this:
+
+    docker pull cshtino/verademo;
+    docker build --no-cache -t verademo-python .
+
+To run the container for local development run this:
+
+    docker run --rm -p 8080:8080 --name verademo verademo-python
 
 Navigate to: `http://127.0.0.1:8080`.
+
+Then register as a new user and add some feeds
+
+## Run locally without Docker (Linux/Mac only)
+
+To run the program locally without using docker run this:
+
+    python3 -m venv env
+    source env/bin/activate
+    pip install -r requirements.txt
+    python manage.py runserver
+
+To be able to use the fortune feature in tools (Linux exclusive), run this before running the server:
+
+    apt-get install -y fortune-mod
+
+Navigate to: `http://127.0.0.1:8000`
 
 ## Exploitation Demos
 
@@ -41,16 +65,3 @@ Also see the `docs` folder for in-depth explanations of the various exploits exp
 
 - Django (Version 4.2.13)
 - sqlite3 (Supported by Django)
-
-## Development
-
-To build the container run this:
-
-    docker pull cshtino/verademo;
-    docker build --no-cache -t verademo-python .
-
-To run the container for local development run this:
-
-    docker run --rm -p 8080:8080 --name verademo verademo-python
-
-Then register as a new user and add some feeds
