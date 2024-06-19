@@ -28,11 +28,11 @@ If you don't already have Docker this is a prerequisite.
 
 ### Download Docker
 
-Visit [docker desktop](https://www.docker.com/products/docker-desktop/) and download your compatible version.
-Follow installation instructions
-Open the app.
+Visit [docker desktop](https://www.docker.com/products/docker-desktop/) and download your compatible version.\
+Follow installation instructions\
+Open the app.\
 
-### To build/run the container run this:
+### To build/run the container run this in terminal:
 
     docker run -p 8080:8080 --name verademo ssessions/verademo-python
 
