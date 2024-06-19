@@ -26,18 +26,19 @@ Blab-a-Gag is a fairly simple forum type application which allows:
 
 If you don't already have Docker this is a prerequisite.
 
-To build the container run this:
+### Download Docker
 
-    docker pull cshtino/verademo;
-    docker build --no-cache -t verademo-python .
+Visit [docker desktop](https://www.docker.com/products/docker-desktop/) and download your compatible version.\
+Follow installation instructions\
+Open the app.
 
-To run the container for local development run this:
+### In terminal:
 
-    docker run --rm -p 8080:8080 --name verademo verademo-python
+    docker run -p 8080:8080 --name verademo ssessions/verademo-python
 
 Navigate to: `http://127.0.0.1:8080`.
 
-Then register as a new user and add some feeds
+Then register as a new user and add some feeds!
 
 ## Run locally without Docker (Linux/Mac only)
 
@@ -51,8 +52,6 @@ To run the program locally without using docker run this:
 To be able to use the fortune feature in tools (Linux exclusive), run this before running the server:
 
     apt-get install -y fortune-mod
-
-Navigate to: `http://127.0.0.1:8000`
 
 ## Exploitation Demos
 
