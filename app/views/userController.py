@@ -137,22 +137,11 @@ def login(request):
                     nextView = 'login'
                     response = render(request, 'app/' + nextView + '.html', {})
         except DatabaseError as db_err:
-<<<<<<< HEAD
             logger.error("Database error", db_err)
             nextView = 'login'
             response = render(request, 'app/' + nextView + '.html', {})   
         except Exception as e:
             logger.error("Unexpected error", e)
-=======
-            logger.error("Database error: " + str(db_err))
-            nextView = 'login'
-            response = render(request, 'app/' + nextView + '.html', {})   
-        except Exception as e:
-            logger.error("Unexpected error:", e)
->>>>>>> abd2975 (Merge)
-            nextView = 'login'
-            response = render(request, 'app/' + nextView + '.html', {})
-
         logger.info("Redirecting to view: " + nextView)
             
         return response
@@ -244,11 +233,7 @@ def processRegister(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-<<<<<<< HEAD
         logger.error("Unexpected error", e)
-=======
-        logger.error("Unexpected error:", e)
->>>>>>> abd2975 (Merge)
     
     return render(request, 'app/register.html')
 
@@ -319,12 +304,8 @@ def processRegisterFinish(request):
         except sqlite3.Error as er:
             logger.error(er.sqlite_errorcode,er.sqlite_errorname)
         except Exception as e:
-<<<<<<< HEAD
             logger.error("Unexpected error", e)
-=======
-            logger.error("Unexpected error:", e)
-        # except ClassNotFoundException as
->>>>>>> abd2975 (Merge)
+
         request.session['username'] = username
         emailUser(username)
         return redirect('/login?username=' + username)
@@ -353,11 +334,8 @@ def emailUser(username):
     except ConnectionRefusedError as conn_err:
         logger.error("Connection refused", conn_err)
     except Exception as e:
-<<<<<<< HEAD
         logger.error("Unexpected error", e)
-=======
-        logger.error("Unexpected error:", e)
->>>>>>> abd2975 (Merge)
+
 
 # handles redirect for profile requests
 def profile(request):
@@ -430,11 +408,8 @@ def showProfile(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-<<<<<<< HEAD
         logger.error("Unexpected error", e)
-=======
-        logger.error("Unexpected error:", e)
->>>>>>> abd2975 (Merge)
+
         
     return render(request, 'app/profile.html', {})
 
@@ -497,11 +472,7 @@ def processProfile(request):
     except sqlite3.Error as ex :
         logger.error(ex.sqlite_errorcode, ex.sqlite_errorname)
     except Exception as e:
-<<<<<<< HEAD
         logger.error("Unexpected error", e)
-=======
-        logger.error("Unexpected error:", e)
->>>>>>> abd2975 (Merge)
         response = JsonResponse({'message':"<script>alert('An error occurred, please try again.');</script>"},status=500)
         #response.status_code = 500
         return response
