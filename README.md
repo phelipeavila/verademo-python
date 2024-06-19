@@ -30,9 +30,9 @@ If you don't already have Docker this is a prerequisite.
 
 Visit [docker desktop](https://www.docker.com/products/docker-desktop/) and download your compatible version.\
 Follow installation instructions\
-Open the app.\
+Open the app.
 
-### To build/run the container run this in terminal:
+### In terminal:
 
     docker run -p 8080:8080 --name verademo ssessions/verademo-python
 
@@ -52,7 +52,6 @@ To run the program locally without using docker run this:
 To be able to use the fortune feature in tools (Linux exclusive), run this before running the server:
 
     apt-get install -y fortune-mod
-
 
 ## Exploitation Demos
 
