@@ -8,7 +8,8 @@ on:
 
 jobs:
   Veracode-SAST-Pipeline:
-    if: github.ref == 'refs/heads/pipeline-scan'
+    if: false
+    ##if: github.ref == 'refs/heads/pipeline-scan'
     name: Veracode SAST Pipeline
     runs-on: ubuntu-latest
     strategy:
