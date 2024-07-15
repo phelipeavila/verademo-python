@@ -47,6 +47,10 @@ jobs:
       options: --user root
 
     steps:
+      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Zip & Scan
         run: |
           zip -r -v ${{ vars.TARGET_FILE_PATH }} . -i '*.py' '*.html'
@@ -60,17 +64,16 @@ jobs:
     strategy:
       fail-fast: true
     env:
-      APPLICATION_NAME: Verademo-java-1
+      APPLICATION_NAME: Verademo-python
     container:
       image: veracode/api-wrapper-java:latest
       options: --user root
 
     steps:
-      - name: Download
-        uses: actions/download-artifact@v4
+      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v4
         with:
-          name: artfacts
-          path: .
+          persist-credentials: false
 
       - name: Scan
         run: |
