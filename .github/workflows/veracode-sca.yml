@@ -42,5 +42,5 @@ jobs:
           export EXTRA_ARGS='--update-advisor --uri-as-name' 
 
           curl -sSL https://download.sourceclear.com/ci.sh | bash -s -- package --source . --output verascan --trust $EXTRA_ARGS
-					ls -lah
+          ls -lah
         continue-on-error: true
