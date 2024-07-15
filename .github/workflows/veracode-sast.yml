@@ -60,13 +60,14 @@ jobs:
         continue-on-error: true
 
   Veracode-SAST-Sandbox:
-    if: github.ref == 'refs/heads/sandbox-scan'
+    ## if: github.ref == 'refs/heads/sandbox-scan'
+    if: true
     name: Veracode SAST Sandbox
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
     env:
-      APPLICATION_NAME: Verademo-python
+      APPLICATION_NAME: Verademo-python-1
     container:
       image: veracode/api-wrapper-java:latest
       options: --user root
@@ -79,6 +80,6 @@ jobs:
 
       - name: Scan
         run: |
-          ### zip -r -v ${{ vars.TARGET_FILE_PATH }} . -i '*.js' '*.html'
+          zip -r -v ${{ vars.TARGET_FILE_NAME }} . -i '*.py' '*.js' '*.html'
           java -jar /opt/veracode/api-wrapper.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -action UploadAndScan -createsandbox true -sandboxname "${{ github.ref }}" -deleteincompletescan 2  -createprofile false -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath ${{ vars.TARGET_FILE_NAME }}
         continue-on-error: true
