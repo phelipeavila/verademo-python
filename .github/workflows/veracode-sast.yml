@@ -53,12 +53,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Zip & Scan
-        run: |
-          zip -r -v ${{ vars.TARGET_FILE_NAME }} . -i '*.py' '*.js' '*.html'
-          java -jar /opt/veracode/api-wrapper.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath ${{ vars.TARGET_FILE_NAME }} -teams Showroom_Phelipe
-        continue-on-error: true
+
   
+      - name: Veracode Upload And Scan
+        uses: veracode/veracode-uploadandscan-action@0.2.7
+        with:
+          appname: "${{ env.APPLICATION_NAME }}"
+          createprofile: true
+          deleteincompletescan: 2
+          filepath: .
+          vid: '${{ secrets.VERACODE_ID }}'
+          vkey: '${{ secrets.VERACODE_KEY }}'
 
     
 
