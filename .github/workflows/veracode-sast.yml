@@ -1,0 +1,76 @@
+name: Veracode Demo - SAST
+on:
+  push:
+    branches:
+      - pipeline-scan
+      - policy-scan
+      - sandbox-scan
+
+jobs:
+  Veracode-SAST-Pipeline:
+    if: github.ref == 'refs/heads/pipeline-scan'
+    name: Veracode SAST Pipeline
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    env:
+      APPLICATION_NAME: Verademo-python
+      ## POLICY_NAME: Policy-test-2
+      POLICY_NAME: Veracode Recommended High
+    container:
+      image: veracode/pipeline-scan:latest
+      options: --user root
+
+    steps:
+      - name: Zip & Scan
+        run: |
+          zip -r -v ${{ vars.TARGET_FILE_PATH }} . -i '*.py' '*.js' '*.html'
+          java -jar /opt/veracode/pipeline-scan.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -f ${{ vars.TARGET_FILE_NAME }} -p "${{ env.APPLICATION_NAME }}" -pn "${{ env.POLICY_NAME }}"
+          ## java -jar /opt/veracode/pipeline-scan.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -rp "${{ env.POLICY_NAME }}" && java -jar /opt/veracode/pipeline-scan.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -f ${{ vars.TARGET_FILE_NAME }} -p "${{ env.APPLICATION_NAME }}" --policy_file "${{ env.POLICY_NAME }}.json"
+        continue-on-error: true
+
+  Veracode-SAST-Policy:
+    if: github.ref == 'refs/heads/policy-scan'
+    name: Veracode SAST Policy
+    runs-on: ubuntu-latest
+    needs: [Build]
+    strategy:
+      fail-fast: true
+    env:
+      APPLICATION_NAME: Verademo-python
+    container:
+      image: veracode/api-wrapper-java:latest
+      options: --user root
+
+    steps:
+      - name: Zip & Scan
+        run: |
+          zip -r -v ${{ vars.TARGET_FILE_PATH }} . -i '*.py' '*.html'
+          java -jar /opt/veracode/api-wrapper.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath ${{ vars.TARGET_FILE_NAME }}
+        continue-on-error: true
+
+  Veracode-SAST-Sandbox:
+    if: github.ref == 'refs/heads/sandbox-scan'
+    name: Veracode SAST Sandbox
+    runs-on: ubuntu-latest
+    needs: [Build]
+    strategy:
+      fail-fast: true
+    env:
+      APPLICATION_NAME: Verademo-java-1
+    container:
+      image: veracode/api-wrapper-java:latest
+      options: --user root
+
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v4
+        with:
+          name: artfacts
+          path: .
+
+      - name: Scan
+        run: |
+          ### zip -r -v ${{ vars.TARGET_FILE_PATH }} . -i '*.js' '*.html'
+          java -jar /opt/veracode/api-wrapper.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -action UploadAndScan -createsandbox true -sandboxname "${{ github.ref }}" -deleteincompletescan 2  -createprofile false -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath ${{ vars.TARGET_FILE_NAME }}
+        continue-on-error: true
