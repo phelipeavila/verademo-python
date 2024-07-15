@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: true
     env:
-      APPLICATION_NAME: Verademo-python
+      APPLICATION_NAME: Verademo-python-1
       ## POLICY_NAME: Policy-test-2
       POLICY_NAME: Veracode Recommended High
     container:
