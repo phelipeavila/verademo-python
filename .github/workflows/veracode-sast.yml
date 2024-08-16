@@ -6,92 +6,131 @@ on:
       - policy-scan
       - sandbox-scan
 
+env:
+  package_path: 'verascan'
+  package_name: 'veracode-auto-pack-verademo-python-python.zip'
+# https://docs.veracode.com/r/About_auto_packaging#packaged-artifacts
+
 jobs:
+  Build:
+    name: Veracode Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Veracode Package
+        env:
+          VERACODE_API_KEY_ID: ${{ secrets.VID }}
+          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
+        run: |
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          ./veracode package --source . --output ${{env.package_path}} --trust
+          
+          # mv ${{env.package_path}}/${{env.package_name}} ${{env.package_path}}/package
+          # https://docs.veracode.com/r/About_auto_packaging#packaged-artifacts
+      - name: Upload artfacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artfacts
+          path: ${{env.package_path}}/${{env.package_name}}
+
+  Veracode-SCA:
+    if: github.ref == 'refs/heads/pipeline-scan'
+    name: Veracode SCA Pipeline
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Archive Release
+        env:
+          SCAN_DIR: '.'
+          SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
+          SRCCLR_SCM_REF_TYPE: 'branch'
+          SRCCLR_SCM_REF: ${{ github.ref }}
+          SRCCLR_SCM_REV: ${{ github.run_id }}
+          EXTRA_ARGS: '--update-advisor --uri-as-name' 
+        run: |
+          curl -sSL https://download.sourceclear.com/ci.sh | bash -s -- scan $EXTRA_ARGS
+        continue-on-error: true
+
   Veracode-SAST-Pipeline:
-    if: false
-    ##if: github.ref == 'refs/heads/pipeline-scan'
+    if: github.ref == 'refs/heads/pipeline-scan'
     name: Veracode SAST Pipeline
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-    env:
-      APPLICATION_NAME: Verademo-python
-      ## POLICY_NAME: Policy-test-2
-      POLICY_NAME: Veracode Recommended High
-    container:
-      image: veracode/pipeline-scan:latest
-      options: --user root
+    needs: [Build]
 
     steps:
-      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
-        uses: actions/checkout@v4
+      - name: Download artfacts
+        uses: actions/download-artifact@v4
         with:
-          persist-credentials: false
+          name: artfacts
+          path: .
 
-      - name: Zip & Scan
+      - name: Scan with default policy
+        env:
+          POLICY_NAME: Veracode Recommended Medium
         run: |
-          zip -r -v ${{ vars.TARGET_FILE_NAME }} . -i '*.py' '*.js' '*.html'
-          java -jar /opt/veracode/pipeline-scan.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -f ${{ vars.TARGET_FILE_NAME }} -p "${{ env.APPLICATION_NAME }}" -pn "${{ env.POLICY_NAME }}"
-          ## java -jar /opt/veracode/pipeline-scan.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -rp "${{ env.POLICY_NAME }}" && java -jar /opt/veracode/pipeline-scan.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -f ${{ vars.TARGET_FILE_NAME }} -p "${{ env.APPLICATION_NAME }}" --policy_file "${{ env.POLICY_NAME }}.json"
+          curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+          unzip -u pipeline-scan-LATEST.zip
+          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "${{env.package_name}}" -pn "${{ env.POLICY_NAME }}" --issue_details true --json_output true
         continue-on-error: true
 
-  Veracode-SAST-Policy:
-    if: true
-    ## if: github.ref == 'refs/heads/policy-scan'
+      - name: Scan with custom policy
+        env:
+          POLICY_NAME: Policy-test-2
+        run: |
+          curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+          unzip -u pipeline-scan-LATEST.zip
+          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -rp "${{ env.POLICY_NAME }}"
+          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
+        continue-on-error: true
+
+  Veracode-Policy-Scan:
+    # if: github.ref == 'refs/heads/policy-scan'
     name: Veracode SAST Policy
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-    env:
-      APPLICATION_NAME: Verademo-python-2
-    container:
-      image: veracode/api-wrapper-java:latest
-      options: --user root
+    needs: [Build]
 
     steps:
-      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
-        uses: actions/checkout@v4
+      - name: Download artfacts
+        uses: actions/download-artifact@v4
         with:
-          persist-credentials: false
-      - name: Zip & Scan
+          name: artfacts
+          path: .
+
+      - name: Scan
+        env:
+          APPLICATION_NAME: Verademo-java-1
         run: |
-          zip -r -v ${{ vars.TARGET_FILE_NAME }} . -i '*.py' '*.js' '*.html'
-          java -jar /opt/veracode/api-wrapper.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath ${{ vars.TARGET_FILE_NAME }} -teams Showroom_Phelipe
+          curl -L -o veracode-wrapper.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/24.7.14.0/vosp-api-wrappers-java-24.7.14.0.jar
+          java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "${{env.package_name}}"
         continue-on-error: true
-  
-      - name: Veracode Upload And Scan
-        uses: veracode/veracode-uploadandscan-action@0.2.7
-        with:
-          appname: "${{ env.APPLICATION_NAME }}"
-          createprofile: true
-          deleteincompletescan: 2
-          filepath: .
-          vid: '${{ secrets.VERACODE_ID }}'
-          vkey: '${{ secrets.VERACODE_KEY }}'
 
-    
-
-  Veracode-SAST-Sandbox:
-    ## if: github.ref == 'refs/heads/sandbox-scan'
-    if: false
+  Veracode-Sandbox-Scan:
+    # if: github.ref == 'refs/heads/sandbox-scan'
     name: Veracode SAST Sandbox
     runs-on: ubuntu-latest
+    needs: [Build]
     strategy:
       fail-fast: true
     env:
-      APPLICATION_NAME: Verademo-python-1
-    container:
-      image: veracode/api-wrapper-java:latest
-      options: --user root
+      APPLICATION_NAME: Verademo-java-1
 
     steps:
-      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
-        uses: actions/checkout@v4
+      - name: Download
+        uses: actions/download-artifact@v4
         with:
-          persist-credentials: false
+          name: artfacts
+          path: .
 
       - name: Scan
         run: |
-          zip -r -v ${{ vars.TARGET_FILE_NAME }} . -i '*.py' '*.js' '*.html'
-          java -jar /opt/veracode/api-wrapper.jar -vid "${{ secrets.VERACODE_ID }}" -vkey "${{ secrets.VERACODE_KEY }}" -action UploadAndScan -createsandbox true -sandboxname "${{ github.ref }}" -deleteincompletescan 2  -createprofile false -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath ${{ vars.TARGET_FILE_NAME }}
+          curl -L -o veracode-wrapper.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/24.7.14.0/vosp-api-wrappers-java-24.7.14.0.jar
+          java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "${{env.package_name}}" -createsandbox true -sandboxname "${{ github.ref }}" 
         continue-on-error: true
