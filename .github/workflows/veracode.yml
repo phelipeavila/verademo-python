@@ -106,7 +106,7 @@ jobs:
 
       - name: Scan
         env:
-          APPLICATION_NAME: Verademo-java-1
+          APPLICATION_NAME: Verademo-python-1
         run: |
           curl -L -o veracode-wrapper.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/24.7.14.0/vosp-api-wrappers-java-24.7.14.0.jar
           java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "${{env.package_name}}"
@@ -120,7 +120,7 @@ jobs:
     strategy:
       fail-fast: true
     env:
-      APPLICATION_NAME: Verademo-java-1
+      APPLICATION_NAME: Verademo-python-1
 
     steps:
       - name: Download
