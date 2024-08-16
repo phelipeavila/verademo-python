@@ -1,4 +1,4 @@
-name: Veracode Demo - SAST
+name: Veracode Demo
 on:
   push:
     branches:

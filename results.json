@@ -1,0 +1,1947 @@
+{
+   "_links": {
+      "root": {
+         "href": "/",
+         "name": "",
+         "templated": false
+      },
+      "self": {
+         "href": "/scans/214014ea-be37-4b2b-bd09-cde556cc8579/findings",
+         "name": "",
+         "templated": false
+      },
+      "help": {
+         "href": "https://help.veracode.com/reader/tS9CaFwL4_lbIEWWomsJoA/ovfZGgu96UINQxIuTqRDwg",
+         "name": "",
+         "templated": false
+      },
+      "create": {
+         "href": "",
+         "name": "",
+         "templated": false
+      },
+      "start": {
+         "href": "",
+         "name": "",
+         "templated": false
+      },
+      "details": {
+         "href": "",
+         "name": "",
+         "templated": false
+      },
+      "upload": {
+         "href": "",
+         "name": "",
+         "templated": false
+      },
+      "cancel": {
+         "href": "",
+         "name": "",
+         "templated": false
+      }
+   },
+   "scan_id": "214014ea-be37-4b2b-bd09-cde556cc8579",
+   "scan_status": "SUCCESS",
+   "message": "Scan successful. Results size: 135518 bytes",
+   "modules": [
+      "JS files within source.zip",
+      "Python files within source.zip"
+   ],
+   "modules_count": 2,
+   "findings": [
+      {
+         "title": "hashlib.md5",
+         "issue_id": 1000,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Use of a Broken or Risky Cryptographic Algorithm",
+         "cwe_id": "327",
+         "display_text": "\u003cspan\u003eThis function uses the hashlib.md5() function, which uses a hash algorithm that is considered weak. In recent years, researchers have demonstrated ways to breach many uses of previously-thought-safe hash functions such as MD5. \u003c/span\u003e \u003cspan\u003eConsider using a stronger algorithm in order to prevent attackers from being able to manipulate hash results. If this algorithm is being used to hash passwords, then consider using a strong computationally-hard algorithm such as PBKDF2 or bcrypt instead of a plain hashing algorithm.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/327.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/models.py",
+               "line": 27,
+               "function_name": "create"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "SECRET_KEY",
+         "issue_id": 1001,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "s",
+         "issue_type": "Use of Hard-coded Password",
+         "cwe_id": "259",
+         "display_text": "\u003cspan\u003eThis variable assignment uses a hard-coded password that may compromise system security in a way that cannot be easily remedied.  The use of a hard-coded password significantly increases the possibility that the account being protected will be compromised.  Moreover, the password cannot be changed without patching the software.  If a hard-coded password is compromised in a commercial product, all deployed instances may be vulnerable to attack.  In some cases, this finding may indicate a reference to a password (e.g. the name of a key in a properties file) rather than an actual password. SECRET_KEY\u003c/span\u003e \u003cspan\u003eStore passwords out-of-band from the application code.  Follow best practices for protecting credentials stored in locations such as configuration or properties files. An HSM may be appropriate for particularly sensitive credentials.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/259.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/verademo-python/settings.py",
+               "line": 24
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "httplib2.Http",
+         "issue_id": 1002,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Certificate Validation",
+         "cwe_id": "295",
+         "display_text": "\u003cspan\u003eIn this codepath (httplib2.Http), strict verification of the SSL/TLS certificate chain is disabled.  Failing to validate the certificate chain leaves the connection vulnerable to man-in-the-middle attacks.\u003c/span\u003e \u003cspan\u003eAlways enable strict validation of certificates when using SSL/TLS.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/295.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/resetController.py",
+               "line": 62,
+               "function_name": "reset"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "httplib2.Http.add_credentials",
+         "issue_id": 1003,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Use of Hard-coded Credentials",
+         "cwe_id": "798",
+         "display_text": "\u003cspan\u003eThe application contains hard-coded information that may contain credentials to an external service.  The use of hard-coded credentials significantly increases the possibility that the account being protected will be compromised. httplib2.Http.add_credentials\u003c/span\u003e \u003cspan\u003eStore credentials out-of-band from the application code.  Follow best practices for protecting credentials stored in locations such as configuration or properties files.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/798.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/resetController.py",
+               "line": 63,
+               "function_name": "reset"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "random.choice",
+         "issue_id": 1004,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Insufficient Entropy",
+         "cwe_id": "331",
+         "display_text": "\u003cspan\u003eStandard random number generators do not provide a sufficient amount of entropy when used for security purposes. Attackers can brute force the output of pseudorandom number generators such as rand().\u003c/span\u003e \u003cspan\u003eIf this random number is used where security is a concern, such as generating passwords, session keys, authentication etc, use a trusted cryptographic random number generator instead. The new secrets module introduced in Python 3.6, is used for generating such cryptographically strong random number generators.\u003c/span\u003e \u003cspan\u003eReferences:\u003ca href=\"https://cwe.mitre.org/data/definitions/331.html\"\u003eCWE\u003c/a\u003e \u003cBR\u003e\u003ca href=\"https://docs.python.org/3/library/secrets.html#module-secrets\"\u003esecrets module\u003c/a\u003e\u003cBR\u003e\u003ca href=\"https://cryptography.io/en/latest/\"\u003ecryptography.io\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/resetController.py",
+               "line": 110,
+               "function_name": "processReset"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "random.randint",
+         "issue_id": 1005,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Insufficient Entropy",
+         "cwe_id": "331",
+         "display_text": "\u003cspan\u003eStandard random number generators do not provide a sufficient amount of entropy when used for security purposes. Attackers can brute force the output of pseudorandom number generators such as rand().\u003c/span\u003e \u003cspan\u003eIf this random number is used where security is a concern, such as generating passwords, session keys, authentication etc, use a trusted cryptographic random number generator instead. The new secrets module introduced in Python 3.6, is used for generating such cryptographically strong random number generators.\u003c/span\u003e \u003cspan\u003eReferences:\u003ca href=\"https://cwe.mitre.org/data/definitions/331.html\"\u003eCWE\u003c/a\u003e \u003cBR\u003e\u003ca href=\"https://docs.python.org/3/library/secrets.html#module-secrets\"\u003esecrets module\u003c/a\u003e\u003cBR\u003e\u003ca href=\"https://cryptography.io/en/latest/\"\u003ecryptography.io\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/resetController.py",
+               "line": 127,
+               "function_name": "processReset"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "random.randint",
+         "issue_id": 1006,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Insufficient Entropy",
+         "cwe_id": "331",
+         "display_text": "\u003cspan\u003eStandard random number generators do not provide a sufficient amount of entropy when used for security purposes. Attackers can brute force the output of pseudorandom number generators such as rand().\u003c/span\u003e \u003cspan\u003eIf this random number is used where security is a concern, such as generating passwords, session keys, authentication etc, use a trusted cryptographic random number generator instead. The new secrets module introduced in Python 3.6, is used for generating such cryptographically strong random number generators.\u003c/span\u003e \u003cspan\u003eReferences:\u003ca href=\"https://cwe.mitre.org/data/definitions/331.html\"\u003eCWE\u003c/a\u003e \u003cBR\u003e\u003ca href=\"https://docs.python.org/3/library/secrets.html#module-secrets\"\u003esecrets module\u003c/a\u003e\u003cBR\u003e\u003ca href=\"https://cryptography.io/en/latest/\"\u003ecryptography.io\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/resetController.py",
+               "line": 146,
+               "function_name": "processReset"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "random.randint",
+         "issue_id": 1007,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Insufficient Entropy",
+         "cwe_id": "331",
+         "display_text": "\u003cspan\u003eStandard random number generators do not provide a sufficient amount of entropy when used for security purposes. Attackers can brute force the output of pseudorandom number generators such as rand().\u003c/span\u003e \u003cspan\u003eIf this random number is used where security is a concern, such as generating passwords, session keys, authentication etc, use a trusted cryptographic random number generator instead. The new secrets module introduced in Python 3.6, is used for generating such cryptographically strong random number generators.\u003c/span\u003e \u003cspan\u003eReferences:\u003ca href=\"https://cwe.mitre.org/data/definitions/331.html\"\u003eCWE\u003c/a\u003e \u003cBR\u003e\u003ca href=\"https://docs.python.org/3/library/secrets.html#module-secrets\"\u003esecrets module\u003c/a\u003e\u003cBR\u003e\u003ca href=\"https://cryptography.io/en/latest/\"\u003ecryptography.io\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/resetController.py",
+               "line": 150,
+               "function_name": "processReset"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "random.randint",
+         "issue_id": 1008,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Insufficient Entropy",
+         "cwe_id": "331",
+         "display_text": "\u003cspan\u003eStandard random number generators do not provide a sufficient amount of entropy when used for security purposes. Attackers can brute force the output of pseudorandom number generators such as rand().\u003c/span\u003e \u003cspan\u003eIf this random number is used where security is a concern, such as generating passwords, session keys, authentication etc, use a trusted cryptographic random number generator instead. The new secrets module introduced in Python 3.6, is used for generating such cryptographically strong random number generators.\u003c/span\u003e \u003cspan\u003eReferences:\u003ca href=\"https://cwe.mitre.org/data/definitions/331.html\"\u003eCWE\u003c/a\u003e \u003cBR\u003e\u003ca href=\"https://docs.python.org/3/library/secrets.html#module-secrets\"\u003esecrets module\u003c/a\u003e\u003cBR\u003e\u003ca href=\"https://cryptography.io/en/latest/\"\u003ecryptography.io\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/resetController.py",
+               "line": 154,
+               "function_name": "processReset"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "random.randint",
+         "issue_id": 1009,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Insufficient Entropy",
+         "cwe_id": "331",
+         "display_text": "\u003cspan\u003eStandard random number generators do not provide a sufficient amount of entropy when used for security purposes. Attackers can brute force the output of pseudorandom number generators such as rand().\u003c/span\u003e \u003cspan\u003eIf this random number is used where security is a concern, such as generating passwords, session keys, authentication etc, use a trusted cryptographic random number generator instead. The new secrets module introduced in Python 3.6, is used for generating such cryptographically strong random number generators.\u003c/span\u003e \u003cspan\u003eReferences:\u003ca href=\"https://cwe.mitre.org/data/definitions/331.html\"\u003eCWE\u003c/a\u003e \u003cBR\u003e\u003ca href=\"https://docs.python.org/3/library/secrets.html#module-secrets\"\u003esecrets module\u003c/a\u003e\u003cBR\u003e\u003ca href=\"https://cryptography.io/en/latest/\"\u003ecryptography.io\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/resetController.py",
+               "line": 158,
+               "function_name": "processReset"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "hashlib.md5",
+         "issue_id": 1010,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Use of a Broken or Risky Cryptographic Algorithm",
+         "cwe_id": "327",
+         "display_text": "\u003cspan\u003eThis function uses the hashlib.md5() function, which uses a hash algorithm that is considered weak. In recent years, researchers have demonstrated ways to breach many uses of previously-thought-safe hash functions such as MD5. \u003c/span\u003e \u003cspan\u003eConsider using a stronger algorithm in order to prevent attackers from being able to manipulate hash results. If this algorithm is being used to hash passwords, then consider using a strong computationally-hard algorithm such as PBKDF2 or bcrypt instead of a plain hashing algorithm.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/327.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 102,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "cryptography.hazmat.primitives.asymmetric.rsa.generate_private_key",
+         "issue_id": 1011,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Inadequate Encryption Strength",
+         "cwe_id": "326",
+         "display_text": "\u003cspan\u003eThe key size specified for this algorithm is not large enough to protect it from brute force attacks.\u003c/span\u003e \u003cspan\u003eFor symmetric algorithms other than DES, use a key size \u003e= 128 bits, for RSA use a key size \u003e= 2048 bits, and for 3DES use a key size of 192 bits (168 effective).\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/326.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 113,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "hashlib.md5",
+         "issue_id": 1012,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "sink",
+         "issue_type": "Use of a Broken or Risky Cryptographic Algorithm",
+         "cwe_id": "327",
+         "display_text": "\u003cspan\u003eThis function uses the hashlib.md5() function, which uses a hash algorithm that is considered weak. In recent years, researchers have demonstrated ways to breach many uses of previously-thought-safe hash functions such as MD5. \u003c/span\u003e \u003cspan\u003eConsider using a stronger algorithm in order to prevent attackers from being able to manipulate hash results. If this algorithm is being used to hash passwords, then consider using a strong computationally-hard algorithm such as PBKDF2 or bcrypt instead of a plain hashing algorithm.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/327.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 286,
+               "function_name": "processRegisterFinish"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.DEBUG",
+         "issue_id": 1013,
+         "gob": "B",
+         "severity": 2,
+         "issue_type_id": "t",
+         "issue_type": "Information Exposure Through Debug Information",
+         "cwe_id": "215",
+         "display_text": "\u003cspan\u003eEnabling django.DEBUG() property exposes debug information that may expose sensitive information which an attacker can use to fingerprint the application. This information can be used by an attacker in executing other more sophisticated attacks and can also enable the attacker to target known vulnerabilities in application components.\u003c/span\u003e\u003cspan\u003eMake sure, () property is disabled, in production configurations.\u003c/span\u003e\u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/215.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/verademo-python/settings.py",
+               "line": 27
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.ALLOWED_HOSTS",
+         "issue_id": 1014,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "t",
+         "issue_type": "Permissive List of Allowed Inputs",
+         "cwe_id": "183",
+         "display_text": "\u003cspan\u003eThe django.ALLOWED_HOSTS() property is configured with at least one value such as using wildcards(*), which might allow this application to be accessed by an untrusted domain. This could open up your application to same kinds of attacks as XSS, or arbitrary execution of untrusted javascript on your servers.\u003c/span\u003e\u003cspan\u003eMake sure, domains allowed to communicate with your applications, are carefully allowlisted and configured accordingly.\u003c/span\u003e\u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/183.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/verademo-python/settings.py",
+               "line": 30
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1015,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 120,
+               "function_name": "feed"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.http.HttpResponse",
+         "issue_id": 1016,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)",
+         "cwe_id": "80",
+         "display_text": "\u003cspan\u003eThis call to django.http.HttpResponse() contains a cross-site scripting (XSS) flaw.  The application populates the HTTP response with user-supplied input, allowing an attacker to embed malicious content, such as Javascript code, which will be executed in the context of the victim's browser.  XSS vulnerabilities are commonly exploited to steal or manipulate cookies, modify presentation of content, and compromise confidential information, with new attack vectors being discovered on a regular basis. \u003c/span\u003e \u003cspan\u003eUse contextual escaping on all untrusted data before using it to construct any portion of an HTTP response.  The escaping method should be chosen based on the specific use case of the untrusted data, otherwise it may not protect fully against the attack. For example, if the data is being written to the body of an HTML page, use HTML entity escaping; if the data is being written to an attribute, use attribute escaping; etc.  Both the OWASP Java Encoder library and the Microsoft AntiXSS library provide contextual escaping methods. For more details on contextual escaping, see https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html. In addition, as a best practice, always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/79.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/xss/\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 173,
+               "function_name": "morefeed"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1017,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 257,
+               "function_name": "blab"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1018,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 126,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1019,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 111,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.http.HttpResponse",
+         "issue_id": 1020,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)",
+         "cwe_id": "80",
+         "display_text": "\u003cspan\u003eThis call to django.http.HttpResponse() contains a cross-site scripting (XSS) flaw.  The application populates the HTTP response with user-supplied input, allowing an attacker to embed malicious content, such as Javascript code, which will be executed in the context of the victim's browser.  XSS vulnerabilities are commonly exploited to steal or manipulate cookies, modify presentation of content, and compromise confidential information, with new attack vectors being discovered on a regular basis. \u003c/span\u003e \u003cspan\u003eUse contextual escaping on all untrusted data before using it to construct any portion of an HTTP response.  The escaping method should be chosen based on the specific use case of the untrusted data, otherwise it may not protect fully against the attack. For example, if the data is being written to the body of an HTML page, use HTML entity escaping; if the data is being written to an attribute, use attribute escaping; etc.  Both the OWASP Java Encoder library and the Microsoft AntiXSS library provide contextual escaping methods. For more details on contextual escaping, see https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html. In addition, as a best practice, always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/79.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/xss/\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 174,
+               "function_name": "showPasswordHint"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1021,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 173,
+               "function_name": "showPasswordHint"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1022,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 169,
+               "function_name": "showPasswordHint"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "urllib.request.Request",
+         "issue_id": 1023,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Server-Side Request Forgery ('SSRF')",
+         "cwe_id": "918",
+         "display_text": "\u003cspan\u003eSSRF attacks works when an attacker can pass a URL to access other upstream resources. This happens when resource urls aren't validated for expected destination. Attackers can craft a vulnerable URL to access variety of sensitive information like AWS metadata, database services and other web enabled services.\u003c/span\u003e \u003cspan\u003eAs a mitigation, create a list of allowed hosts and protocols and validate every request against it. As far as possible, don't allow URLs coming directly from user to be passed on these APIs.\u003c/span\u003e\u003cspan\u003eReferences : \u003ca href=\"https://cwe.mitre.org/data/definitions/918.html\"CWE\u003e 918\u003c/a\u003e\u003cBR\u003e\u003ca href=\"https://owasp.org/www-community/attacks/Server_Side_Request_Forgery\"SSRF\u003e Attacks\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/homeController.py",
+               "line": 12,
+               "function_name": "home"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "urllib.request.urlopen",
+         "issue_id": 1024,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Server-Side Request Forgery ('SSRF')",
+         "cwe_id": "918",
+         "display_text": "\u003cspan\u003eSSRF attacks works when an attacker can pass a URL to access other upstream resources. This happens when resource urls aren't validated for expected destination. Attackers can craft a vulnerable URL to access variety of sensitive information like AWS metadata, database services and other web enabled services.\u003c/span\u003e \u003cspan\u003eAs a mitigation, create a list of allowed hosts and protocols and validate every request against it. As far as possible, don't allow URLs coming directly from user to be passed on these APIs.\u003c/span\u003e\u003cspan\u003eReferences : \u003ca href=\"https://cwe.mitre.org/data/definitions/918.html\"CWE\u003e 918\u003c/a\u003e\u003cBR\u003e\u003ca href=\"https://owasp.org/www-community/attacks/Server_Side_Request_Forgery\"SSRF\u003e Attacks\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/homeController.py",
+               "line": 13,
+               "function_name": "home"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.shortcuts.redirect",
+         "issue_id": 1025,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "URL Redirection to Untrusted Site ('Open Redirect')",
+         "cwe_id": "601",
+         "display_text": "\u003cspan\u003eThis call to django.shortcuts.redirect() contains a URL redirection to untrusted site flaw.  Writing unsanitized user-supplied input into a URL value could cause the web application to redirect the request to the specified URL, leading to phishing attempts to steal user credentials.\u003c/span\u003e \u003cspan\u003eAlways validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible. \u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/601.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 93,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1026,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 145,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.shortcuts.redirect",
+         "issue_id": 1027,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "URL Redirection to Untrusted Site ('Open Redirect')",
+         "cwe_id": "601",
+         "display_text": "\u003cspan\u003eThis call to django.shortcuts.redirect() contains a URL redirection to untrusted site flaw.  Writing unsanitized user-supplied input into a URL value could cause the web application to redirect the request to the specified URL, leading to phishing attempts to steal user credentials.\u003c/span\u003e \u003cspan\u003eAlways validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible. \u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/601.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 90,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1028,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 86,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1029,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 105,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1030,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 104,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "pickle.loads",
+         "issue_id": 1031,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Deserialization of Untrusted Data",
+         "cwe_id": "502",
+         "display_text": "\u003cspan\u003eThis call to pickle.loads() has an inherent bug where the deserialized object is not validated as serializable and can lead to code execution, if an attacker can control the input stream. \u003c/span\u003e \u003cspan\u003eIf available, use the signing/sealing features of the programming language to assure that deserialized data has not been tainted. For example, a hash-based message authentication code (HMAC) could be used to ensure that data has not been modified.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/502.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 66,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1032,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 68,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1033,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 54,
+               "function_name": "login"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.http.HttpResponse",
+         "issue_id": 1034,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)",
+         "cwe_id": "80",
+         "display_text": "\u003cspan\u003eThis call to django.http.HttpResponse() contains a cross-site scripting (XSS) flaw.  The application populates the HTTP response with user-supplied input, allowing an attacker to embed malicious content, such as Javascript code, which will be executed in the context of the victim's browser.  XSS vulnerabilities are commonly exploited to steal or manipulate cookies, modify presentation of content, and compromise confidential information, with new attack vectors being discovered on a regular basis. \u003c/span\u003e \u003cspan\u003eUse contextual escaping on all untrusted data before using it to construct any portion of an HTTP response.  The escaping method should be chosen based on the specific use case of the untrusted data, otherwise it may not protect fully against the attack. For example, if the data is being written to the body of an HTML page, use HTML entity escaping; if the data is being written to an attribute, use attribute escaping; etc.  Both the OWASP Java Encoder library and the Microsoft AntiXSS library provide contextual escaping methods. For more details on contextual escaping, see https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html. In addition, as a best practice, always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/79.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/xss/\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 176,
+               "function_name": "showPasswordHint"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1035,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 163,
+               "function_name": "showPasswordHint"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1036,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 162,
+               "function_name": "showPasswordHint"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1037,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 156,
+               "function_name": "showPasswordHint"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1038,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 110,
+               "function_name": "feed"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1039,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 43,
+               "function_name": "feed"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1040,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 75,
+               "function_name": "feed"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1041,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 51,
+               "function_name": "feed"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1042,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 162,
+               "function_name": "morefeed"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1043,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 336,
+               "function_name": "blabbers"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "eval",
+         "issue_id": 1044,
+         "gob": "B",
+         "severity": 5,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+         "cwe_id": "95",
+         "display_text": "\u003cspan\u003eThis call to eval() contains user-supplied input.  If this input could be modified by an attacker, arbitrary code could be executed. \u003c/span\u003e \u003cspan\u003eValidate all user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  In general, avoid executing code derived from untrusted input.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/95.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 348,
+               "function_name": "blabbers"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1045,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 342,
+               "function_name": "blabbers"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1046,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 341,
+               "function_name": "blabbers"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1047,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 286,
+               "function_name": "blabbers"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1048,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 300,
+               "function_name": "blabbers"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1049,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 298,
+               "function_name": "blabbers"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1050,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 564,
+               "function_name": "downloadImage"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.http.HttpResponse",
+         "issue_id": 1051,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)",
+         "cwe_id": "80",
+         "display_text": "\u003cspan\u003eThis call to django.http.HttpResponse() contains a cross-site scripting (XSS) flaw.  The application populates the HTTP response with user-supplied input, allowing an attacker to embed malicious content, such as Javascript code, which will be executed in the context of the victim's browser.  XSS vulnerabilities are commonly exploited to steal or manipulate cookies, modify presentation of content, and compromise confidential information, with new attack vectors being discovered on a regular basis. \u003c/span\u003e \u003cspan\u003eUse contextual escaping on all untrusted data before using it to construct any portion of an HTTP response.  The escaping method should be chosen based on the specific use case of the untrusted data, otherwise it may not protect fully against the attack. For example, if the data is being written to the body of an HTML page, use HTML entity escaping; if the data is being written to an attribute, use attribute escaping; etc.  Both the OWASP Java Encoder library and the Microsoft AntiXSS library provide contextual escaping methods. For more details on contextual escaping, see https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html. In addition, as a best practice, always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/79.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/xss/\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 578,
+               "function_name": "downloadImage"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1052,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 577,
+               "function_name": "downloadImage"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "open",
+         "issue_id": 1053,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "External Control of File Name or Path",
+         "cwe_id": "73",
+         "display_text": "\u003cspan\u003eThis call to open() contains a path manipulation flaw.  The argument to the function is a filename constructed using user-supplied input.  If an attacker is allowed to specify all or part of the filename, it may be possible to gain unauthorized access to files on the server, including those outside the webroot, that would be normally be inaccessible to end users.  The level of exposure depends on the effectiveness of input validation routines, if any. \u003c/span\u003e \u003cspan\u003eValidate all user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  When using blocklists, be sure that the sanitizing routine performs a sufficient number of iterations to remove all instances of disallowed characters.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/73.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Path_Traversal\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 573,
+               "function_name": "downloadImage"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "os.path.exists",
+         "issue_id": 1054,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "External Control of File Name or Path",
+         "cwe_id": "73",
+         "display_text": "\u003cspan\u003eThis call to os.path.exists() contains a path manipulation flaw.  The argument to the function is a filename constructed using user-supplied input.  If an attacker is allowed to specify all or part of the filename, it may be possible to gain unauthorized access to files on the server, including those outside the webroot, that would be normally be inaccessible to end users.  The level of exposure depends on the effectiveness of input validation routines, if any. \u003c/span\u003e \u003cspan\u003eValidate all user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  When using blocklists, be sure that the sanitizing routine performs a sufficient number of iterations to remove all instances of disallowed characters.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/73.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Path_Traversal\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 572,
+               "function_name": "downloadImage"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1055,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 569,
+               "function_name": "downloadImage"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1056,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 248,
+               "function_name": "blab"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.shortcuts.redirect",
+         "issue_id": 1057,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "URL Redirection to Untrusted Site ('Open Redirect')",
+         "cwe_id": "601",
+         "display_text": "\u003cspan\u003eThis call to django.shortcuts.redirect() contains a URL redirection to untrusted site flaw.  Writing unsanitized user-supplied input into a URL value could cause the web application to redirect the request to the specified URL, leading to phishing attempts to steal user credentials.\u003c/span\u003e \u003cspan\u003eAlways validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible. \u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/601.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 262,
+               "function_name": "blab"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1058,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 187,
+               "function_name": "blab"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1059,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 211,
+               "function_name": "blab"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1060,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/blabController.py",
+               "line": 201,
+               "function_name": "blab"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1061,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 223,
+               "function_name": "processRegister"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1062,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 296,
+               "function_name": "processRegisterFinish"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1063,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 294,
+               "function_name": "processRegisterFinish"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.shortcuts.redirect",
+         "issue_id": 1064,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "URL Redirection to Untrusted Site ('Open Redirect')",
+         "cwe_id": "601",
+         "display_text": "\u003cspan\u003eThis call to django.shortcuts.redirect() contains a URL redirection to untrusted site flaw.  Writing unsanitized user-supplied input into a URL value could cause the web application to redirect the request to the specified URL, leading to phishing attempts to steal user credentials.\u003c/span\u003e \u003cspan\u003eAlways validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible. \u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/601.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 311,
+               "function_name": "processRegisterFinish"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1065,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 397,
+               "function_name": "showProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1066,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 396,
+               "function_name": "showProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1067,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 387,
+               "function_name": "showProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1068,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 386,
+               "function_name": "showProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1069,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 368,
+               "function_name": "showProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "pickle.loads",
+         "issue_id": 1070,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Deserialization of Untrusted Data",
+         "cwe_id": "502",
+         "display_text": "\u003cspan\u003eThis call to pickle.loads() has an inherent bug where the deserialized object is not validated as serializable and can lead to code execution, if an attacker can control the input stream. \u003c/span\u003e \u003cspan\u003eIf available, use the signing/sealing features of the programming language to assure that deserialized data has not been tainted. For example, a hash-based message authentication code (HMAC) could be used to ensure that data has not been modified.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/502.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 504,
+               "function_name": "processProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1071,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 444,
+               "function_name": "processProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1072,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 457,
+               "function_name": "processProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "open",
+         "issue_id": 1073,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "External Control of File Name or Path",
+         "cwe_id": "73",
+         "display_text": "\u003cspan\u003eThis call to open() contains a path manipulation flaw.  The argument to the function is a filename constructed using user-supplied input.  If an attacker is allowed to specify all or part of the filename, it may be possible to gain unauthorized access to files on the server, including those outside the webroot, that would be normally be inaccessible to end users.  The level of exposure depends on the effectiveness of input validation routines, if any. \u003c/span\u003e \u003cspan\u003eValidate all user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  When using blocklists, be sure that the sanitizing routine performs a sufficient number of iterations to remove all instances of disallowed characters.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/73.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Path_Traversal\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 532,
+               "function_name": "processProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1074,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 530,
+               "function_name": "processProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "os.remove",
+         "issue_id": 1075,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "External Control of File Name or Path",
+         "cwe_id": "73",
+         "display_text": "\u003cspan\u003eThis call to os.remove() contains a path manipulation flaw.  The argument to the function is a filename constructed using user-supplied input.  If an attacker is allowed to specify all or part of the filename, it may be possible to gain unauthorized access to files on the server, including those outside the webroot, that would be normally be inaccessible to end users.  The level of exposure depends on the effectiveness of input validation routines, if any. \u003c/span\u003e \u003cspan\u003eValidate all user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  When using blocklists, be sure that the sanitizing routine performs a sufficient number of iterations to remove all instances of disallowed characters.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/73.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Path_Traversal\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 519,
+               "function_name": "processProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.http.JsonResponse",
+         "issue_id": 1076,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)",
+         "cwe_id": "80",
+         "display_text": "\u003cspan\u003eThis call to django.http.JsonResponse() contains a cross-site scripting (XSS) flaw.  The application populates the HTTP response with user-supplied input, allowing an attacker to embed malicious content, such as Javascript code, which will be executed in the context of the victim's browser.  XSS vulnerabilities are commonly exploited to steal or manipulate cookies, modify presentation of content, and compromise confidential information, with new attack vectors being discovered on a regular basis. \u003c/span\u003e \u003cspan\u003eUse contextual escaping on all untrusted data before using it to construct any portion of an HTTP response.  The escaping method should be chosen based on the specific use case of the untrusted data, otherwise it may not protect fully against the attack. For example, if the data is being written to the body of an HTML page, use HTML entity escaping; if the data is being written to an attribute, use attribute escaping; etc.  Both the OWASP Java Encoder library and the Microsoft AntiXSS library provide contextual escaping methods. For more details on contextual escaping, see https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html. In addition, as a best practice, always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/79.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/xss/\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 431,
+               "function_name": "processProfile"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1077,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/toolsController.py",
+               "line": 49,
+               "function_name": "ping"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "subprocess.Popen",
+         "issue_id": 1078,
+         "gob": "B",
+         "severity": 5,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+         "cwe_id": "78",
+         "display_text": "\u003cspan\u003eThis call to subprocess.Popen() contains a command injection flaw.  The argument to the function is constructed using user-supplied input.  If an attacker is allowed to specify all or part of the command, it may be possible to execute commands on the server with the privileges of the executing process.  The level of exposure depends on the effectiveness of input validation routines, if any. \u003c/span\u003e \u003cspan\u003eValidate all user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  When using blocklists, be sure that the sanitizing routine performs a sufficient number of iterations to remove all instances of disallowed characters.  Most APIs that execute system commands also have a \"safe\" version of the method that takes an array of strings as input rather than a single string, which protects against some forms of command injection.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/78.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Command_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/toolsController.py",
+               "line": 43,
+               "function_name": "ping"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1079,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/toolsController.py",
+               "line": 48,
+               "function_name": "ping"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1080,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/toolsController.py",
+               "line": 41,
+               "function_name": "ping"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "subprocess.Popen",
+         "issue_id": 1081,
+         "gob": "B",
+         "severity": 5,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+         "cwe_id": "78",
+         "display_text": "\u003cspan\u003eThis call to subprocess.Popen() contains a command injection flaw.  The argument to the function is constructed using user-supplied input.  If an attacker is allowed to specify all or part of the command, it may be possible to execute commands on the server with the privileges of the executing process.  The level of exposure depends on the effectiveness of input validation routines, if any. \u003c/span\u003e \u003cspan\u003eValidate all user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  When using blocklists, be sure that the sanitizing routine performs a sufficient number of iterations to remove all instances of disallowed characters.  Most APIs that execute system commands also have a \"safe\" version of the method that takes an array of strings as input rather than a single string, which protects against some forms of command injection.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/78.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Command_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/toolsController.py",
+               "line": 72,
+               "function_name": "fortune"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1082,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 617,
+               "function_name": "usernameExists"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1083,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 604,
+               "function_name": "usernameExists"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "os.rename",
+         "issue_id": 1084,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "External Control of File Name or Path",
+         "cwe_id": "73",
+         "display_text": "\u003cspan\u003eThis call to os.rename() contains a path manipulation flaw.  The argument to the function is a filename constructed using user-supplied input.  If an attacker is allowed to specify all or part of the filename, it may be possible to gain unauthorized access to files on the server, including those outside the webroot, that would be normally be inaccessible to end users.  The level of exposure depends on the effectiveness of input validation routines, if any. \u003c/span\u003e \u003cspan\u003eValidate all user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.  When using blocklists, be sure that the sanitizing routine performs a sufficient number of iterations to remove all instances of disallowed characters.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/73.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Path_Traversal\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 658,
+               "function_name": "updateUsername"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "logging.Logger.info",
+         "issue_id": 1085,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Output Neutralization for Logs",
+         "cwe_id": "117",
+         "display_text": "\u003cspan\u003eThis call to logging.Logger.info() could result in a log forging attack.  Writing unsanitized user-supplied data into a log file allows an attacker to forge log entries or inject malicious content into log files.  Corrupted log files can be used to cover an attacker's tracks or as a delivery mechanism for an attack on a log viewing or processing utility.  For example, if a web administrator uses a browser-based utility to review logs, a cross-site scripting attack might be possible. \u003c/span\u003e \u003cspan\u003eAvoid directly embedding user input in log files when possible.  Sanitize user-supplied data used to construct log entries by using a safe logging mechanism such as the OWASP ESAPI Logger, which will automatically remove unexpected carriage returns and line feeds and can be configured to use HTML entity encoding for non-alphanumeric data.   Only create a custom blocklist when absolutely necessary.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/117.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/Log_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 653,
+               "function_name": "updateUsername"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "django.db.connection.cursor.execute",
+         "issue_id": 1086,
+         "gob": "B",
+         "severity": 4,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "cwe_id": "89",
+         "display_text": "\u003cspan\u003eThis database query contains a SQL injection flaw.  The call to django.db.connection.cursor.execute() constructs a dynamic SQL query using a variable derived from user-supplied input.  An attacker could exploit this flaw to execute arbitrary SQL queries against the database. \u003c/span\u003e \u003cspan\u003eAvoid dynamically constructing SQL queries.  Instead, use parameterized prepared statements to prevent the database from interpreting the contents of bind variables as part of the query.  Always validate user-supplied input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/89.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/SQL_Injection\"\u003eOWASP\u003c/a\u003e\u003c/span\u003e\n",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/views/userController.py",
+               "line": 645,
+               "function_name": "updateUsername"
+            }
+         },
+         "flaw_match": {},
+         "stack_dumps": {}
+      },
+      {
+         "title": "jQueryResult.attr",
+         "issue_id": 1000,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)",
+         "cwe_id": "80",
+         "display_text": "\u003cspan\u003eThis call to jQueryResult.attr() contains a cross-site scripting (XSS) flaw.  The application populates the HTTP response with untrusted input, allowing an attacker to embed malicious content, such as Javascript code, which will be executed in the context of the victim's browser.  XSS vulnerabilities are commonly exploited to steal or manipulate cookies, modify presentation of content, and compromise confidential information, with new attack vectors being discovered on a regular basis. \u003c/span\u003e \u003cspan\u003eUse contextual escaping on all untrusted data before using it to construct any portion of an HTTP response.  The escaping method should be chosen based on the specific use case of the untrusted data, otherwise it may not protect fully against the attack. For example, if the data is being written to the body of an HTML page, use HTML entity escaping; if the data is being written to an attribute, use attribute escaping; etc.  Both the OWASP Java Encoder library and the Microsoft AntiXSS library provide contextual escaping methods. For more details on contextual escaping, see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.md. In addition, as a best practice, always validate untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/79.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/xss/\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/templates/app/profile.html",
+               "line": 219,
+               "function_name": "lambda_3",
+               "qualified_function_name": "lambda_3",
+               "function_prototype": "lambda_3(: any,  : any,  : any, ...) : any",
+               "scope": "UNKNOWN"
+            }
+         },
+         "flaw_match": {
+            "procedure_hash": "451813336",
+            "prototype_hash": "3760276193",
+            "flaw_hash": "1322529665",
+            "flaw_hash_count": 1,
+            "flaw_hash_ordinal": 1,
+            "cause_hash": "4240655191",
+            "cause_hash_count": 1,
+            "cause_hash_ordinal": 1,
+            "cause_hash2": "1585430898",
+            "cause_hash2_ordinal": "1"
+         },
+         "stack_dumps": {
+            "stack_dump": [
+               {
+                  "Frame": [
+                     {
+                        "FrameId": "0",
+                        "FunctionName": "lambda_3",
+                        "SourceFile": "verademo-python/app/templates/app/profile.html",
+                        "SourceLine": "218",
+                        "SourceFileId": "15",
+                        "StatementText": {},
+                        "VarNames": "(/**X-VC scoperef targetid=\"37809\" */!main::image_path/**X-VC /scoperef */ + /**X-VC scoperef targetid=\"38212\" */val/**X-VC /scoperef */ + \".png\")",
+                        "QualifiedFunctionName": "lambda_3",
+                        "FunctionPrototype": "lambda_3(: any,  : any,  : any, ...) : any"
+                     },
+                     {
+                        "FrameId": "1",
+                        "FunctionName": "lambda_3",
+                        "SourceFile": "verademo-python/app/templates/app/profile.html",
+                        "SourceLine": "218",
+                        "SourceFileId": "15",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC scoperef targetid=\"38212\" */val/**X-VC /scoperef */",
+                        "QualifiedFunctionName": "lambda_3",
+                        "FunctionPrototype": "lambda_3(: any,  : any,  : any, ...) : any"
+                     },
+                     {
+                        "FrameId": "2",
+                        "FunctionName": "lambda_3",
+                        "SourceFile": "verademo-python/app/templates/app/profile.html",
+                        "SourceLine": "214",
+                        "SourceFileId": "15",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC defscope id=\"38212\" */var val : any/**X-VC /defscope */",
+                        "QualifiedFunctionName": "lambda_3",
+                        "FunctionPrototype": "lambda_3(: any,  : any,  : any, ...) : any"
+                     },
+                     {
+                        "FrameId": "3",
+                        "FunctionName": "lambda_2",
+                        "SourceFile": "verademo-python/app/templates/app/profile.html",
+                        "SourceLine": "214",
+                        "SourceFileId": "15",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC scoperef targetid=\"38114\" */data/**X-VC /scoperef */./**X-VC scoperef targetid=\"38672\" */values/**X-VC /scoperef */",
+                        "QualifiedFunctionName": "lambda_2",
+                        "FunctionPrototype": "lambda_2(: any,  : any, ...) : any"
+                     },
+                     {
+                        "FrameId": "4",
+                        "FunctionName": "lambda_2",
+                        "SourceFile": "verademo-python/app/templates/app/profile.html",
+                        "SourceLine": "210",
+                        "SourceFileId": "15",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC defscope id=\"38114\" */var data : any/**X-VC /defscope */",
+                        "QualifiedFunctionName": "lambda_2",
+                        "FunctionPrototype": "lambda_2(: any,  : any, ...) : any"
+                     }
+                  ]
+               }
+            ]
+         },
+         "flaw_details_link": "https://downloads.veracode.com/securityscan/cwe/v4/java/80.html"
+      },
+      {
+         "title": "jQueryResult.append",
+         "issue_id": 1002,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)",
+         "cwe_id": "80",
+         "display_text": "\u003cspan\u003eThis call to jQueryResult.append() contains a cross-site scripting (XSS) flaw.  The application populates the HTTP response with untrusted input, allowing an attacker to embed malicious content, such as Javascript code, which will be executed in the context of the victim's browser.  XSS vulnerabilities are commonly exploited to steal or manipulate cookies, modify presentation of content, and compromise confidential information, with new attack vectors being discovered on a regular basis. \u003c/span\u003e \u003cspan\u003eUse contextual escaping on all untrusted data before using it to construct any portion of an HTTP response.  The escaping method should be chosen based on the specific use case of the untrusted data, otherwise it may not protect fully against the attack. For example, if the data is being written to the body of an HTML page, use HTML entity escaping; if the data is being written to an attribute, use attribute escaping; etc.  Both the OWASP Java Encoder library and the Microsoft AntiXSS library provide contextual escaping methods. For more details on contextual escaping, see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.md. In addition, as a best practice, always validate untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/79.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/xss/\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/templates/app/profile.html",
+               "line": 224,
+               "function_name": "lambda_2",
+               "qualified_function_name": "lambda_2",
+               "function_prototype": "lambda_2(: any,  : any, ...) : any",
+               "scope": "UNKNOWN"
+            }
+         },
+         "flaw_match": {
+            "procedure_hash": "967856201",
+            "prototype_hash": "2659999086",
+            "flaw_hash": "3103718343",
+            "flaw_hash_count": 1,
+            "flaw_hash_ordinal": 1,
+            "cause_hash": "2323626286",
+            "cause_hash_count": 1,
+            "cause_hash_ordinal": 1,
+            "cause_hash2": "438364638",
+            "cause_hash2_ordinal": "1"
+         },
+         "stack_dumps": {
+            "stack_dump": [
+               {
+                  "Frame": [
+                     {
+                        "FrameId": "0",
+                        "FunctionName": "lambda_2",
+                        "SourceFile": "verademo-python/app/templates/app/profile.html",
+                        "SourceLine": "223",
+                        "SourceFileId": "15",
+                        "StatementText": {},
+                        "QualifiedFunctionName": "lambda_2",
+                        "FunctionPrototype": "lambda_2(: any,  : any, ...) : any"
+                     },
+                     {
+                        "FrameId": "1",
+                        "FunctionName": "lambda_2",
+                        "SourceFile": "verademo-python/app/templates/app/profile.html",
+                        "SourceLine": "223",
+                        "SourceFileId": "15",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC scoperef targetid=\"38114\" */data/**X-VC /scoperef */./**X-VC scoperef targetid=\"38345\" */message/**X-VC /scoperef */",
+                        "QualifiedFunctionName": "lambda_2",
+                        "FunctionPrototype": "lambda_2(: any,  : any, ...) : any"
+                     },
+                     {
+                        "FrameId": "2",
+                        "FunctionName": "lambda_2",
+                        "SourceFile": "verademo-python/app/templates/app/profile.html",
+                        "SourceLine": "210",
+                        "SourceFileId": "15",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC defscope id=\"38114\" */var data : any/**X-VC /defscope */",
+                        "QualifiedFunctionName": "lambda_2",
+                        "FunctionPrototype": "lambda_2(: any,  : any, ...) : any"
+                     }
+                  ]
+               }
+            ]
+         },
+         "flaw_details_link": "https://downloads.veracode.com/securityscan/cwe/v4/java/80.html"
+      },
+      {
+         "title": "jQueryResult.append",
+         "issue_id": 1001,
+         "gob": "B",
+         "severity": 3,
+         "issue_type_id": "taint",
+         "issue_type": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)",
+         "cwe_id": "80",
+         "display_text": "\u003cspan\u003eThis call to jQueryResult.append() contains a cross-site scripting (XSS) flaw.  The application populates the HTTP response with untrusted input, allowing an attacker to embed malicious content, such as Javascript code, which will be executed in the context of the victim's browser.  XSS vulnerabilities are commonly exploited to steal or manipulate cookies, modify presentation of content, and compromise confidential information, with new attack vectors being discovered on a regular basis. \u003c/span\u003e \u003cspan\u003eUse contextual escaping on all untrusted data before using it to construct any portion of an HTTP response.  The escaping method should be chosen based on the specific use case of the untrusted data, otherwise it may not protect fully against the attack. For example, if the data is being written to the body of an HTML page, use HTML entity escaping; if the data is being written to an attribute, use attribute escaping; etc.  Both the OWASP Java Encoder library and the Microsoft AntiXSS library provide contextual escaping methods. For more details on contextual escaping, see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.md. In addition, as a best practice, always validate untrusted input to ensure that it conforms to the expected format, using centralized data validation routines when possible.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href=\"https://cwe.mitre.org/data/definitions/79.html\"\u003eCWE\u003c/a\u003e \u003ca href=\"https://owasp.org/www-community/attacks/xss/\"\u003eOWASP\u003c/a\u003e \u003ca href=\"https://docs.veracode.com/r/review_cleansers\"\u003eSupported Cleansers\u003c/a\u003e\u003c/span\u003e",
+         "files": {
+            "source_file": {
+               "file": "verademo-python/app/templates/app/feed.html",
+               "line": 160,
+               "function_name": "lambda_1",
+               "qualified_function_name": "lambda_1",
+               "function_prototype": "lambda_1(: any,  : any, ...) : any",
+               "scope": "UNKNOWN"
+            }
+         },
+         "flaw_match": {
+            "procedure_hash": "4141575645",
+            "prototype_hash": "1826537584",
+            "flaw_hash": "3132762339",
+            "flaw_hash_count": 1,
+            "flaw_hash_ordinal": 1,
+            "cause_hash": "1176028798",
+            "cause_hash_count": 1,
+            "cause_hash_ordinal": 1,
+            "cause_hash2": "1522093433",
+            "cause_hash2_ordinal": "3"
+         },
+         "stack_dumps": {
+            "stack_dump": [
+               {
+                  "Frame": [
+                     {
+                        "FrameId": "0",
+                        "FunctionName": "lambda_1",
+                        "SourceFile": "verademo-python/app/templates/app/feed.html",
+                        "SourceLine": "159",
+                        "SourceFileId": "13",
+                        "StatementText": {},
+                        "QualifiedFunctionName": "lambda_1",
+                        "FunctionPrototype": "lambda_1(: any,  : any, ...) : any"
+                     },
+                     {
+                        "FrameId": "1",
+                        "FunctionName": "lambda_1",
+                        "SourceFile": "verademo-python/app/templates/app/feed.html",
+                        "SourceLine": "159",
+                        "SourceFileId": "13",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC scoperef targetid=\"33905\" */data/**X-VC /scoperef */",
+                        "QualifiedFunctionName": "lambda_1",
+                        "FunctionPrototype": "lambda_1(: any,  : any, ...) : any"
+                     },
+                     {
+                        "FrameId": "2",
+                        "FunctionName": "lambda_1",
+                        "SourceFile": "verademo-python/app/templates/app/feed.html",
+                        "SourceLine": "157",
+                        "SourceFileId": "13",
+                        "StatementText": {},
+                        "VarNames": "/**X-VC defscope id=\"33905\" */var data : any/**X-VC /defscope */",
+                        "QualifiedFunctionName": "lambda_1",
+                        "FunctionPrototype": "lambda_1(: any,  : any, ...) : any"
+                     }
+                  ]
+               }
+            ]
+         },
+         "flaw_details_link": "https://downloads.veracode.com/securityscan/cwe/v4/java/80.html"
+      }
+   ],
+   "selected_modules": []
+}
