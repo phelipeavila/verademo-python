@@ -147,8 +147,10 @@ jobs:
           
           
   Veracode-Policy-Scan:
+# esse job possui diversas formas de executar o upload and scan, com o Java Wrapper ou Action.
+# escolha a que melhor se ajustar ao ambiente
     if: github.ref == 'refs/heads/policy-scan'
-    name: Veracode SAST Policy
+    name: Veracode Policy Scan
     runs-on: ubuntu-latest
     needs: [Package]
 
@@ -159,17 +161,29 @@ jobs:
           name: artfacts
           path: ./${{env.package_path}}
 
-      - name: Scan
+      - name: Upload and Scan
         env:
           APPLICATION_NAME: Verademo-python-1
         run: |
           curl -L -o veracode-wrapper.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/24.7.14.0/vosp-api-wrappers-java-24.7.14.0.jar
           java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "./${{env.package_path}}/${{env.package_name}}"
-        continue-on-error: true
+
+      - name: Upload and Scan - Action
+        uses: veracode/veracode-uploadandscan-action@0.2.7
+        with:
+          appname: "Verademo-python-1"
+          filepath: "./${{env.package_path}}/${{env.package_name}}"
+          vid: "${{ secrets.VID }}"
+          vkey: "${{ secrets.VKEY }}"
+          deleteincompletescan: 2
+
+    
 
   Veracode-Sandbox-Scan:
+# esse job possui diversas formas de executar o upload and scan, com o Java Wrapper ou Action.
+# escolha a que melhor se ajustar ao ambiente
     if: github.ref == 'refs/heads/sandbox-scan'
-    name: Veracode SAST Sandbox
+    name: Veracode Sandbox Scan
     runs-on: ubuntu-latest
     needs: [Package]
     strategy:
@@ -178,14 +192,22 @@ jobs:
       APPLICATION_NAME: Verademo-python-1
 
     steps:
-      - name: Download
+      - name: Download artfacts
         uses: actions/download-artifact@v4
         with:
           name: artfacts
           path: ./${{env.package_path}}
 
-      - name: Scan
+      - name: Upload and Scan
         run: |
           curl -L -o veracode-wrapper.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/24.7.14.0/vosp-api-wrappers-java-24.7.14.0.jar
           java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "./${{env.package_path}}/${{env.package_name}}" -createsandbox true -sandboxname "${{ github.ref }}" 
-        continue-on-error: true
+
+      - name: Upload and Scan - Action
+        uses: veracode/veracode-uploadandscan-action@0.2.7
+        with:
+          appname: "Verademo-python-1"
+          filepath: "./${{env.package_path}}/${{env.package_name}}"
+          vid: "${{ secrets.VID }}"
+          vkey: "${{ secrets.VKEY }}"
+          deleteincompletescan: 2
