@@ -77,7 +77,7 @@ jobs:
           SRCCLR_SCM_REF_TYPE: 'branch'
           SRCCLR_SCM_REF: ${{ github.ref }}
           SRCCLR_SCM_REV: ${{ github.run_id }}
-          EXTRA_ARGS: '--update-advisor --uri-as-name' 
+          EXTRA_ARGS: '--recursive --update-advisor --uri-as-name' 
         run: |
           curl -sSL https://download.sourceclear.com/ci.sh | bash -s -- scan $EXTRA_ARGS
         continue-on-error: true
@@ -87,13 +87,12 @@ jobs:
           SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
         uses: veracode/veracode-sca@v2.1.10
         with:
-          #path: "./"
+          path: "./"
           recursive: true
           quick: false
           create-issues: false
           allow-dirty: true
           update_advisor: true
-          debug: true
         continue-on-error: true
 
 
