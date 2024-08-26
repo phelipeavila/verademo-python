@@ -107,7 +107,7 @@ jobs:
           VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
           POLICY_NAME: Veracode Recommended Medium
         run: |
-          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh | true
           ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --verbose
         continue-on-error: true
 
@@ -117,7 +117,7 @@ jobs:
           VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
           POLICY_NAME: Veracode Recommended Medium
         run: |
-          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh | true
           ./veracode policy get "${{env.POLICY_NAME}}" --format json
           ls -lah
           ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
@@ -129,7 +129,7 @@ jobs:
           VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
           POLICY_NAME: Policy-test-2
         run: |
-          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh | true
           ./veracode policy get "${{env.POLICY_NAME}}" --format json
           ls -lah
           ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
