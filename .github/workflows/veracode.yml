@@ -157,7 +157,7 @@ jobs:
           # DPERECATED, WILL BE REMOVED WITH NEXT VERSION - Name of the Veracode default policy rule to apply to the scan results. You can only use this parameter with a Veracode default policy.
           # policy_name: # optional
           # Name of the local policy file you want to apply to the scan results.
-          policy_file: "Veracode Recommended Medium.json"
+          # policy_file: "Veracode Recommended Medium.json"
           # Amount of time, in minutes, for the Pipeline Scan to wait before reporting an unsuccessful scan if the scan does not complete. Default is 60 minutes, which is also the maximum value.
           timeout: # optional
           # Enter true to show detailed messages for each issue in the results summary.
