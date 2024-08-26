@@ -133,24 +133,15 @@ jobs:
       #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
       #   continue-on-error: true
 
-      - name: Veracode Pipeline-Scan
+      - name: Pipeline Scan with Action by Veracode
+      # https://github.com/marketplace/actions/veracode-pipeline-scan
         uses: veracode/Veracode-pipeline-scan-action@v1.0.15
         with:
           vid: "${{ secrets.VID }}"
           vkey: "${{ secrets.VKEY }}"
           file: "./${{env.package_path}}/${{env.package_name}}"
-          # GITHUB_TOKEN or a repo scoped PAT.
-          token: # default is ${{ github.token }}
           # Name of the Veracode default policy or custom-built policy to apply to the scan results.
           veracode_policy_name: "Veracode Recommended Medium"
-          fail_on_severity: # optional
-          fail_on_cwe: # optional
-          baseline_file: # optional
-          timeout: # optional
-          # Enter the [application profile](https://docs.veracode.com/r/request_profile) ID for the application you want to upload and scan.
-          app_id: Verademo-python-1
-          # Enter one these values, which are case-sensitive, for the type of development stage: Development, Testing, Release.
-
           fail_build: false
           issue_details: true
           
