@@ -91,24 +91,68 @@ jobs:
           name: artfacts
           path: ./${{env.package_path}}
 
-      - name: Scan with default policy
+      - name: Scan with CLI - default
         env:
+          VERACODE_API_KEY_ID: ${{ secrets.VID }}
+          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
           POLICY_NAME: Veracode Recommended Medium
         run: |
-          curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
-          unzip -u pipeline-scan-LATEST.zip
-          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" -pn "${{ env.POLICY_NAME }}" --issue_details true --json_output true
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}"
         continue-on-error: true
 
-      - name: Scan with custom policy
+      - name: Scan with CLI - default verbose
         env:
+          VERACODE_API_KEY_ID: ${{ secrets.VID }}
+          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
+          POLICY_NAME: Veracode Recommended Medium
+        run: |
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --verbose
+        continue-on-error: true
+
+      - name: Scan with CLI - custom policy
+        env:
+          VERACODE_API_KEY_ID: ${{ secrets.VID }}
+          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
+          POLICY_NAME: Veracode Recommended Medium
+        run: |
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          ./veracode policy get "${{env.POLICY_NAME}}" --format json
+          ls -lah
+          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
+        continue-on-error: true
+
+      - name: Scan with CLI - custom policy 2
+        env:
+          VERACODE_API_KEY_ID: ${{ secrets.VID }}
+          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
           POLICY_NAME: Policy-test-2
         run: |
-          curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
-          unzip -u pipeline-scan-LATEST.zip
-          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -rp "${{ env.POLICY_NAME }}"
-          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          ./veracode policy get "${{env.POLICY_NAME}}" --format json
+          ls -lah
+          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
         continue-on-error: true
+
+      # - name: Scan with default policy
+      #   env:
+      #     POLICY_NAME: Veracode Recommended Medium
+      #   run: |
+      #     curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+      #     unzip -u pipeline-scan-LATEST.zip
+      #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" -pn "${{ env.POLICY_NAME }}" --issue_details true --json_output true
+      #   continue-on-error: true
+
+      # - name: Scan with custom policy
+      #   env:
+      #     POLICY_NAME: Policy-test-2
+      #   run: |
+      #     curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+      #     unzip -u pipeline-scan-LATEST.zip
+      #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -rp "${{ env.POLICY_NAME }}"
+      #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
+      #   continue-on-error: true
 
   Veracode-Policy-Scan:
     if: github.ref == 'refs/heads/policy-scan'
