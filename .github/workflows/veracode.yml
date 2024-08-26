@@ -87,7 +87,7 @@ jobs:
           SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
         uses: veracode/veracode-sca@v2.1.10
         with:
-          path: "."
+          #path: "./"
           quick: false
           create-issues: false
           allow-dirty: true
