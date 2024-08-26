@@ -79,7 +79,7 @@ jobs:
   #       continue-on-error: true
 
   Veracode-SAST-Pipeline:
-# esse job possui diversas formas de executar o pipeline scan, com o veracode CLI ou Wrapper.
+# esse job possui diversas formas de executar o pipeline scan, com o veracode CLI, Wrapper ou Action.
 # escolha a que melhor se ajustar ao ambiente
     if: github.ref == 'refs/heads/pipeline-scan'
     name: Veracode SAST Pipeline
@@ -93,45 +93,45 @@ jobs:
           name: artfacts
           path: ./${{env.package_path}}
 
-      # - name: Pipeline Scan with CLI - default
-      #   env:
-      #     VERACODE_API_KEY_ID: ${{ secrets.VID }}
-      #     VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
-      #   run: |
-      #     curl -fsS https://tools.veracode.com/veracode-cli/install | sh
-      #     ./veracode static scan "./${{env.package_path}}/${{env.package_name}}"
-      #   continue-on-error: true
+      - name: Pipeline Scan with CLI - default
+        env:
+          VERACODE_API_KEY_ID: ${{ secrets.VID }}
+          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
+        run: |
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}"
+        continue-on-error: true
 
-      # - name: Pipeline Scan with CLI - custom policy
-      #   env:
-      #     VERACODE_API_KEY_ID: ${{ secrets.VID }}
-      #     VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
-      #     POLICY_NAME: Veracode Recommended Medium
-      #     #POLICY_NAME: Policy-test-2
-      #   run: |
-      #     #curl -fsS https://tools.veracode.com/veracode-cli/install | sh
-      #     ./veracode policy get "${{env.POLICY_NAME}}" --format json
-      #     ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
-      #   continue-on-error: true
+      - name: Pipeline Scan with CLI - custom policy
+        env:
+          VERACODE_API_KEY_ID: ${{ secrets.VID }}
+          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
+          POLICY_NAME: Veracode Recommended Medium
+          #POLICY_NAME: Policy-test-2
+        run: |
+          #curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          ./veracode policy get "${{env.POLICY_NAME}}" --format json
+          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
+        continue-on-error: true
 
-      # - name: Pipeline Scan with wrapper - default policy
-      #   env:
-      #     POLICY_NAME: Veracode Recommended Medium
-      #   run: |
-      #     curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
-      #     unzip -u pipeline-scan-LATEST.zip
-      #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" -pn "${{ env.POLICY_NAME }}" --issue_details true --json_output true
-      #   continue-on-error: true
+      - name: Pipeline Scan with wrapper - default policy
+        env:
+          POLICY_NAME: Veracode Recommended Medium
+        run: |
+          curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+          unzip -u pipeline-scan-LATEST.zip
+          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" -pn "${{ env.POLICY_NAME }}" --issue_details true --json_output true
+        continue-on-error: true
 
-      # - name: Pipeline Scan with wrapper - custom policy
-      #   env:
-      #     POLICY_NAME: Policy-test-2
-      #   run: |
-      #     curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
-      #     unzip -u pipeline-scan-LATEST.zip
-      #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -rp "${{ env.POLICY_NAME }}"
-      #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
-      #   continue-on-error: true
+      - name: Pipeline Scan with wrapper - custom policy
+        env:
+          POLICY_NAME: Policy-test-2
+        run: |
+          curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+          unzip -u pipeline-scan-LATEST.zip
+          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -rp "${{ env.POLICY_NAME }}"
+          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
+        continue-on-error: true
 
       - name: Pipeline Scan with Action by Veracode
       # https://github.com/marketplace/actions/veracode-pipeline-scan
