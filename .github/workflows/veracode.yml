@@ -67,6 +67,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install dependencies
+      # modifique esse step para instalar as dependências da aplicação antes do SCA
         run: |
           pip list
           pip install pipenv
@@ -100,7 +101,6 @@ jobs:
 # esse job possui diversas formas de executar o pipeline scan, com o veracode CLI, Wrapper ou Action.
 # escolha a que melhor se ajustar ao ambiente
     # if: github.ref == 'refs/heads/pipeline-scan'
-    if: false
     name: Veracode SAST Pipeline
     runs-on: ubuntu-latest
     needs: [Package]
