@@ -1,3 +1,10 @@
+##Antes de iniciar, crie os seguintes secrets para o repositório:
+## "VID" com o conteúdo da VERACODE API KEY ID
+## "VKEY" com o conteúdo da VERACODE API KEY SECRET
+## "SRCCLR" com o conteúdo da chave do AGENT SCAN
+## Essas chaves devem ser geradas no portal da Veracode
+
+
 name: Veracode Demo
 on:
   push:
@@ -5,14 +12,27 @@ on:
       - pipeline-scan
       - policy-scan
       - sandbox-scan
+##Nome das branches opcional, caso queira criar múltiplas branches e executar
+#cada scan em uma branch específica. Em cada stage também há um if: para
+#validar se a stage deve ser executada naquela branch.
 
 env:
   package_path: 'verascan'
   package_name: 'veracode-auto-pack-verademo-python-python.zip'
-# https://docs.veracode.com/r/About_auto_packaging#packaged-artifacts
+## O nome da variável package_path pode ser modificado. Será criado um diretório
+# com esse nome e o conteudo do package será salvo nele.
+## O nome da variável package_name irá depender da linguagem/nome do projeto.
+# Valide no link abaixo os padrões do Veracode Package ou execute
+# uma vez e veja nos logs o nome do arquivo gerado.
+## https://docs.veracode.com/r/About_auto_packaging#packaged-artifacts
+
+## Também é possível utilizar o comando 'mv' (comentado abaixo) para renomear
+# o package gerado para um nome genérico e utilizá-lo nas tasks seguintes, porém
+# caso o comando package identifique mais de uma linguagem no repositório, ele irá
+# gerar mais de um .zip e o comando 'mv' deve ser ajustado
 
 jobs:
-  Build:
+  Package:
     name: Veracode Package
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +49,6 @@ jobs:
           ./veracode package --source . --output ${{env.package_path}} --trust
           
           # mv ${{env.package_path}}/${{env.package_name}} ${{env.package_path}}/package
-          # https://docs.veracode.com/r/About_auto_packaging#packaged-artifacts
       - name: Upload artfacts
         uses: actions/upload-artifact@v4
         with:
@@ -63,14 +82,14 @@ jobs:
     if: github.ref == 'refs/heads/pipeline-scan'
     name: Veracode SAST Pipeline
     runs-on: ubuntu-latest
-    needs: [Build]
+    needs: [Package]
 
     steps:
       - name: Download artfacts
         uses: actions/download-artifact@v4
         with:
           name: artfacts
-          path: .
+          path: ./${{env.package_path}}
 
       - name: Scan with default policy
         env:
@@ -78,7 +97,7 @@ jobs:
         run: |
           curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
           unzip -u pipeline-scan-LATEST.zip
-          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "${{env.package_name}}" -pn "${{ env.POLICY_NAME }}" --issue_details true --json_output true
+          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" -pn "${{ env.POLICY_NAME }}" --issue_details true --json_output true
         continue-on-error: true
 
       - name: Scan with custom policy
@@ -88,35 +107,35 @@ jobs:
           curl -O -L https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
           unzip -u pipeline-scan-LATEST.zip
           java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -rp "${{ env.POLICY_NAME }}"
-          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
+          java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
         continue-on-error: true
 
   Veracode-Policy-Scan:
     if: github.ref == 'refs/heads/policy-scan'
     name: Veracode SAST Policy
     runs-on: ubuntu-latest
-    needs: [Build]
+    needs: [Package]
 
     steps:
       - name: Download artfacts
         uses: actions/download-artifact@v4
         with:
           name: artfacts
-          path: .
+          path: ./${{env.package_path}}
 
       - name: Scan
         env:
           APPLICATION_NAME: Verademo-python-1
         run: |
           curl -L -o veracode-wrapper.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/24.7.14.0/vosp-api-wrappers-java-24.7.14.0.jar
-          java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "${{env.package_name}}"
+          java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "./${{env.package_path}}/${{env.package_name}}"
         continue-on-error: true
 
   Veracode-Sandbox-Scan:
     if: github.ref == 'refs/heads/sandbox-scan'
     name: Veracode SAST Sandbox
     runs-on: ubuntu-latest
-    needs: [Build]
+    needs: [Package]
     strategy:
       fail-fast: true
     env:
@@ -127,10 +146,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: artfacts
-          path: .
+          path: ./${{env.package_path}}
 
       - name: Scan
         run: |
           curl -L -o veracode-wrapper.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/24.7.14.0/vosp-api-wrappers-java-24.7.14.0.jar
-          java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "${{env.package_name}}" -createsandbox true -sandboxname "${{ github.ref }}" 
+          java -jar veracode-wrapper.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -action UploadAndScan -deleteincompletescan 2 -createprofile true -appname "${{ env.APPLICATION_NAME }}" -version "${{ github.run_id }}" -filepath "./${{env.package_path}}/${{env.package_name}}" -createsandbox true -sandboxname "${{ github.ref }}" 
         continue-on-error: true
