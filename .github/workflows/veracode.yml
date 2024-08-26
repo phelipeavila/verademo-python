@@ -55,30 +55,32 @@ jobs:
           name: artfacts
           path: ${{env.package_path}}/${{env.package_name}}
 
-  Veracode-SCA:
-    if: github.ref == 'refs/heads/pipeline-scan'
-    name: Veracode SCA Pipeline
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-    steps:
-      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - name: Archive Release
-        env:
-          SCAN_DIR: '.'
-          SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
-          SRCCLR_SCM_REF_TYPE: 'branch'
-          SRCCLR_SCM_REF: ${{ github.ref }}
-          SRCCLR_SCM_REV: ${{ github.run_id }}
-          EXTRA_ARGS: '--update-advisor --uri-as-name' 
-        run: |
-          curl -sSL https://download.sourceclear.com/ci.sh | bash -s -- scan $EXTRA_ARGS
-        continue-on-error: true
+  # Veracode-SCA:
+  #   if: github.ref == 'refs/heads/pipeline-scan'
+  #   name: Veracode SCA Pipeline
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true
+  #   steps:
+  #     - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
+  #       uses: actions/checkout@v4
+  #       with:
+  #         persist-credentials: false
+  #     - name: Archive Release
+  #       env:
+  #         SCAN_DIR: '.'
+  #         SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
+  #         SRCCLR_SCM_REF_TYPE: 'branch'
+  #         SRCCLR_SCM_REF: ${{ github.ref }}
+  #         SRCCLR_SCM_REV: ${{ github.run_id }}
+  #         EXTRA_ARGS: '--update-advisor --uri-as-name' 
+  #       run: |
+  #         curl -sSL https://download.sourceclear.com/ci.sh | bash -s -- scan $EXTRA_ARGS
+  #       continue-on-error: true
 
   Veracode-SAST-Pipeline:
+# esse job possui diversas formas de executar o pipeline scan, com o veracode CLI ou Wrapper.
+# escolha a que melhor se ajustar ao ambiente
     if: github.ref == 'refs/heads/pipeline-scan'
     name: Veracode SAST Pipeline
     runs-on: ubuntu-latest
@@ -91,51 +93,28 @@ jobs:
           name: artfacts
           path: ./${{env.package_path}}
 
-      - name: Scan with CLI - default
-        env:
-          VERACODE_API_KEY_ID: ${{ secrets.VID }}
-          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
-          POLICY_NAME: Veracode Recommended Medium
-        run: |
-          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
-          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}"
-        continue-on-error: true
+      # - name: Pipeline Scan with CLI - default
+      #   env:
+      #     VERACODE_API_KEY_ID: ${{ secrets.VID }}
+      #     VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
+      #   run: |
+      #     curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+      #     ./veracode static scan "./${{env.package_path}}/${{env.package_name}}"
+      #   continue-on-error: true
 
-      - name: Scan with CLI - default verbose
-        env:
-          VERACODE_API_KEY_ID: ${{ secrets.VID }}
-          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
-          POLICY_NAME: Veracode Recommended Medium
-        run: |
-          curl -fsS https://tools.veracode.com/veracode-cli/install | sh | true
-          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --verbose
-        continue-on-error: true
+      # - name: Pipeline Scan with CLI - custom policy
+      #   env:
+      #     VERACODE_API_KEY_ID: ${{ secrets.VID }}
+      #     VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
+      #     POLICY_NAME: Veracode Recommended Medium
+      #     #POLICY_NAME: Policy-test-2
+      #   run: |
+      #     #curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+      #     ./veracode policy get "${{env.POLICY_NAME}}" --format json
+      #     ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
+      #   continue-on-error: true
 
-      - name: Scan with CLI - custom policy
-        env:
-          VERACODE_API_KEY_ID: ${{ secrets.VID }}
-          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
-          POLICY_NAME: Veracode Recommended Medium
-        run: |
-          curl -fsS https://tools.veracode.com/veracode-cli/install | sh | true
-          ./veracode policy get "${{env.POLICY_NAME}}" --format json
-          ls -lah
-          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
-        continue-on-error: true
-
-      - name: Scan with CLI - custom policy 2
-        env:
-          VERACODE_API_KEY_ID: ${{ secrets.VID }}
-          VERACODE_API_KEY_SECRET: ${{ secrets.VKEY }}
-          POLICY_NAME: Policy-test-2
-        run: |
-          curl -fsS https://tools.veracode.com/veracode-cli/install | sh | true
-          ./veracode policy get "${{env.POLICY_NAME}}" --format json
-          ls -lah
-          ./veracode static scan "./${{env.package_path}}/${{env.package_name}}" --policy-file "${{env.POLICY_NAME}}.json"
-        continue-on-error: true
-
-      # - name: Scan with default policy
+      # - name: Pipeline Scan with wrapper - default policy
       #   env:
       #     POLICY_NAME: Veracode Recommended Medium
       #   run: |
@@ -144,7 +123,7 @@ jobs:
       #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" -pn "${{ env.POLICY_NAME }}" --issue_details true --json_output true
       #   continue-on-error: true
 
-      # - name: Scan with custom policy
+      # - name: Pipeline Scan with wrapper - custom policy
       #   env:
       #     POLICY_NAME: Policy-test-2
       #   run: |
@@ -153,6 +132,77 @@ jobs:
       #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" -rp "${{ env.POLICY_NAME }}"
       #     java -jar pipeline-scan.jar -vid "${{ secrets.VID }}" -vkey "${{ secrets.VKEY }}" --file "./${{env.package_path}}/${{env.package_name}}" --policy_file "${{ env.POLICY_NAME }}.json" --json_output true
       #   continue-on-error: true
+
+      - name: Veracode Pipeline-Scan
+        # You may pin to the exact commit or the version.
+        # uses: veracode/Veracode-pipeline-scan-action@e4326eb9e6735637c250e725c67d1b5f56d1a97c
+        uses: veracode/Veracode-pipeline-scan-action@v1.0.15
+        with:
+          vid: "${{ secrets.VID }}"
+          vkey: "${{ secrets.VKEY }}"
+          # Filename of the packaged application to upload and scan.
+          file: "./${{env.package_path}}/${{env.package_name}}"
+          # GITHUB_TOKEN or a repo scoped PAT.
+          token: # default is ${{ github.token }}
+          # Name of the Veracode default policy or custom-built policy to apply to the scan results.
+          veracode_policy_name: "Veracode Recommended Medium"
+          # DPERECATED, WILL BE REMOVED WITH NEXT VERSION - Name of the security policy to download as a file. Required only if you want to download the configuration for a custom policy defined by your organization. After downloading the policy, you can provide this file in a subsequent command using the policy_file parameter.
+          request_policy: # optional
+          # Fail the pipeline job if the scan finds flaws of the specified severities. Enter a comma-separated list of severities in quotation marks.
+          fail_on_severity: # optional
+          # Fail the pipeline job if the scan finds flaws of the specified CWEs. Enter a comma-separated list of CWE IDs.
+          fail_on_cwe: # optional
+          # Filter the flaws that exist in the specified baseline file and show only the additional flaws in the current scan.
+          baseline_file: # optional
+          # DPERECATED, WILL BE REMOVED WITH NEXT VERSION - Name of the Veracode default policy rule to apply to the scan results. You can only use this parameter with a Veracode default policy.
+          policy_name: # optional
+          # Name of the local policy file you want to apply to the scan results.
+          policy_file: "Veracode Recommended Medium.json"
+          # Amount of time, in minutes, for the Pipeline Scan to wait before reporting an unsuccessful scan if the scan does not complete. Default is 60 minutes, which is also the maximum value.
+          timeout: # optional
+          # Enter true to show detailed messages for each issue in the results summary.
+          issue_details: true
+          # Enter true to show a human-readable results summary on the console. Default is true.
+          summary_display: # optional
+          # Enter true to show the JSON containing the scan results on the console. Default is false.
+          json_display: # optional
+          # Enter true to display detailed messages in the scan results. Default is false.
+          verbose: # optional
+          # Enter true to save the scan results as a human-readable file. Default is false.
+          summary_output: # optional
+          # Enter the filename of the scan results summary file. The file is stored in the current directory. Default is results.txt.
+          summary_output_file: # optional
+          # Enter true to save the scan results in JSON format. Default is true.
+          json_output: # optional
+          # Rename the JSON file that contains the scan results. The file is stored in the current directory. Default filename is results.json.
+          json_output_file: # optional
+          # Enter the filename in the current directory to save results that violate pass-fail criteria. Default is filtered_results.json.
+          filtered_json_output_file: # optional
+          # Enter the name of the CI/CD code repository that runs a Pipeline Scan. This parameter adds the repository name to the scan results, which can help you track scans across repositories.
+          project_name: # optional
+          # Enter the source control URL for the CI/CD code repository that runs a Pipeline Scan.
+          project_url: # optional
+          # Enter the source control reference, revision, or branch for the CI/CD code repository that runs a Pipeline Scan.
+          project_ref: # optional
+          # Enter the [application profile](https://docs.veracode.com/r/request_profile) ID for the application you want to upload and scan.
+          app_id: # optional
+          # Enter one these values, which are case-sensitive, for the type of development stage: Development, Testing, Release.
+          development_stage: # optional
+          # Enable debug mode. 1 for on
+          debug: # optional
+          # Enable the storage of a baseline file. Takes true or false
+          store_baseline_file: # optional
+          # Enter the branch name where the baseline file should be stored
+          store_baseline_file_branch: # optional
+          # From which results should the baseline file be created. standard = full results || filtered = filtered results
+          create_baseline_from: # optional
+          # Fail the build upon findings. Takes true or false
+          fail_build: # optional
+          # Enter a case-sensitive, comma-separated list of name patterns that represent the names of the modules to scan as top-level modules. Veracode identifies these modules during prescan. The * wildcard matches zero or more characters. The ? wildcard matches exactly one character. For example, to include various module names that contain module: --include "module 1, module-*, module2.jar". The scan results show the names of the modules that Veracode identified and the modules included in the scan. This parameter does not pause, stop, or impact the performance of your pipeline.
+          include: # optional
+          # Enable it, if artifact version 2 requires usage
+          use_upgraded_version: # optional
+
 
   Veracode-Policy-Scan:
     if: github.ref == 'refs/heads/policy-scan'
